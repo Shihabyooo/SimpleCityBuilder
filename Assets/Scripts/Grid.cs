@@ -8,11 +8,12 @@ public class Grid : MonoBehaviour
 {
     static public Grid grid = null;
 
-    Vector2Int boundary;
+    Vector2Int boundary; //TODO consider removing this. So far, this is only usefull in editor visualization. 
     public Vector2Int noOfCells;
     const int cellSize = 1;
     BoxCollider gridCollider;
     float colliderPadding = 10.0f;
+    int[,] gridStatus; //0 = empty, 1 = occupied by building TODO add more status codes.
 
     void Awake()
     {
@@ -27,21 +28,31 @@ public class Grid : MonoBehaviour
 
         gridCollider = this.gameObject.GetComponent<BoxCollider>();
         UpdateGridBoundary();
+
+        //initialize gridStatus;
+        gridStatus = new int[noOfCells.x, noOfCells.y];//[noOfCells.y];
+        for (int i = 0; i < noOfCells.x; i++)
+            for (int j = 0; j < noOfCells.y; j++)
+                gridStatus[i, j] = 0;
     }
 
     void UpdateGridBoundary()
     {
+        //Update numerical boundary itself
         boundary.x = noOfCells.x * cellSize;
         boundary.y = noOfCells.y * cellSize;
-        gridCollider.center = this.transform.position;
+
+        //update collider boundary
+        Vector3 _centre = this.transform.position;
+        _centre.y = -0.5f; //half the thickness, so the collider is spawned with its surface (which the raycast will hit matches the sufrace of the grid).
+        gridCollider.center = _centre;
         gridCollider.size = new Vector3(boundary.x + colliderPadding, 1.0f, boundary.y + colliderPadding);
     }
 
-    public Cell SampleForCell(Vector3 _position)
+    public Cell SampleForCell(Vector3 position)
     {
         Cell cell = new Cell();
         
-        Vector3 position = _position;
         Vector3 offset = position - this.transform.position;
 
         if (Mathf.Abs(offset.x) > (float)(noOfCells.x * cellSize) / 2.0f || Mathf.Abs(offset.z) > (float)(noOfCells.y * cellSize) / 2.0f)
@@ -50,18 +61,52 @@ public class Grid : MonoBehaviour
             return null;
         }
 
-        Vector2Int distInCells = new Vector2Int(Mathf.FloorToInt(offset.x / (float)cellSize - (noOfCells.x%2 * (float)cellSize / 2.0f)), Mathf.FloorToInt(offset.z / (float)cellSize - (noOfCells.y%2 * (float)cellSize / 2.0f)));
+        float[] rawDistInCells = {  ((offset.x + (Mathf.Sign(offset.x) * noOfCells.x%2 * (float)cellSize / 2.0f)) / (float)cellSize),
+                                    ((offset.z + (Mathf.Sign(offset.z) * noOfCells.y%2 * (float)cellSize / 2.0f)) / (float)cellSize)};
+
+        int[] rawDistSigns = {(int)Mathf.Sign(rawDistInCells[0]), (int)Mathf.Sign(rawDistInCells[1])};
+
+        Vector2Int distInCells = new Vector2Int(Mathf.FloorToInt(Mathf.Abs(rawDistInCells[0])) * rawDistSigns[0],
+                                                Mathf.FloorToInt(Mathf.Abs(rawDistInCells[1])) * rawDistSigns[1]);
         
-        Vector3 cellCentre = this.transform.position; //to save copying the y value manually.
+        //Compute position of cell's centre.
+        //TODO simplify the eqns bellow.
+        cell.cellCentre.x = (float)(distInCells.x * cellSize);
+        cell.cellCentre.x += (1 - noOfCells.x%2) * (float)cellSize / 2.0f * rawDistSigns[0]; //special consideration for even numbered cell x count.
 
-        cellCentre.x = (float)(distInCells.x * cellSize) + (float)cellSize / 2.0f;
-        cellCentre.x += noOfCells.x%2 * (float)cellSize / 2.0f;
+        cell.cellCentre.z = (float)(distInCells.y * cellSize);
+        cell.cellCentre.z += (1 - noOfCells.y%2) * (float)cellSize / 2.0f * rawDistSigns[1]; //special consideration for even numbered cell y count.
 
-        cellCentre.z = (float)(distInCells.y * cellSize) + (float)cellSize / 2.0f;
-        cellCentre.z += noOfCells.y%2 * (float)cellSize / 2.0f;
+        cell.cellCentre.y = this.transform.position.y;
 
-        lastCellCentre = cellCentre; //test
+        //Compute cellID
+        cell.cellID[0] = Mathf.FloorToInt((float)noOfCells.x / 2.0f) + distInCells.x;
+        cell.cellID[0] += (1 - noOfCells.x%2) * (((1 + rawDistSigns[0]) / 2) - 1); //special consideration for even numbered cell x count.
+
+        cell.cellID[1] = Mathf.FloorToInt((float)noOfCells.y / 2.0f) + distInCells.y;
+        cell.cellID[1] += (1 - noOfCells.y%2) * (((1 + rawDistSigns[1]) / 2) - 1); //special consideration for even numbered cell y count.
+
+        SetCellState(ref cell);
+
+        lastCellCentre = cell.cellCentre; //test
+        print ("dist in cells: " + distInCells + ", or: " + (rawDistInCells[0] * rawDistSigns[0]) + ", " + (rawDistInCells[1] * rawDistSigns[1]) ); //test
+        print ("cellID: " + cell.cellID[0] + ", " +cell.cellID[1]); //test
         return cell;
+    }
+
+    void SetCellState(ref Cell cell)
+    {   
+        switch(gridStatus[cell.cellID[0], cell.cellID[1]])
+        {
+            case (0):
+            cell.isOccupied = false;
+                break;
+            case (1):
+            cell.isOccupied = true;
+                break;
+            default:
+                break;
+        }
     }
 
 
@@ -105,6 +150,7 @@ public class Grid : MonoBehaviour
 
 public class Cell
 {
-    Vector3 cellCentre;
-    bool isOccupied = false;
+    public Vector3 cellCentre;
+    public bool isOccupied = false;
+    public int[] cellID = new int[2]; //from 0, 0 to noOfCells.x-1, noOfCells.y-1
 }
