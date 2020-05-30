@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 224963317}
   - component: {fileID: 224963318}
   - component: {fileID: 224963316}
+  - component: {fileID: 224963319}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -183,6 +184,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf2c8a559e1cfa34ea55d0893092865a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &224963319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224963315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abddfdf38522888438c30916b0fb80c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  database:
+    buildings:
+    - {fileID: 607661258291843303, guid: 57280bb5b562c4b4784f534701417cfd, type: 3}
+    - {fileID: 6647950454765076272, guid: 8fa5c1659899cea48b8a68326a3bc507, type: 3}
+    - {fileID: 329271276303203813, guid: 892025365c33e8b4f906dae3e330ab64, type: 3}
+    - {fileID: 622912356041477303, guid: 3cc1712cee577c9488be6a90668730a7, type: 3}
 --- !u!1 &423706122
 GameObject:
   m_ObjectHideFlags: 0
@@ -1145,7 +1164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec398b396805e7d4fb0ede40c8edaf76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  noOfCells: {x: 11, y: 11}
+  noOfCells: {x: 10, y: 11}
 --- !u!65 &1991680714
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 [RequireComponent(typeof(BoxCollider))]
 public class Grid : MonoBehaviour
 {
@@ -14,6 +13,9 @@ public class Grid : MonoBehaviour
     BoxCollider gridCollider;
     float colliderPadding = 10.0f;
     int[,] gridStatus; //0 = empty, 1 = occupied by building TODO add more status codes.
+
+    //[SerializeField] GridLayerBase[] extraGridLayers;
+
 
     void Awake()
     {
@@ -57,7 +59,7 @@ public class Grid : MonoBehaviour
 
         if (Mathf.Abs(offset.x) > (float)(noOfCells.x * cellSize) / 2.0f || Mathf.Abs(offset.z) > (float)(noOfCells.y * cellSize) / 2.0f)
         {
-            print ("Sampled outside boundary");//test
+            //print ("Sampled outside boundary");//test
             return null;
         }
 
@@ -88,9 +90,9 @@ public class Grid : MonoBehaviour
 
         SetCellState(ref cell);
 
-        lastCellCentre = cell.cellCentre; //test
-        print ("dist in cells: " + distInCells + ", or: " + (rawDistInCells[0] * rawDistSigns[0]) + ", " + (rawDistInCells[1] * rawDistSigns[1]) ); //test
-        print ("cellID: " + cell.cellID[0] + ", " +cell.cellID[1]); //test
+        //lastCellCentre = cell.cellCentre; //test
+        //print ("dist in cells: " + distInCells + ", or: " + (rawDistInCells[0] * rawDistSigns[0]) + ", " + (rawDistInCells[1] * rawDistSigns[1]) ); //test
+        //print ("cellID: " + cell.cellID[0] + ", " +cell.cellID[1]); //test
         return cell;
     }
 
@@ -153,4 +155,28 @@ public class Cell
     public Vector3 cellCentre;
     public bool isOccupied = false;
     public int[] cellID = new int[2]; //from 0, 0 to noOfCells.x-1, noOfCells.y-1
+}
+
+
+
+//TODO revisit these classes
+[System.Serializable]
+public class GridLayerBase
+{
+    public string name;
+}
+
+[System.Serializable]
+public class GridLayer<T> : GridLayerBase
+{
+    public T value;
+    public T[,] gridStatus;
+
+    public T GetCellStatus(uint cellID_x, uint cellID_y) //Returns default value of assigned type if index outside array range
+    {
+        if (cellID_x >= gridStatus.GetLength(0) || cellID_y >= gridStatus.GetLength(1))
+            return default(T);
+        
+        return gridStatus[cellID_x, cellID_y];
+    }
 }
