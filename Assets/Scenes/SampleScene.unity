@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b82a9b71a974f5408d7574981dad444, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentCursorMode: 1
+  currentCursorMode: 0
   gridLayer:
     serializedVersion: 2
     m_Bits: 256
