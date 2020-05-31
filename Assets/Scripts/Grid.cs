@@ -88,7 +88,7 @@ public class Grid : MonoBehaviour
         cell.cellID[1] = Mathf.FloorToInt((float)noOfCells.y / 2.0f) + distInCells.y;
         cell.cellID[1] += (1 - noOfCells.y%2) * (((1 + rawDistSigns[1]) / 2) - 1); //special consideration for even numbered cell y count.
 
-        SetCellState(ref cell);
+        GetCellState(ref cell);
 
         //lastCellCentre = cell.cellCentre; //test
         //print ("dist in cells: " + distInCells + ", or: " + (rawDistInCells[0] * rawDistSigns[0]) + ", " + (rawDistInCells[1] * rawDistSigns[1]) ); //test
@@ -96,7 +96,7 @@ public class Grid : MonoBehaviour
         return cell;
     }
 
-    void SetCellState(ref Cell cell)
+    void GetCellState(ref Cell cell)
     {   
         switch(gridStatus[cell.cellID[0], cell.cellID[1]])
         {
@@ -111,6 +111,20 @@ public class Grid : MonoBehaviour
         }
     }
 
+    public void SetCellOccupiedState (Cell cell, bool isOccupied)
+    {
+        SetCellState((uint)cell.cellID[0], (uint)cell.cellID[1], isOccupied? 1 : 0);
+    }
+
+    public void SetCellOccupiedState (uint cellID_x, uint cellID_y, bool isOccupied)
+    {
+        SetCellState(cellID_x, cellID_y, isOccupied? 1 : 0);
+    }
+
+    void SetCellState(uint cellID_x, uint cellID_y, int state)
+    {
+        gridStatus[cellID_x, cellID_y] = state;
+    }
 
     Vector3 lastCellCentre = new Vector3(0.0f, -10.0f, 0.0f); //test
     void OnDrawGizmos() //unefficient, but not meant for production anyway...
@@ -154,10 +168,10 @@ public class Cell
 {
     public Vector3 cellCentre;
     public bool isOccupied = false;
-    public int[] cellID = new int[2]; //from 0, 0 to noOfCells.x-1, noOfCells.y-1
+    public int[] cellID = new int[2];   //from 0, 0 to noOfCells.x-1, noOfCells.y-1
+                                        //This is dangeours, cellIDs are otherwise treated as uint. I'm gambling here that the calculation of cellID (in SampleForCell())
+                                        //will always compute a positive integer.
 }
-
-
 
 //TODO revisit these classes
 [System.Serializable]

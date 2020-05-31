@@ -54,7 +54,7 @@ public class BuildingsManager : MonoBehaviour
             if (!CanConstructHere(cell))
                 return false;
                 
-
+            Grid.grid.SetCellOccupiedState(cell, true);
             //TODO handle object construction here (add to waiting queue, update relevant databases, etc)
             
             return true;

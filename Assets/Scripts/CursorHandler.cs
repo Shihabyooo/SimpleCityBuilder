@@ -23,7 +23,7 @@ public class CursorHandler : MonoBehaviour
         //currentCursorMode = ControlMode.freeMode; 
     }
 
-    void FixedUpdate() //Should move to Update?
+    void Update()
     {
         //Cursor.lockState = CursorLockMode.Confined;
         switch(currentCursorMode)
@@ -61,22 +61,23 @@ public class CursorHandler : MonoBehaviour
         RaycastHit hit = CastRay(gridLayer);
         Cell cell = Grid.grid.SampleForCell(hit.point);
         
-        buildingToPlace.MovePlan(cell.cellCentre);
+        if (cell != null)
+            buildingToPlace.MovePlan(cell.cellCentre);
 
         if (Input.GetMouseButtonDown(0))
         {
             if (buildingToPlace.Construct(cell))
             {
                 buildingToPlace = null;
-                currentCursorMode = ControlMode.freeMode;
+                SwitchToFreeMode();
             }
         }
         else if (Input.GetMouseButtonDown(1))
         {
             buildingToPlace.Cancel();
             buildingToPlace = null;
+            SwitchToFreeMode();
         }
-
     }
 
     void MenuControl()
@@ -110,6 +111,10 @@ public class CursorHandler : MonoBehaviour
         buildingToPlace = building;
     }
 
+    public void SwitchToFreeMode()
+    {
+        currentCursorMode = ControlMode.freeMode;
+    }
 
 //Other
     Vector3 lastHitPosition = new Vector3(10.0f, 2.0f, 5.0f);
