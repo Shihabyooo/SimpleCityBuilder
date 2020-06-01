@@ -2,23 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+//TODO decouple extra grid layer from base grid (i.e. other layers can have coarser grids, to save memory/performance.)
+
+public enum InfrastructureService
+{
+    none = 0, water = 1, power = 2, gas = 4, education = 8, health = 16, 
+}
+
 [RequireComponent(typeof(BoxCollider))]
 public class Grid : MonoBehaviour
 {
     static public Grid grid = null;
 
     Vector2Int boundary; //TODO consider removing this. So far, this is only usefull in editor visualization. 
-    public Vector2Int noOfCells;
+    public Vector2Int noOfCells; //TODO switch this to uint[2];
     const int cellSize = 1;
     BoxCollider gridCollider;
     float colliderPadding = 10.0f;
     int[,] cellsStatus; //Main grid layer, basically tells whether the cell is empty or not. 0 = empty, 1 = occupied by building. TODO add more status codes.
 
     //Extra grid layers, each layer targets specific element (e.g. water supply, pollution, health coverage, education coverage, etc)
-    public GridLayer<int> waterSupply {get; private set;}
-    public GridLayer<int> powerSupply {get; private set;}
-    public GridLayer<float> pollution {get; private set;}
-
+    //Services and infrastructure
+    public GridLayer<InfrastructureService> infrastructureLayer {get; private set;} //Uses bitmask to mark the reach of an infrastructure service, check InfrastructureService enum.
+    //natural resources
+    public GridLayer<float> groundWaterCapacityLayer {get; private set;} //max capacity, unit volume
+    public GridLayer<float> groundWaterVolumeLayer {get; private set;} //current quantity, unit volume
+    public GridLayer<float> groundWaterRechargeLayer {get; private set;} //unit volume per unit time.
+    public GridLayer<float> windSpeedLayer {get; private set;} //cell size per unit time.
+    public GridLayer<uint> windDirectionLayer {get;private set;} //stored as a degree angle starting from the north (positive y) and going clockwise.
+    //Others layer
+    public GridLayer<float> pollutionLayer {get; private set;}
 
 
     void Awake()
@@ -36,28 +50,34 @@ public class Grid : MonoBehaviour
         UpdateGridBoundary();
 
         InitializeGridLayers();
+        
     }
 
     void InitializeGridLayers()
     {
-    
-    cellsStatus = new int[noOfCells.x, noOfCells.y];//[noOfCells.y];
+        cellsStatus = new int[noOfCells.x, noOfCells.y];
 
-    waterSupply = new GridLayer<int>((uint)noOfCells.x, (uint)noOfCells.y);
-    powerSupply = new GridLayer<int>((uint)noOfCells.x, (uint)noOfCells.y);
-    pollution = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
-
-
-    //The loop bellow is unnecessary?
-    for (uint i = 0; i < noOfCells.x; i++)
-        for (uint j = 0; j < noOfCells.y; j++)
-        {
-            cellsStatus[i, j] = 0;
-            waterSupply.SetCellStatus(i, j, 0);
-            powerSupply.SetCellStatus(i, j, 0);
-            pollution.SetCellStatus(i, j, 0.0f);
-        }
+        infrastructureLayer = new GridLayer<InfrastructureService>((uint)noOfCells.x, (uint)noOfCells.y); // 
+        InitializeNaturalResourcesLayers();
+        InitializeOthersLayers();
     }
+
+    void InitializeNaturalResourcesLayers()
+    {
+        //TODO implement this after figuring out how maps are going to be designed/saved.public GridLayer<float> groundWaterCapacityLayer {get; private set;} //max capacity, unit volume
+        groundWaterCapacityLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
+        groundWaterVolumeLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
+        groundWaterRechargeLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
+        windSpeedLayer  = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
+        windDirectionLayer  = new GridLayer<uint>((uint)noOfCells.x, (uint)noOfCells.y);
+
+    }
+
+    void InitializeOthersLayers()
+    {
+        pollutionLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
+    }
+
 
     void UpdateGridBoundary()
     {
@@ -103,13 +123,14 @@ public class Grid : MonoBehaviour
         cell.cellCentre.y = this.transform.position.y;
 
         //Compute cellID
-        cell.cellID[0] = Mathf.FloorToInt((float)noOfCells.x / 2.0f) + distInCells.x;
-        cell.cellID[0] += (1 - noOfCells.x%2) * (((1 + rawDistSigns[0]) / 2) - 1); //special consideration for even numbered cell x count.
+        //IMPORTANT! You're gambling that the calculations above WILL NEVER produce negative numbers. They should, but you need to double check that...
+        cell.cellID[0] = (uint)(Mathf.FloorToInt((float)noOfCells.x / 2.0f) + distInCells.x);
+        cell.cellID[0] += (uint)((1 - noOfCells.x%2) * (((1 + rawDistSigns[0]) / 2) - 1)); //special consideration for even numbered cell x count.
 
-        cell.cellID[1] = Mathf.FloorToInt((float)noOfCells.y / 2.0f) + distInCells.y;
-        cell.cellID[1] += (1 - noOfCells.y%2) * (((1 + rawDistSigns[1]) / 2) - 1); //special consideration for even numbered cell y count.
+        cell.cellID[1] = (uint)(Mathf.FloorToInt((float)noOfCells.y / 2.0f) + distInCells.y);
+        cell.cellID[1] += (uint)((1 - noOfCells.y%2) * (((1 + rawDistSigns[1]) / 2) - 1)); //special consideration for even numbered cell y count.
 
-        GetCellState(ref cell);
+        GetAllCellStates(ref cell);
 
         //lastCellCentre = cell.cellCentre; //test
         //print ("dist in cells: " + distInCells + ", or: " + (rawDistInCells[0] * rawDistSigns[0]) + ", " + (rawDistInCells[1] * rawDistSigns[1]) ); //test
@@ -117,7 +138,16 @@ public class Grid : MonoBehaviour
         return cell;
     }
 
-    void GetCellState(ref Cell cell)
+
+    void GetAllCellStates(ref Cell cell)
+    {
+        GetCellOccupationState(ref cell);
+        GetCellInfrastructureStates(ref cell);
+        GetCellNaturalResourcesStates(ref cell);
+        GetOtherCellStates(ref cell);
+    }
+
+    void GetCellOccupationState(ref Cell cell)
     {   
         switch(cellsStatus[cell.cellID[0], cell.cellID[1]])
         {
@@ -130,6 +160,29 @@ public class Grid : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    void GetCellInfrastructureStates(ref Cell cell)
+    {
+        InfrastructureService cellServices = infrastructureLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
+        cell.isEducated = IsInfrastructureSet(InfrastructureService.education, cellServices);
+        cell.isHealthed = IsInfrastructureSet(InfrastructureService.health, cellServices);
+        cell.isPowered = IsInfrastructureSet(InfrastructureService.power, cellServices);
+        cell.isWatered = IsInfrastructureSet(InfrastructureService.water, cellServices);    
+    }
+
+    void GetCellNaturalResourcesStates(ref Cell cell)
+    {
+        cell.groundwaterCapacity = groundWaterCapacityLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
+        cell.groundwaterRecharge = groundWaterRechargeLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
+        cell.groundwaterVolume = groundWaterVolumeLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
+        cell.windDirection = windDirectionLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
+        cell.windSpeed = windSpeedLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
+    }
+
+    void GetOtherCellStates(ref Cell cell)
+    {
+        cell.pollution = pollutionLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
     }
 
     public void SetCellOccupiedState (Cell cell, bool isOccupied)
@@ -147,6 +200,17 @@ public class Grid : MonoBehaviour
         cellsStatus[cellID_x, cellID_y] = state;
     }
 
+//helper methods:
+    bool IsInfrastructureSet(InfrastructureService service, InfrastructureService cellServices)
+    {
+        if ((cellServices & service) == service) //TODO check this.
+            return true;
+        
+        return false;
+    }
+
+
+//testing visualization code
     Vector3 lastCellCentre = new Vector3(0.0f, -10.0f, 0.0f); //test
     void OnDrawGizmos() //unefficient, but not meant for production anyway...
     {
@@ -187,11 +251,25 @@ public class Grid : MonoBehaviour
 
 public class Cell
 {
+    public uint[] cellID = new uint[2];   //from 0, 0 to noOfCells.x-1, noOfCells.y-1
     public Vector3 cellCentre;
     public bool isOccupied = false;
-    public int[] cellID = new int[2];   //from 0, 0 to noOfCells.x-1, noOfCells.y-1
-                                        //This is dangeours, cellIDs are otherwise treated as uint. I'm gambling here that the calculation of cellID (in SampleForCell())
-                                        //will always compute a positive integer.
+    //Infrastructure services reach
+    public bool isPowered = false;
+    public bool isWatered = false;
+    public bool isEducated = false;
+    public bool isHealthed = false;
+    //natural resources
+    public float groundwaterVolume = 0.0f;
+    public float groundwaterCapacity = 0.0f;
+    public float groundwaterRecharge = 0.0f;
+    public float windSpeed = 0.0f;
+    public uint windDirection = 0;
+    //others
+    public float pollution = 0.0f;
+
+
+    
 }
 
 //TODO revisit these classes
@@ -234,21 +312,3 @@ public class GridLayer<T>
         //TODO add arguments and implement this.
     }
 }
-
-// public class GridLayerFloat : GridLayer <float>
-// {
-//     public void SetMultipleCellsValueConst(uint centralCellID_x, uint centralCellID_y, uint radius, float value)
-//     {
-//         //TODO implement this
-//     }
-//     public void SetMultipleCellsValueLinearGradient(uint centralCellID_x, uint centralCellID_y, uint radius, float value) //central cell assigns full value, cells at radius + 1 has zero, interpolate in between linearaly.
-//     {
-//         //TODO implement this
-//     }
-
-//     public void SetMultipleCellsValueExponentialGradient() //TODO add arguments and implement this.
-//     {
-
-//     }
-
-// }
