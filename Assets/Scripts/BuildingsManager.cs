@@ -50,6 +50,7 @@ public class BuildingsManager : MonoBehaviour
             //TODO once a mesh loader (or dedicated prefabs are created) for the mock avatar for the buildings, replace the line bellow.
             GameObject newProposedBuilding = buildingsManRef.database.GetBuildingObject(_targetBuildingID).gameObject;
             targetBuildingAvatar = GameObject.Instantiate(newProposedBuilding);
+            targetBuildingAvatar.name = "TargetBuildingAvatar"; //test
 
             if (targetBuildingAvatar == null)
             print ("WARNING! targetBuildingProposal is set to null, meaning no building of provided ID could be found.");
@@ -76,7 +77,7 @@ public class BuildingsManager : MonoBehaviour
             GameObject newBuilding = GameObject.Instantiate(  buildingsManRef.database.GetBuildingObject(targetBuildingStats.id),
                                                             targetBuildingAvatar.transform.position,
                                                             targetBuildingAvatar.transform.rotation);
-        
+            newBuilding.name = "NewBuilding: " + newBuilding.name;
             newBuilding.GetComponent<Building>().BeginConstruction();
             buildingsManRef.AddConstructedBuilding(newBuilding.GetComponent<Building>());
             Destroy(targetBuildingAvatar);

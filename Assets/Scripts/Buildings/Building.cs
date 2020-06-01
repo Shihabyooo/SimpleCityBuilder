@@ -27,22 +27,19 @@ public class Building : MonoBehaviour
     float helperTimer = 0.0f;
     IEnumerator Construction()
     {
-        //The material/opacity changing lines bellow are for testing purposes only (to show construction progress);
         print ("Begining construction of: " + this.gameObject.name + ", finishes in: " + stats.constructionTime); //test
-        Material material = this.gameObject.GetComponent<MeshRenderer>().material; //test   
-        this.gameObject.GetComponent<MeshRenderer>().material.color = new Color(material.color.r, material.color.g, material.color.b, 0.0f); //test
-
+        
         while (helperTimer < stats.constructionTime)
         {
             helperTimer += Time.fixedDeltaTime;
-            this.gameObject.GetComponent<MeshRenderer>().material.color = new Color(material.color.r, material.color.g, material.color.b, (Mathf.Clamp(helperTimer/stats.constructionTime, 0.0f, 1.0f))); //test
+            float ratio = Mathf.Clamp(helperTimer/stats.constructionTime, 0.0f, 1.0f);//test
+            this.transform.transform.localScale = new Vector3(ratio, ratio, ratio);//test
             yield return new WaitForFixedUpdate();
         }
 
         print ("Finshed construction of: " + this.gameObject.name ); //test
         yield return isUnderConstruction = false;
     }
-
 }
 
 [System.Serializable]

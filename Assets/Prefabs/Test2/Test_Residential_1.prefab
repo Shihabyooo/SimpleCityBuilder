@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7759647067295578547}
   - component: {fileID: 4076677466394330442}
   - component: {fileID: 5207093688149400163}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Test_Residential_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,3 +96,5 @@ MonoBehaviour:
     cost: 250
     type: 0
     constructionTime: 5
+    powerRequirements: 1
+    waterRequirements: 1

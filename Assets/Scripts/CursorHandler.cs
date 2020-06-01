@@ -15,6 +15,7 @@ public class CursorHandler : MonoBehaviour
     public LayerMask freeModeSelectables;
     const float maxRayCastDistance = 1000.0f;
     BuildingsManager.BuildingProposal buildingToPlace = null;
+    Vector3 outOfViewPosition = new Vector3(0.0f, -10.0f, 0.0f); //Planned constructions will be moved to this location when the cursor is pointed outside allowable construction zone (outside grid boundaries)
 
 
     void Awake()
@@ -62,17 +63,22 @@ public class CursorHandler : MonoBehaviour
         Cell cell = Grid.grid.SampleForCell(hit.point);
         
         if (cell != null)
+        {
             buildingToPlace.MovePlan(cell.cellCentre);
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (buildingToPlace.Construct(cell))
+            if (Input.GetMouseButtonDown(0))
             {
-                buildingToPlace = null;
-                SwitchToFreeMode();
+                if (buildingToPlace.Construct(cell))
+                {
+                    buildingToPlace = null;
+                    SwitchToFreeMode();
+                }
             }
         }
-        else if (Input.GetMouseButtonDown(1))
+        else //hide building..
+            buildingToPlace.MovePlan(outOfViewPosition);
+
+        if (Input.GetMouseButtonDown(1))
         {
             buildingToPlace.Cancel();
             buildingToPlace = null;
@@ -121,7 +127,7 @@ public class CursorHandler : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(lastHitPosition, 0.3f);
+        //Gizmos.DrawSphere(lastHitPosition, 0.3f);
         //Gizmos.color = Color.green;
         //Gizmos.DrawSphere(mousePosition, 0.15f);
         Gizmos.color = Color.magenta;
