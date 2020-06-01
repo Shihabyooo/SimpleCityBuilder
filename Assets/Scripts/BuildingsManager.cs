@@ -109,8 +109,8 @@ class BuildingsDatabase
     {
         foreach (Building building in buildings)
         {
-            if (building.stats.id == buildingID)
-                return building.stats;
+            if (building.GetStats().id == buildingID)
+                return building.GetStats();
         }
 
         return null;
@@ -120,7 +120,7 @@ class BuildingsDatabase
     {
         foreach (Building building in buildings)
         {
-            if (building.stats.id == buildingID)
+            if (building.GetStats().id == buildingID)
                 return building.gameObject;
         }
 

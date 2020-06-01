@@ -12,9 +12,13 @@ public class Grid : MonoBehaviour
     const int cellSize = 1;
     BoxCollider gridCollider;
     float colliderPadding = 10.0f;
-    int[,] gridStatus; //0 = empty, 1 = occupied by building TODO add more status codes.
+    int[,] cellsStatus; //Main grid layer, basically tells whether the cell is empty or not. 0 = empty, 1 = occupied by building. TODO add more status codes.
 
-    //[SerializeField] GridLayerBase[] extraGridLayers;
+    //Extra grid layers, each layer targets specific element (e.g. water supply, pollution, health coverage, education coverage, etc)
+    public GridLayer<int> waterSupply {get; private set;}
+    public GridLayer<int> powerSupply {get; private set;}
+    public GridLayer<float> pollution {get; private set;}
+
 
 
     void Awake()
@@ -31,11 +35,28 @@ public class Grid : MonoBehaviour
         gridCollider = this.gameObject.GetComponent<BoxCollider>();
         UpdateGridBoundary();
 
-        //initialize gridStatus;
-        gridStatus = new int[noOfCells.x, noOfCells.y];//[noOfCells.y];
-        for (int i = 0; i < noOfCells.x; i++)
-            for (int j = 0; j < noOfCells.y; j++)
-                gridStatus[i, j] = 0;
+        InitializeGridLayers();
+    }
+
+    void InitializeGridLayers()
+    {
+    
+    cellsStatus = new int[noOfCells.x, noOfCells.y];//[noOfCells.y];
+
+    waterSupply = new GridLayer<int>((uint)noOfCells.x, (uint)noOfCells.y);
+    powerSupply = new GridLayer<int>((uint)noOfCells.x, (uint)noOfCells.y);
+    pollution = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
+
+
+    //The loop bellow is unnecessary?
+    for (uint i = 0; i < noOfCells.x; i++)
+        for (uint j = 0; j < noOfCells.y; j++)
+        {
+            cellsStatus[i, j] = 0;
+            waterSupply.SetCellStatus(i, j, 0);
+            powerSupply.SetCellStatus(i, j, 0);
+            pollution.SetCellStatus(i, j, 0.0f);
+        }
     }
 
     void UpdateGridBoundary()
@@ -98,7 +119,7 @@ public class Grid : MonoBehaviour
 
     void GetCellState(ref Cell cell)
     {   
-        switch(gridStatus[cell.cellID[0], cell.cellID[1]])
+        switch(cellsStatus[cell.cellID[0], cell.cellID[1]])
         {
             case (0):
             cell.isOccupied = false;
@@ -123,7 +144,7 @@ public class Grid : MonoBehaviour
 
     void SetCellState(uint cellID_x, uint cellID_y, int state)
     {
-        gridStatus[cellID_x, cellID_y] = state;
+        cellsStatus[cellID_x, cellID_y] = state;
     }
 
     Vector3 lastCellCentre = new Vector3(0.0f, -10.0f, 0.0f); //test
@@ -174,23 +195,60 @@ public class Cell
 }
 
 //TODO revisit these classes
-[System.Serializable]
-public class GridLayerBase
-{
-    public string name;
-}
 
 [System.Serializable]
-public class GridLayer<T> : GridLayerBase
+public class GridLayer<T>
 {
-    public T value;
     public T[,] gridStatus;
 
-    public T GetCellStatus(uint cellID_x, uint cellID_y) //Returns default value of assigned type if index outside array range
+    public GridLayer(uint width, uint height)
+    {
+        gridStatus = new T[width, height];
+    }
+
+    virtual public T GetCellStatus(uint cellID_x, uint cellID_y) //Returns default value of assigned type if index outside array range
     {
         if (cellID_x >= gridStatus.GetLength(0) || cellID_y >= gridStatus.GetLength(1))
             return default(T);
         
         return gridStatus[cellID_x, cellID_y];
     }
+
+    virtual public void SetCellStatus(uint cellID_x, uint cellID_y, T value)
+    {
+        if (cellID_x >= gridStatus.GetLength(0) || cellID_y >= gridStatus.GetLength(1))
+            return;
+        gridStatus[cellID_x, cellID_y] = value;
+    }
+    public void SetMultipleCellsValueConst(uint centralCellID_x, uint centralCellID_y, uint radius, T value)
+    {
+        //TODO implement this
+    }
+    public void SetMultipleCellsValueLinearGradient(uint centralCellID_x, uint centralCellID_y, uint radius, T value) //central cell assigns full value, cells at radius + 1 has zero, interpolate in between linearaly.
+    {
+        //TODO implement this
+    }
+
+    public void SetMultipleCellsValueExponentialGradient() 
+    {
+        //TODO add arguments and implement this.
+    }
 }
+
+// public class GridLayerFloat : GridLayer <float>
+// {
+//     public void SetMultipleCellsValueConst(uint centralCellID_x, uint centralCellID_y, uint radius, float value)
+//     {
+//         //TODO implement this
+//     }
+//     public void SetMultipleCellsValueLinearGradient(uint centralCellID_x, uint centralCellID_y, uint radius, float value) //central cell assigns full value, cells at radius + 1 has zero, interpolate in between linearaly.
+//     {
+//         //TODO implement this
+//     }
+
+//     public void SetMultipleCellsValueExponentialGradient() //TODO add arguments and implement this.
+//     {
+
+//     }
+
+// }

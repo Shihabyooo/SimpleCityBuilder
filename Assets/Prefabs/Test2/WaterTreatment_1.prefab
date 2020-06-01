@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 988332227158051831}
   - component: {fileID: 8136953752190759361}
   - component: {fileID: 2580788230338596152}
-  - component: {fileID: 5246119767219773679}
+  - component: {fileID: -5131711973747427006}
   m_Layer: 0
   m_Name: WaterTreatment_1
   m_TagString: Untagged
@@ -79,7 +79,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &5246119767219773679
+--- !u!114 &-5131711973747427006
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -88,11 +88,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 4317856054911531492}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e1e937231c56c3469d3155e009b98e2, type: 3}
+  m_Script: {fileID: 11500000, guid: 26dd95fe230432647b4b91b10fe431d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
     id: 7
     cost: 1000
-    type: 0
-    constructionTime: 0
+    type: 3
+    constructionTime: 15
+    powerRequirements: 1
+    waterRequirements: 0
+  infraStats:
+    radiusOfInfluence: 10

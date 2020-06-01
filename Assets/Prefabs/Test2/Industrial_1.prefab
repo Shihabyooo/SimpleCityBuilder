@@ -95,4 +95,4 @@ MonoBehaviour:
     id: 6
     cost: 750
     type: 0
-    constructionTime: 0
+    constructionTime: 15

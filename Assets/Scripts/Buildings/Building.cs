@@ -4,16 +4,16 @@ using UnityEngine;
 
 public enum BuildingType //TODO add remaining types.
 {
-    residential,
+    residential, commercial, industrial, infrastructure
 }
 
 public class Building : MonoBehaviour
 {
     public GameObject model {get; private set;}
-    [SerializeField] public BuildingStats stats; //can't use {get; private set;} and have it serialized in the editor at the same time, so leaving at as private and making a getter method.
+    [SerializeField] protected BuildingStats stats; //can't use {get; private set;} and have it serialized in the editor at the same time, so leaving at as private and making a getter method.
     public bool isUnderConstruction {get; private set;}
 
-    BuildingStats GetStats()
+    public BuildingStats GetStats()
     {
         return stats;
     }
@@ -52,6 +52,11 @@ public class BuildingStats
     public uint cost = 0;
     public BuildingType type;
     public float constructionTime = 0.0f;
+
+    //requirements
+    public float powerRequirements = 1.0f; //in units per time.
+    public float waterRequirements = 1.0f; //in units per time.
+    //TODO add remaining requirements.
 
     //TODO add remaining -universal- parameters here.
 }
