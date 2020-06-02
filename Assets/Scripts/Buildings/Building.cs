@@ -18,6 +18,16 @@ public class Building : MonoBehaviour
         return stats;
     }
 
+    public virtual bool CheckResourceRequirements(Cell cell) //this does NOT include checking whether cell is occupied or not, which is handled in BuildingsManager.
+    {   
+        if (stats.requireResourcesToConstruct)
+        {
+            
+        }
+        
+        return true;
+    }
+
     public void BeginConstruction()
     {
         isUnderConstruction = true;
@@ -50,7 +60,8 @@ public class BuildingStats
     public BuildingType type;
     public float constructionTime = 0.0f;
 
-    //requirements
+    //requirements for operation 
+    public bool requireResourcesToConstruct = false; //if set to true, building won't be constructed unless resources are enough, else building will be constructed, but won't operate fully (or at all)
     public float powerRequirements = 1.0f; //in units per time.
     public float waterRequirements = 1.0f; //in units per time.
     //TODO add remaining requirements.
