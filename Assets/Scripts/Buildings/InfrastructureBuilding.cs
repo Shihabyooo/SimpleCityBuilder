@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class InfrastructureBuilding : Building
 {
-    [SerializeField] InfrastructureBuildingStats infraStats;
+    [SerializeField] protected InfrastructureBuildingStats infraStats;
 
     void Awake()
     {
@@ -16,11 +16,16 @@ public class InfrastructureBuilding : Building
         return infraStats;
     }
 
+    public virtual void UpdateCityResources()
+    {
+
+    }
+    
+
 }
 
 [System.Serializable]
 public class InfrastructureBuildingStats
 {
     public uint radiusOfInfluence = 0; //Measured in cells.
-    
 }

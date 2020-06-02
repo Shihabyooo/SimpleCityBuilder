@@ -72,7 +72,7 @@ public class BuildingsManager : MonoBehaviour
             Grid.grid.SetCellOccupiedState(cell, true);
             
             buildingsManRef.AddConstructedBuilding(targetBuilding.GetComponent<Building>());
-            targetBuilding.GetComponent<Building>().BeginConstruction();
+            targetBuilding.GetComponent<Building>().BeginConstruction(cell);
             targetBuilding = null;
                 
             return true;
