@@ -17,7 +17,7 @@ public class Grid : MonoBehaviour
 
     Vector2Int boundary; //TODO consider removing this. So far, this is only usefull in editor visualization. 
     public Vector2Int noOfCells; //TODO switch this to uint[2];
-    const int cellSize = 1;
+    public const int cellSize = 1;
     BoxCollider gridCollider;
     float colliderPadding = 10.0f;
     int[,] cellsStatus; //Main grid layer, basically tells whether the cell is empty or not. 0 = empty, 1 = occupied by building. TODO add more status codes.
@@ -138,7 +138,6 @@ public class Grid : MonoBehaviour
         return cell;
     }
 
-
     void GetAllCellStates(ref Cell cell)
     {
         GetCellOccupationState(ref cell);
@@ -164,25 +163,24 @@ public class Grid : MonoBehaviour
 
     void GetCellInfrastructureStates(ref Cell cell)
     {
-        InfrastructureService cellServices = infrastructureLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
+        InfrastructureService cellServices = infrastructureLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
         cell.isEducated = IsInfrastructureSet(InfrastructureService.education, cellServices);
         cell.isHealthed = IsInfrastructureSet(InfrastructureService.health, cellServices);
         cell.isPowered = IsInfrastructureSet(InfrastructureService.power, cellServices);
         cell.isWatered = IsInfrastructureSet(InfrastructureService.water, cellServices);    
     }
-
     void GetCellNaturalResourcesStates(ref Cell cell)
     {
-        cell.groundwaterCapacity = groundWaterCapacityLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
-        cell.groundwaterRecharge = groundWaterRechargeLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
-        cell.groundwaterVolume = groundWaterVolumeLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
-        cell.windDirection = windDirectionLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
-        cell.windSpeed = windSpeedLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
+        cell.groundwaterCapacity = groundWaterCapacityLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
+        cell.groundwaterRecharge = groundWaterRechargeLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
+        cell.groundwaterVolume = groundWaterVolumeLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
+        cell.windDirection = windDirectionLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
+        cell.windSpeed = windSpeedLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
     }
 
     void GetOtherCellStates(ref Cell cell)
     {
-        cell.pollution = pollutionLayer.GetCellStatus(cell.cellID[0], cell.cellID[1]);
+        cell.pollution = pollutionLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
     }
 
     public void SetCellOccupiedState (Cell cell, bool isOccupied)
@@ -209,9 +207,34 @@ public class Grid : MonoBehaviour
         return false;
     }
 
+    //TODO fix the function bellow. While for most of the radius it works correctly, it fails at the poles (@ymin and ymax), only painting a single cell each.
+    public void SetInfrastructureState(InfrastructureService service, uint cellID_x, uint cellID_y, uint radius) 
+    {
+        //Equation of circle: (x-a)^2 + (y-b)^2 = r^2
+        //a = cellID_x, b = cellID_y, r = radius
+        
+        uint minY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y - (long)radius, 0, noOfCells.y - 1));
+        uint maxY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y + (long)radius, 0, noOfCells.y - 1));
+        
+        for (uint i = minY; i <= maxY; i++)
+        {
+            long sqrtVal = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow(radius, 2) - Mathf.Pow((long)i - (long)cellID_y, 2))); //cache this calculation, since its result will be used twice.
+
+            uint minX = (uint)Mathf.FloorToInt(Mathf.Clamp( (long)cellID_x - sqrtVal, 0, noOfCells.x - 1));
+            uint maxX = (uint)Mathf.CeilToInt(Mathf.Clamp( (long)cellID_x + sqrtVal, 0, noOfCells.x - 1));
+
+            for (uint j = minX; j <= maxX; j++)
+            {
+                infrastructureLayer.GetCellRef(j, i) = infrastructureLayer.GetCellValue(j, i) | service;
+            }
+        }
+
+    }
+    
 
 //testing visualization code
     Vector3 lastCellCentre = new Vector3(0.0f, -10.0f, 0.0f); //test
+    public bool visualizeWaterInfra = false;
     void OnDrawGizmos() //unefficient, but not meant for production anyway...
     {
         //UpdateGridBoundary();
@@ -246,6 +269,32 @@ public class Grid : MonoBehaviour
 
         Gizmos.DrawCube(lastCellCentre, new Vector3(0.5f, 0.5f, 0.5f));
 
+        if (visualizeWaterInfra)
+        {
+            Gizmos.color = Color.cyan;
+            for (uint i = 0; i < noOfCells.x; i++)
+            {
+                for (uint j = 0; j < noOfCells.y; j++)
+                {
+                    if (IsInfrastructureSet(InfrastructureService.water, infrastructureLayer.GetCellValue(i, j)))
+                    {
+
+                        cornerSW = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize);
+                        cornerNW = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize + cellSize);
+                        cornerNE = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize + cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize + cellSize);
+                        cornerSE = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize + cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize);
+
+                        Gizmos.DrawLine(cornerSW, cornerNW);
+                        Gizmos.DrawLine(cornerNW, cornerNE);
+                        Gizmos.DrawLine(cornerNE, cornerSE);
+                        Gizmos.DrawLine(cornerSE, cornerSW);
+                        //Vector3 _shift = new Vector3( i *cellSize, 0.0f, j * cellSize);
+                        //Gizmos.DrawRay(cornerSW + _shift, cornerSW + _shift + new Vector3(cellSize, 0.0f, 0.0f));
+                        //Gizmos.DrawLine(cornerSW + _shift, cornerSE + _shift + new Vector3(0.0f, 0.0f, cellSize));
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -284,7 +333,7 @@ public class GridLayer<T>
         gridStatus = new T[width, height];
     }
 
-    virtual public T GetCellStatus(uint cellID_x, uint cellID_y) //Returns default value of assigned type if index outside array range
+    virtual public T GetCellValue(uint cellID_x, uint cellID_y) //Returns default value of assigned type if index outside array range
     {
         if (cellID_x >= gridStatus.GetLength(0) || cellID_y >= gridStatus.GetLength(1))
             return default(T);
@@ -292,7 +341,12 @@ public class GridLayer<T>
         return gridStatus[cellID_x, cellID_y];
     }
 
-    virtual public void SetCellStatus(uint cellID_x, uint cellID_y, T value)
+    virtual public ref T GetCellRef(uint cellID_x, uint cellID_y) //used primarily for the infrastructureLayer in Grid class, since these will be processed with bitwise ops.
+    {
+        return ref gridStatus[cellID_x, cellID_y];
+    }
+
+    virtual public void SetCellValue(uint cellID_x, uint cellID_y, T value)
     {
         if (cellID_x >= gridStatus.GetLength(0) || cellID_y >= gridStatus.GetLength(1))
             return;
