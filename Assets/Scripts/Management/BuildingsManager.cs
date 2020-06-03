@@ -7,7 +7,11 @@ public class BuildingsManager : MonoBehaviour
     BuildingProposal currentProposal = null;
     [SerializeField] BuildingsDatabase database;
 
-    public List<Building> constructedBuildings {get; private set;}
+    public List<Building> constructedBuildings {get; private set;} //containers ALL constructed buildings.
+    public List<InfrastructureBuilding> waterProductionBuildings {get; private set;} //contains only water producing buildings
+    public List<InfrastructureBuilding> powerProductionBuildings {get; private set;} //contains only power producing buildings
+    //TODO add lists for remaining infrastructure types and update the AddInfrastructureBuilding() method accordingly.
+
 
     void Awake()
     {
@@ -30,6 +34,27 @@ public class BuildingsManager : MonoBehaviour
     void AddConstructedBuilding(Building building)
     {
         constructedBuildings.Add(building);
+    }
+
+    public void AddInfrastructureBuilding(InfrastructureBuilding building, InfrastructureService type)
+    {
+        switch(type) 
+        {
+            case InfrastructureService.water:
+                waterProductionBuildings.Add(building);
+                break;
+            case InfrastructureService.power:
+                powerProductionBuildings.Add(building);
+                break;
+            case InfrastructureService.health:
+                break;
+            case InfrastructureService.education:
+                break;
+            case InfrastructureService.gas:
+                break;
+            default:
+                break;
+        }
     }
 
 

@@ -10,9 +10,9 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     static public GameManager gameMan = null;
-    static public ResourcesManager resourceMan = null; //Because it will be accessed directly by other scripts, this is also set as a public static ref.
+    static public ResourcesManager resourceMan = null;
     CursorHandler cursorHandler;
-    BuildingsManager buildingsMan;
+    static public BuildingsManager buildingsMan = null;
     SimulationManager simMan;
 
     void Awake()

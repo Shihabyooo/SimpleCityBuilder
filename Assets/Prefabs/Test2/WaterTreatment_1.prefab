@@ -103,6 +103,6 @@ MonoBehaviour:
   infraStats:
     radiusOfInfluence: 4
   plantStats:
-    maxTreatmentRate: 0
-    minGroundWaterVolume: 0
-    extractionRadius: 0
+    maxTreatmentRate: 5
+    minGroundWaterVolume: 0.5
+    extractionRadius: 1
