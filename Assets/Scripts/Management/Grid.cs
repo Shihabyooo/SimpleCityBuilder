@@ -50,7 +50,7 @@ public class Grid : MonoBehaviour
         UpdateGridBoundary();
 
         InitializeGridLayers();
-        
+        AddRandomNaturalResources(); //test
     }
 
     void InitializeGridLayers()
@@ -77,7 +77,6 @@ public class Grid : MonoBehaviour
     {
         pollutionLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
     }
-
 
     void UpdateGridBoundary()
     {
@@ -169,6 +168,7 @@ public class Grid : MonoBehaviour
         cell.isPowered = IsInfrastructureSet(InfrastructureService.power, cellServices);
         cell.isWatered = IsInfrastructureSet(InfrastructureService.water, cellServices);    
     }
+
     void GetCellNaturalResourcesStates(ref Cell cell)
     {
         cell.groundwaterCapacity = groundWaterCapacityLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
@@ -228,13 +228,60 @@ public class Grid : MonoBehaviour
                 infrastructureLayer.GetCellRef(j, i) = infrastructureLayer.GetCellValue(j, i) | service;
             }
         }
+    }
 
+    public float GetTotalGroundWaterVolume(uint cellID_x, uint cellID_y, uint radius)
+    {
+        float sum = 0.0f;
+        
+        //Same logic as SetInfrastructureState()
+        uint minY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y - (long)radius, 0, noOfCells.y - 1));
+        uint maxY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y + (long)radius, 0, noOfCells.y - 1));
+        
+        for (uint i = minY; i <= maxY; i++)
+        {
+            long sqrtVal = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow(radius, 2) - Mathf.Pow((long)i - (long)cellID_y, 2))); //cache this calculation, since its result will be used twice.
+
+            uint minX = (uint)Mathf.FloorToInt(Mathf.Clamp( (long)cellID_x - sqrtVal, 0, noOfCells.x - 1));
+            uint maxX = (uint)Mathf.CeilToInt(Mathf.Clamp( (long)cellID_x + sqrtVal, 0, noOfCells.x - 1));
+
+            for (uint j = minX; j <= maxX; j++)
+            {
+                sum+= groundWaterVolumeLayer.GetCellValue(j, i);
+            }
+        }
+
+        return sum;
     }
     
 
-//testing visualization code
+//testing metdhods
+
+    void AddRandomNaturalResources()
+    {
+        uint halfMapX = (uint)Mathf.RoundToInt(noOfCells.x / 2.0f);
+        uint halfMapY = (uint)Mathf.RoundToInt(noOfCells.y / 2.0f);
+
+        for (uint i = 0; i < halfMapX; i++)
+        {
+            for (uint j = 0; j < halfMapY; j++)
+            {
+                groundWaterCapacityLayer.GetCellRef(i,j) = Random.Range(0.0f, 100.0f);
+                groundWaterVolumeLayer.GetCellRef(i,j) = groundWaterCapacityLayer.GetCellValue(i,j);
+                groundWaterRechargeLayer.GetCellRef(i,j) = Random.Range(0.0f, 2.0f);
+                windSpeedLayer.GetCellRef(i,j) = Random.Range(0.0f, 10.0f);
+                windDirectionLayer.GetCellRef(i,j) = (uint)Mathf.FloorToInt(Random.Range(0.0f, 90.0f));
+            }
+        }
+    }
+
     Vector3 lastCellCentre = new Vector3(0.0f, -10.0f, 0.0f); //test
     public bool visualizeWaterInfra = false;
+    public bool visualizeGroundWaterRecharge = false;
+    public bool visualizeGroundWaterVolume = false;
+    public bool visualizeGroundWaterCapacity = false;
+    public bool visualizeWindSpeed = false;
+    public bool visualizeWindDirection = false;
     void OnDrawGizmos() //unefficient, but not meant for production anyway...
     {
         //UpdateGridBoundary();
@@ -271,14 +318,15 @@ public class Grid : MonoBehaviour
 
         if (visualizeWaterInfra)
         {
-            Gizmos.color = Color.cyan;
             for (uint i = 0; i < noOfCells.x; i++)
             {
                 for (uint j = 0; j < noOfCells.y; j++)
                 {
+                    Vector3 cellCentre = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize + (float)cellSize / 2.0f, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize + (float)cellSize / 2.0f);
+
                     if (IsInfrastructureSet(InfrastructureService.water, infrastructureLayer.GetCellValue(i, j)))
                     {
-
+                        Gizmos.color = Color.cyan;
                         cornerSW = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize);
                         cornerNW = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize + cellSize);
                         cornerNE = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize + cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize + cellSize);
@@ -288,9 +336,31 @@ public class Grid : MonoBehaviour
                         Gizmos.DrawLine(cornerNW, cornerNE);
                         Gizmos.DrawLine(cornerNE, cornerSE);
                         Gizmos.DrawLine(cornerSE, cornerSW);
-                        //Vector3 _shift = new Vector3( i *cellSize, 0.0f, j * cellSize);
-                        //Gizmos.DrawRay(cornerSW + _shift, cornerSW + _shift + new Vector3(cellSize, 0.0f, 0.0f));
-                        //Gizmos.DrawLine(cornerSW + _shift, cornerSE + _shift + new Vector3(0.0f, 0.0f, cellSize));
+                    }
+                    if (visualizeGroundWaterCapacity && groundWaterCapacityLayer.GetCellValue(i, j) > 0.1f)
+                    {
+                        Gizmos.color = Color.blue;
+                        Gizmos.DrawCube(cellCentre, new Vector3(cellSize, groundWaterCapacityLayer.GetCellValue(i, j), cellSize));
+                    }
+                    if (visualizeGroundWaterRecharge && groundWaterRechargeLayer.GetCellValue(i, j) > 0.1f)
+                    {
+                        Gizmos.color = Color.green;
+                        Gizmos.DrawCube(cellCentre, new Vector3(cellSize, groundWaterRechargeLayer.GetCellValue(i, j), cellSize));
+                    }
+                    if (visualizeGroundWaterVolume && groundWaterVolumeLayer.GetCellValue(i, j) > 0.1f)
+                    {
+                        Gizmos.color = Color.cyan;
+                        Gizmos.DrawCube(cellCentre, new Vector3(cellSize, groundWaterVolumeLayer.GetCellValue(i, j), cellSize));
+                    }
+                    if (visualizeWindDirection)// && groundWaterRechargeLayer.GetCellValue(i, j) > 0.1f)
+                    {
+                        Gizmos.color = Color.white;
+                        //Gizmos.DrawCube(cellCentre, new Vector3(cellSize, windDirectionLayer.GetCellValue(i, j), cellSize));
+                    }
+                    if (visualizeWindSpeed && windSpeedLayer.GetCellValue(i, j) > 0.1f)
+                    {
+                        Gizmos.color = Color.yellow;
+                        Gizmos.DrawCube(cellCentre, new Vector3(cellSize, windSpeedLayer.GetCellValue(i, j), cellSize));
                     }
                 }
             }
@@ -352,6 +422,9 @@ public class GridLayer<T>
             return;
         gridStatus[cellID_x, cellID_y] = value;
     }
+
+
+    //TODO consider removing these methods:
     public void SetMultipleCellsValueConst(uint centralCellID_x, uint centralCellID_y, uint radius, T value)
     {
         //TODO implement this
