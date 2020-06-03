@@ -4,22 +4,27 @@ using UnityEngine;
 
 public class WaterTreatmentPlant_1 : InfrastructureBuilding
 {
-    public float currentTreatmentRate {get; private set;}
-    public float currentEfficiency {get; private set;}
-    public float currentMaxTreatmentRate {get; private set;} //not to be confused with maxTreatmentRate in WaterTreatmentPlantStats. This one is variable depending on other simulation factors.
+    //TODO reset (uncomment) the {get; private set;} parts bellow:
+    public float currentTreatmentRate;// {get; private set;}
+    public float currentEfficiency;// {get; private set;}
+    public float currentMaxTreatmentRate;// {get; private set;} //not to be confused with maxTreatmentRate in WaterTreatmentPlantStats. This one is variable depending on other simulation factors.
+    //public float currentDemand = 0.0f;
 
 
     [SerializeField] WaterTreatmentPlantStats plantStats = new WaterTreatmentPlantStats();
-    public override void UpdateCityResources()
-    {
-
-    }
-
 
     protected override void OnConstructionComplete()
     {
         base.OnConstructionComplete();
         Grid.grid.SetInfrastructureState(InfrastructureService.water, occupiedCell[0], occupiedCell[1], infraStats.radiusOfInfluence);
+        ComputeCurrentProduction();
+        GameManager.buildingsMan.AddInfrastructureBuilding(this, InfrastructureService.water);
+        UpdateCityResources();
+    }
+
+    public override void UpdateCityResources() //pointless?
+    {
+
     }
 
     float ComputeCurrentProduction() //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
@@ -30,6 +35,16 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
         //Building Budget affects efficiency.
         //Efficiency affect how much is the currentMaxTreatmentRate compared to plantStats.maxTreatmentRate.
         
+        //Sample groundWaterVolumeLayer in the main Grid
+        float availableGroundWater = Grid.grid.GetTotalGroundWaterVolume(occupiedCell[0], occupiedCell[1], plantStats.extractionRadius);
+        currentEfficiency = 0.8f;
+
+        if (availableGroundWater < plantStats.minGroundWaterVolume)
+            return 0.0f;
+
+        currentMaxTreatmentRate = currentEfficiency * plantStats.maxTreatmentRate;
+        //production = Mathf.Min(currentMaxTreatmentRate, currentDemand);
+        production = currentMaxTreatmentRate;
 
         return production;
     }
