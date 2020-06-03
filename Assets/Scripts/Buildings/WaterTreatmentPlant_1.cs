@@ -51,11 +51,11 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
     
 
     
-    void OnDrawGizmos() //test
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(this.transform.position, infraStats.radiusOfInfluence * Grid.cellSize);
-    }
+    // void OnDrawGizmos() //test
+    // {
+    //     Gizmos.color = Color.blue;
+    //     Gizmos.DrawWireSphere(this.transform.position, infraStats.radiusOfInfluence * Grid.cellSize);
+    // }
 }
 
 [System.Serializable]

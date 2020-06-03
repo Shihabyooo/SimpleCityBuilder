@@ -16,6 +16,8 @@ public class BuildingsManager : MonoBehaviour
     void Awake()
     {
         constructedBuildings = new List<Building>();
+        waterProductionBuildings = new List<InfrastructureBuilding>();
+        powerProductionBuildings = new List<InfrastructureBuilding>();
     }
 
     public BuildingProposal StartNewBuildingProposal(int buildingID)

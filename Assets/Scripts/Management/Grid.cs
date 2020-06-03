@@ -315,8 +315,10 @@ public class Grid : MonoBehaviour
         }
 
         Gizmos.DrawCube(lastCellCentre, new Vector3(0.5f, 0.5f, 0.5f));
+        
 
-        if (visualizeWaterInfra)
+
+        if (UnityEditor.EditorApplication.isPlaying) 
         {
             for (uint i = 0; i < noOfCells.x; i++)
             {
@@ -324,7 +326,7 @@ public class Grid : MonoBehaviour
                 {
                     Vector3 cellCentre = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize + (float)cellSize / 2.0f, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize + (float)cellSize / 2.0f);
 
-                    if (IsInfrastructureSet(InfrastructureService.water, infrastructureLayer.GetCellValue(i, j)))
+                    if (visualizeWaterInfra && IsInfrastructureSet(InfrastructureService.water, infrastructureLayer.GetCellValue(i, j)))
                     {
                         Gizmos.color = Color.cyan;
                         cornerSW = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize);
