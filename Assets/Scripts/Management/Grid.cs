@@ -257,6 +257,10 @@ public class Grid : MonoBehaviour
 
 //testing metdhods
 
+    float minGWCap = 0.0f, maxGWCap = 100.0f;
+    float minGWRech = 0.0f, maxGWRech = 2.0f;
+    float minWindSp = 1.0f, maxWindSp = 8.0f;
+    uint minWindDeg = 0, maxWindDeg = 90;
     void AddRandomNaturalResources()
     {
         uint halfMapX = (uint)Mathf.RoundToInt(noOfCells.x / 2.0f);
@@ -266,17 +270,18 @@ public class Grid : MonoBehaviour
         {
             for (uint j = 0; j < halfMapY; j++)
             {
-                groundWaterCapacityLayer.GetCellRef(i,j) = Random.Range(0.0f, 100.0f);
+                groundWaterCapacityLayer.GetCellRef(i,j) = Random.Range(minGWCap, maxGWCap);
                 groundWaterVolumeLayer.GetCellRef(i,j) = groundWaterCapacityLayer.GetCellValue(i,j);
-                groundWaterRechargeLayer.GetCellRef(i,j) = Random.Range(0.0f, 2.0f);
-                windSpeedLayer.GetCellRef(i,j) = Random.Range(0.0f, 10.0f);
-                windDirectionLayer.GetCellRef(i,j) = (uint)Mathf.FloorToInt(Random.Range(0.0f, 90.0f));
+                groundWaterRechargeLayer.GetCellRef(i,j) = Random.Range(minGWRech, maxGWRech);
+                windSpeedLayer.GetCellRef(i,j) = Random.Range(minWindSp, maxWindSp);
+                windDirectionLayer.GetCellRef(i,j) = (uint)Mathf.FloorToInt(Random.Range((float)minWindDeg, (float)maxWindDeg));
             }
         }
     }
 
     Vector3 lastCellCentre = new Vector3(0.0f, -10.0f, 0.0f); //test
     public bool visualizeWaterInfra = false;
+    public bool visualizePowerInfra = false;
     public bool visualizeGroundWaterRecharge = false;
     public bool visualizeGroundWaterVolume = false;
     public bool visualizeGroundWaterCapacity = false;
@@ -325,6 +330,7 @@ public class Grid : MonoBehaviour
                 for (uint j = 0; j < noOfCells.y; j++)
                 {
                     Vector3 cellCentre = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize + (float)cellSize / 2.0f, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize + (float)cellSize / 2.0f);
+                    float barSize = (float)cellSize * 0.75f;
 
                     if (visualizeWaterInfra && IsInfrastructureSet(InfrastructureService.water, infrastructureLayer.GetCellValue(i, j)))
                     {
@@ -339,20 +345,42 @@ public class Grid : MonoBehaviour
                         Gizmos.DrawLine(cornerNE, cornerSE);
                         Gizmos.DrawLine(cornerSE, cornerSW);
                     }
+                    if (visualizePowerInfra && IsInfrastructureSet(InfrastructureService.water, infrastructureLayer.GetCellValue(i,j)))
+                    {
+                        Gizmos.color = Color.yellow;
+
+                        cornerSW = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize);
+                        cornerNW = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize + cellSize);
+                        cornerNE = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize + cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize + cellSize);
+                        cornerSE = new Vector3(_pos.x - boundary.x / 2.0f + i * cellSize + cellSize, _pos.y, _pos.z - boundary.y / 2.0f + j * cellSize);
+                        
+                        Gizmos.DrawLine(cornerSW, cornerNW);
+                        Gizmos.DrawLine(cornerNW, cornerNE);
+                        Gizmos.DrawLine(cornerNE, cornerSE);
+                        Gizmos.DrawLine(cornerSE, cornerSW);
+                    }
+
+
                     if (visualizeGroundWaterCapacity && groundWaterCapacityLayer.GetCellValue(i, j) > 0.1f)
                     {
                         Gizmos.color = Color.blue;
-                        Gizmos.DrawCube(cellCentre, new Vector3(cellSize, groundWaterCapacityLayer.GetCellValue(i, j), cellSize));
+                        //Gizmos.DrawCube(cellCentre + new Vector3(0.0f, groundWaterCapacityLayer.GetCellValue(i, j) / 2.0f, 0.0f), new Vector3(barSize, groundWaterCapacityLayer.GetCellValue(i, j), barSize));
+                        float _size = barSize * groundWaterCapacityLayer.GetCellValue(i, j) / maxGWCap;
+                        Gizmos.DrawCube(cellCentre, new Vector3(_size, _size, _size));
                     }
                     if (visualizeGroundWaterRecharge && groundWaterRechargeLayer.GetCellValue(i, j) > 0.1f)
                     {
                         Gizmos.color = Color.green;
-                        Gizmos.DrawCube(cellCentre, new Vector3(cellSize, groundWaterRechargeLayer.GetCellValue(i, j), cellSize));
+                        //Gizmos.DrawCube(cellCentre + new Vector3(0.0f, groundWaterRechargeLayer.GetCellValue(i, j) / 2.0f, 0.0f), new Vector3(barSize, groundWaterRechargeLayer.GetCellValue(i, j), barSize));
+                        float _size = barSize * groundWaterRechargeLayer.GetCellValue(i, j) / maxGWRech;
+                        Gizmos.DrawCube(cellCentre, new Vector3(_size, _size, _size));
                     }
                     if (visualizeGroundWaterVolume && groundWaterVolumeLayer.GetCellValue(i, j) > 0.1f)
                     {
                         Gizmos.color = Color.cyan;
-                        Gizmos.DrawCube(cellCentre, new Vector3(cellSize, groundWaterVolumeLayer.GetCellValue(i, j), cellSize));
+                        //Gizmos.DrawCube(cellCentre + new Vector3(0.0f, groundWaterVolumeLayer.GetCellValue(i, j) / 2.0f, 0.0f) , new Vector3(barSize, groundWaterVolumeLayer.GetCellValue(i, j), barSize));
+                        float _size = barSize * groundWaterVolumeLayer.GetCellValue(i, j) / maxGWCap;
+                        Gizmos.DrawCube(cellCentre, new Vector3(_size, _size, _size));
                     }
                     if (visualizeWindDirection)// && groundWaterRechargeLayer.GetCellValue(i, j) > 0.1f)
                     {
@@ -362,7 +390,9 @@ public class Grid : MonoBehaviour
                     if (visualizeWindSpeed && windSpeedLayer.GetCellValue(i, j) > 0.1f)
                     {
                         Gizmos.color = Color.yellow;
-                        Gizmos.DrawCube(cellCentre, new Vector3(cellSize, windSpeedLayer.GetCellValue(i, j), cellSize));
+                        //Gizmos.DrawCube(cellCentre + new Vector3(0.0f, windSpeedLayer.GetCellValue(i, j) / 2.0f, 0.0f), new Vector3(barSize, windSpeedLayer.GetCellValue(i, j), barSize));
+                        float _size = barSize * windSpeedLayer.GetCellValue(i, j) / maxWindSp;
+                        Gizmos.DrawCube(cellCentre, new Vector3(_size, _size, _size));
                     }
                 }
             }
