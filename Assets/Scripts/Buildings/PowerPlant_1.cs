@@ -5,7 +5,7 @@ using UnityEngine;
 public class PowerPlant_1 : InfrastructureBuilding
 {
 
-     //TODO reset (uncomment) the {get; private set;} parts bellow:
+    //TODO reset (uncomment) the {get; private set;} parts bellow:
     public float currentPowerProduction;// {get; private set;}
     public float currentEfficiency;// {get; private set;}
     public float currentMaxPowerProduction;// {get; private set;} //not to be confused with maxPowerProduction in PowerPlantStats. This one is variable depending on other simulation factors.
@@ -13,7 +13,7 @@ public class PowerPlant_1 : InfrastructureBuilding
 
     [SerializeField] PowerPlantStats plantStats = new PowerPlantStats();
 
-     protected override void OnConstructionComplete()
+    protected override void OnConstructionComplete()
     {
         base.OnConstructionComplete();
         Grid.grid.SetInfrastructureState(InfrastructureService.power, occupiedCell[0], occupiedCell[1], infraStats.radiusOfInfluence);

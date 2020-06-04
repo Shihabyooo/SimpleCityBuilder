@@ -102,3 +102,10 @@ MonoBehaviour:
   occupiedCell: 0000000000000000
   infraStats:
     radiusOfInfluence: 5
+  currentPowerProduction: 0
+  currentEfficiency: 0
+  currentMaxPowerProduction: 0
+  farmStats:
+    maxPowerProduction: 3
+    minWindSpeed: 2
+    maxWindSpeed: 7
