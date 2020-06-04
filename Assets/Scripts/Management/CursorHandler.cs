@@ -5,7 +5,7 @@ using UnityEngine;
 
 public enum ControlMode
 {
-    freeMode, buildingDrag, menu
+    freeMode, buildingDrag, menu, cellInspection
 }
 
 public class CursorHandler : MonoBehaviour
@@ -37,6 +37,9 @@ public class CursorHandler : MonoBehaviour
                 break;
             case ControlMode.menu:
                 MenuControl();
+                break;
+            case ControlMode.cellInspection:
+                CellInspectionControl();
                 break;
             default:
                 break;
@@ -91,6 +94,21 @@ public class CursorHandler : MonoBehaviour
 
     }
 
+    void CellInspectionControl()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit hit = CastRay(gridLayer);
+            inspectedCell = Grid.grid.SampleForCell(hit.point);
+        }
+        
+        if (Input.GetMouseButtonDown(1))
+        {
+            showCellValue = false;
+            SwitchToFreeMode();
+        }
+    }
+
 //Control Utilities
     Vector3 direction; //test. For vizualization in editor.
     RaycastHit CastRay(LayerMask mask)
@@ -113,6 +131,9 @@ public class CursorHandler : MonoBehaviour
 //Other Utilities
     public void SwitchToBuildingPlacement(BuildingsManager.BuildingProposal building)
     {
+        if (currentCursorMode != ControlMode.freeMode) //can only switch to building placement from freemode.
+            return;
+
         currentCursorMode = ControlMode.buildingDrag;
         buildingToPlace = building;
     }
@@ -122,7 +143,13 @@ public class CursorHandler : MonoBehaviour
         currentCursorMode = ControlMode.freeMode;
     }
 
-//Other
+    public void SwitchToCellInspection()
+    {
+        showCellValue = true;
+        currentCursorMode = ControlMode.cellInspection;
+    }
+//Other testing methods
+
     Vector3 lastHitPosition = new Vector3(10.0f, 2.0f, 5.0f);
     void OnDrawGizmos()
     {
@@ -133,4 +160,61 @@ public class CursorHandler : MonoBehaviour
         Gizmos.color = Color.magenta;
         Gizmos.DrawLine(Camera.main.transform.position, direction * maxRayCastDistance);
     }
+
+
+    bool showCellValue = false;
+    Cell inspectedCell;
+    void OnGUI()
+    {
+        
+        GUI.Label(new Rect(10, 20, 100, 20), ("current control mode: " + currentCursorMode.ToString()));
+        
+        if (UnityEditor.EditorApplication.isPlaying && showCellValue)
+        {
+            int lineHeight = 20;
+            Rect rect = new Rect(250, lineHeight, 500, lineHeight);
+            if (inspectedCell != null)
+            {
+                Rect nextLine = rect;
+                
+                string text = "Infrastructure state: ";
+                if (inspectedCell.isPowered)
+                    text += "Powered, ";
+                if (inspectedCell.isWatered)
+                    text += "Watered, ";
+                if (inspectedCell.isEducated)
+                    text += "Educated, ";
+                if (inspectedCell.isHealthed)
+                    text += "Healthed, ";
+                if (inspectedCell.isOccupied)
+                    text += "Occupied, ";
+
+                GUI.Label(nextLine, text);
+                
+                nextLine.y += lineHeight + 5;
+                text = "GW Capacity: " + inspectedCell.groundwaterCapacity.ToString();
+                GUI.Label(nextLine, text);
+
+                nextLine.y += lineHeight + 5;
+                text = "GW Volume: " + inspectedCell.groundwaterVolume.ToString();
+                GUI.Label(nextLine, text);
+
+                nextLine.y += lineHeight + 5;
+                text = "GW Recharge: " + inspectedCell.groundwaterRecharge.ToString();
+                GUI.Label(nextLine, text);
+
+                nextLine.y += lineHeight + 5;
+                text = "Wind Direction: " + inspectedCell.windDirection.ToString();
+                GUI.Label(nextLine, text);
+
+                nextLine.y += lineHeight + 5;
+                text = "Wind Speed: " + inspectedCell.windSpeed.ToString();
+                GUI.Label(nextLine, text);
+
+            }
+            else
+                GUI.Label(rect, "NULL");
+        }
+    }
+
 }

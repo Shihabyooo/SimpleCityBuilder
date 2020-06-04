@@ -35,4 +35,9 @@ public class GameManager : MonoBehaviour
     {
         cursorHandler.SwitchToBuildingPlacement(buildingsMan.StartNewBuildingProposal(buildingID));
     }
+
+    public void SwitchToCellInspector()
+    {
+        cursorHandler.SwitchToCellInspection();
+    }
 }
