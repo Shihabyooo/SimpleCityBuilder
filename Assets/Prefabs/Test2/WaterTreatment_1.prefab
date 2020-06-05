@@ -99,9 +99,18 @@ MonoBehaviour:
     requireResourcesToConstruct: 0
     powerRequirements: 1
     waterRequirements: 0
+    minBudget: 2000
+    maxBudget: 5000
   occupiedCell: 0000000000000000
+  budget: 0
   infraStats:
     radiusOfInfluence: 4
+    minEfficiency: 0.2
+    maxEfficiency: 0.8
+  currentTreatmentRate: 0
+  currentEfficiency: 0.8
+  currentMaxTreatmentRate: 0
+  availableGroundWater: 0
   plantStats:
     maxTreatmentRate: 5
     minGroundWaterVolume: 0.5

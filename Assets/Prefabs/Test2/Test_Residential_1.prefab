@@ -99,3 +99,7 @@ MonoBehaviour:
     requireResourcesToConstruct: 1
     powerRequirements: 1
     waterRequirements: 1
+    minBudget: 100
+    maxBudget: 500
+  occupiedCell: 0000000000000000
+  budget: 0

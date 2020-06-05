@@ -99,9 +99,14 @@ MonoBehaviour:
     requireResourcesToConstruct: 0
     powerRequirements: 0
     waterRequirements: 0
+    minBudget: 1000
+    maxBudget: 3000
   occupiedCell: 0000000000000000
+  budget: 0
   infraStats:
     radiusOfInfluence: 5
+    minEfficiency: 0.2
+    maxEfficiency: 0.8
   currentPowerProduction: 0
   currentEfficiency: 0
   currentMaxPowerProduction: 0

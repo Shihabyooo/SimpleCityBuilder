@@ -96,5 +96,10 @@ MonoBehaviour:
     cost: 500
     type: 0
     constructionTime: 10
+    requireResourcesToConstruct: 0
     powerRequirements: 1
     waterRequirements: 1
+    minBudget: 1000
+    maxBudget: 3000
+  occupiedCell: 0000000000000000
+  budget: 0

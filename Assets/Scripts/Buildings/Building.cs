@@ -13,28 +13,31 @@ public class Building : MonoBehaviour
     [SerializeField] protected BuildingStats stats; //can't use {get; private set;} and have it serialized in the editor at the same time, so leaving at as private and making a getter method.
     public bool isUnderConstruction {get; private set;}
     public uint[] occupiedCell = new uint[2]; //the cell this building is constructed on, set by BuildingsManager (via ProposedBuilding).
+    [SerializeField] protected uint budget; //IMPORTANT! budget must always be from stats.minBudget to stats.maxBudget
 
+
+    virtual protected void Awake()
+    {
+        budget = (uint)Mathf.FloorToInt((float)(stats.minBudget + stats.maxBudget) / 2.0f);
+    }
 
     public BuildingStats GetStats()
     {
         return stats;
     }
 
-    public virtual bool CheckResourceRequirements(Cell cell) //this does NOT include checking whether cell is occupied or not, which is handled in BuildingsManager.
+    public virtual bool CheckConstructionResourceRequirements(Cell cell) //this does NOT include checking whether cell is occupied or not, which is handled in BuildingsManager.
     {   
         
         if (stats.requireResourcesToConstruct)
         {
             //There are two steps to this: Check that the cell is covered by required services (data contained in the cell),
             //and check that the available resources for the service are enought (from ResourcesManager)
-            if ((stats.powerRequirements > 0.001f && !cell.isPowered)  //first check
-                || stats.powerRequirements < GameManager.resourceMan.AvailablePower()) //second check.
+            if (stats.powerRequirements > GameManager.resourceMan.AvailablePower() && !cell.isPowered) //second check.
                 return false;
 
-            if ((stats.waterRequirements > 0.001f && !cell.isWatered)  //first check
-                || stats.waterRequirements < GameManager.resourceMan.AvailableWater()) //second check.
+            if (stats.waterRequirements > GameManager.resourceMan.AvailableWater() && !cell.isWatered) //second check.
                 return false;
-
         }
         
         return true;
@@ -81,8 +84,13 @@ public class BuildingStats
 
     //requirements for operation 
     public bool requireResourcesToConstruct = false; //if set to true, building won't be constructed unless resources are enough, else building will be constructed, but won't operate fully (or at all)
-    public float powerRequirements = 1.0f; //in units per time.
-    public float waterRequirements = 1.0f; //in units per time.
+    public float powerRequirements = 1.0f; //in unit power per unit time.
+    public float waterRequirements = 1.0f; //in unit volume per unit time.
+
+
+    //IMPORATANT! maxBudget must always be greater than minBudget
+    public uint minBudget = 1; //unit of money per unit time
+    public uint maxBudget = 2; //unit of money per unit time
     //TODO add remaining requirements.
 
     //TODO add remaining -universal- parameters here.
