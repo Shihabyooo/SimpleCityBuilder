@@ -6,7 +6,6 @@ public class ResourcesManager : MonoBehaviour
 {
     [SerializeField] CityResources resources = new CityResources(); //The serialization is only for testing (to view parameters in editor while testing)
 
-
     public CityResources GetCityResources()
     {
         return resources;
@@ -37,8 +36,49 @@ public class ResourcesManager : MonoBehaviour
 
         return resources.totalAvailableHospitalBeds - resources.currentFilledHospitalBeds;    
     }
-}
 
+
+    //Setters
+    public void UpdatePowerDraw(float newDraw)
+    {
+        resources.currentPowerDraw = newDraw;
+    }
+
+    public void UpdateAvailablePower(float newAvailable)
+    {
+        resources.totalAvailablePower = newAvailable;
+    }
+
+    public void UpdateWaterConsumption(float newConsumption)
+    {
+        resources.currentWaterConsumption = newConsumption;
+    }
+
+    public void UpdateWaterSupply(float newSupply)
+    {
+        resources.totalAvailableWaterSupply = newSupply;
+    }
+
+    public void UpdateStudentCount(ulong newCount)
+    {
+        resources.currentStudentsCount = newCount;
+    }
+
+    public void UpdateAvailableEducationSeats(ulong newSeats)
+    {
+        resources.totalAvailableEducationSeats = newSeats;
+    }
+
+    public void UpdateAvailableHospitalBeds(ulong newBeds)
+    {
+        resources.totalAvailableHospitalBeds = newBeds;
+    }
+
+    public void UpdateFilledHospitalBeds(ulong newBeds)
+    {
+        resources.currentFilledHospitalBeds = newBeds;
+    }
+}
 
 [System.Serializable]
 public class CityResources
