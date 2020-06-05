@@ -38,6 +38,12 @@ public class GameManager : MonoBehaviour
 
     public void SwitchToBuildingPlacement(int buildingID)
     {
+        //this check is redunandt in SwitchToBuildingPlacement, but because StartNewBuidlingProposal() does work we don't want to happen if we are not constructing, we 
+        //do this check here.
+        //Alternative: Modify SwitchToBuildingPlacement to take a buildingID and have it handle talking buildingsMan.
+        if (cursorHandler.CurrentCursorMode() != ControlMode.freeMode) 
+            return;                                                    
+
         cursorHandler.SwitchToBuildingPlacement(buildingsMan.StartNewBuildingProposal(buildingID));
     }
 

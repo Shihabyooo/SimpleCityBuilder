@@ -5,6 +5,7 @@ using UnityEngine;
 public class ResourcesManager : MonoBehaviour
 {
     [SerializeField] CityResources resources = new CityResources(); //The serialization is only for testing (to view parameters in editor while testing)
+    [SerializeField] CityFinances finances = new CityFinances(); //The serialization is only for testing (to view parameters in editor while testing)
 
     public CityResources GetCityResources()
     {
@@ -18,7 +19,7 @@ public class ResourcesManager : MonoBehaviour
 
     public float AvailableWater()
     {
-        return resources.totalAvailablePower - resources.currentPowerDraw;
+        return resources.totalAvailableWaterSupply - resources.currentWaterConsumption;
     }
 
     public ulong AvailableEducation()
@@ -78,6 +79,53 @@ public class ResourcesManager : MonoBehaviour
     {
         resources.currentFilledHospitalBeds = newBeds;
     }
+
+
+    //testing viz
+    void OnGUI()
+    {
+        
+        int screenWidth  = Screen.width;
+        
+        int dataDispWidth = 250;
+        int lineHeight = 20;
+        Rect rect = new Rect(screenWidth - dataDispWidth - 130, 50, dataDispWidth, lineHeight);
+
+        string message = "Tresury: " + finances.treasury.ToString();
+        GUI.Label(rect, message);
+
+        rect.y += lineHeight + 5;
+        message = "[PLACEHOLDER]";
+        GUI.Label(rect, message);
+
+        rect.y += lineHeight + 5;
+        message = "Available Power: " + resources.totalAvailablePower.ToString();
+        GUI.Label(rect, message);
+
+        rect.y += lineHeight + 5;
+        message = "Power Draw: " + resources.currentPowerDraw.ToString();
+        GUI.Label(rect, message);
+
+        rect.y += lineHeight + 5;
+        message = "Water Supply: " + resources.totalAvailableWaterSupply.ToString();
+        GUI.Label(rect, message);
+
+        rect.y += lineHeight + 5;
+        message = "Available Education Seats: " + resources.totalAvailableEducationSeats.ToString();
+        GUI.Label(rect, message);
+
+        rect.y += lineHeight + 5;
+        message = "Current Students Count: " + resources.currentStudentsCount.ToString();
+        GUI.Label(rect, message);
+
+        rect.y += lineHeight + 5;
+        message = "Available Hospital Beds: " + resources.totalAvailableHospitalBeds.ToString();
+        GUI.Label(rect, message);
+
+        rect.y += lineHeight + 5;
+        message = "Filled Hospital Beds: " + resources.currentFilledHospitalBeds.ToString();
+        GUI.Label(rect, message);
+    }
 }
 
 [System.Serializable]
@@ -91,4 +139,11 @@ public class CityResources
     public ulong totalAvailableEducationSeats = 0;
     public ulong currentFilledHospitalBeds = 0;
     public ulong totalAvailableHospitalBeds = 0;
+}
+
+public class CityFinances
+{
+    public long treasury;
+
+    //TODO add other finances/economy related parameters here
 }

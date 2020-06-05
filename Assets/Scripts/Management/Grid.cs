@@ -287,6 +287,7 @@ public class Grid : MonoBehaviour
     public bool visualizeGroundWaterCapacity = false;
     public bool visualizeWindSpeed = false;
     public bool visualizeWindDirection = false;
+    public bool visualizePollution = false;
     void OnDrawGizmos() //unefficient, but not meant for production anyway...
     {
         //UpdateGridBoundary();
@@ -345,7 +346,7 @@ public class Grid : MonoBehaviour
                         Gizmos.DrawLine(cornerNE, cornerSE);
                         Gizmos.DrawLine(cornerSE, cornerSW);
                     }
-                    if (visualizePowerInfra && IsInfrastructureSet(InfrastructureService.water, infrastructureLayer.GetCellValue(i,j)))
+                    if (visualizePowerInfra && IsInfrastructureSet(InfrastructureService.power, infrastructureLayer.GetCellValue(i,j)))
                     {
                         Gizmos.color = Color.yellow;
 

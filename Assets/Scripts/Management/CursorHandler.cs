@@ -105,6 +105,7 @@ public class CursorHandler : MonoBehaviour
         if (Input.GetMouseButtonDown(1))
         {
             showCellValue = false;
+            inspectedCell = null;
             SwitchToFreeMode();
         }
     }
@@ -147,6 +148,11 @@ public class CursorHandler : MonoBehaviour
     {
         showCellValue = true;
         currentCursorMode = ControlMode.cellInspection;
+    }
+
+    public ControlMode CurrentCursorMode()
+    {
+        return currentCursorMode;
     }
 //Other testing methods
 

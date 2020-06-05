@@ -82,7 +82,7 @@ public class BuildingsManager : MonoBehaviour
 
       public bool CanConstructHere(Cell cell)
        {
-          if (cell.isOccupied || !targetBuilding.GetComponent<Building>().CheckResourceRequirements(cell))
+          if (cell.isOccupied || !targetBuilding.GetComponent<Building>().CheckConstructionResourceRequirements(cell))
                return false;
 
            //TODO add logic to assess whether positition supports building of this type here.
