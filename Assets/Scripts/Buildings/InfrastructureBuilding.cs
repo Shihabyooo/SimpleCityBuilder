@@ -16,12 +16,11 @@ public class InfrastructureBuilding : Building
         return infraStats;
     }
 
-    public virtual void UpdateCityResources()
+    public virtual float ComputeProduction()
     {
-
+        return 0.0f;
     }
     
-
 }
 
 [System.Serializable]

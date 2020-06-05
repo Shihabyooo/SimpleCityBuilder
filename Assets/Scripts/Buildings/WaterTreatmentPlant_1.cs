@@ -17,17 +17,11 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
     {
         base.OnConstructionComplete();
         Grid.grid.SetInfrastructureState(InfrastructureService.water, occupiedCell[0], occupiedCell[1], infraStats.radiusOfInfluence);
-        ComputeCurrentProduction();
+        ComputeProduction();
         GameManager.buildingsMan.AddInfrastructureBuilding(this, InfrastructureService.water);
-        UpdateCityResources();
     }
 
-    public override void UpdateCityResources() //pointless?
-    {
-
-    }
-
-    float ComputeCurrentProduction() //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
+    public override float ComputeProduction()  //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
     {
         float production = 0.0f;
 

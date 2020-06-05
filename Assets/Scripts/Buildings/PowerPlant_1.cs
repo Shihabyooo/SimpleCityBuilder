@@ -17,12 +17,11 @@ public class PowerPlant_1 : InfrastructureBuilding
     {
         base.OnConstructionComplete();
         Grid.grid.SetInfrastructureState(InfrastructureService.power, occupiedCell[0], occupiedCell[1], infraStats.radiusOfInfluence);
-        ComputeCurrentProduction();
+        ComputeProduction();
         GameManager.buildingsMan.AddInfrastructureBuilding(this, InfrastructureService.power);
-        //UpdateCityResources();
     }
 
-    float ComputeCurrentProduction() //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
+    public override float ComputeProduction() //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
     {
         float production = 0.0f;
 
