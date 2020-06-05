@@ -5,7 +5,7 @@ using UnityEngine;
 public class BuildingsManager : MonoBehaviour
 {
     BuildingProposal currentProposal = null;
-    [SerializeField] BuildingsDatabase database;
+    [SerializeField] BuildingsDatabase database = new BuildingsDatabase();
 
     public List<Building> constructedBuildings {get; private set;} //containers ALL constructed buildings.
     public List<InfrastructureBuilding> waterProductionBuildings {get; private set;} //contains only water producing buildings

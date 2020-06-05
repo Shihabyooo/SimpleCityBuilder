@@ -31,6 +31,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        simMan.StartSimulation();
+    }
+
     public void SwitchToBuildingPlacement(int buildingID)
     {
         cursorHandler.SwitchToBuildingPlacement(buildingsMan.StartNewBuildingProposal(buildingID));
