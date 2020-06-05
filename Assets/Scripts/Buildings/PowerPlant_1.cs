@@ -28,8 +28,10 @@ public class PowerPlant_1 : InfrastructureBuilding
         //Building Budget affects efficiency.
         //Efficiency affect how much is the currentMaxPowerProduction compared to plantStats.maxPowerProduction.
         
+        //currentEfficiency = 0.8f;
 
-        currentEfficiency = 0.8f;
+        float budgetEffect = (float)(budget - stats.minBudget) / (float) (stats.maxBudget - stats.minBudget); //linear interpolation
+        currentEfficiency = budgetEffect * (infraStats.maxEfficiency - infraStats.minEfficiency) + infraStats.minEfficiency; //linear interpolation
 
 
         currentMaxPowerProduction = Mathf.Max(currentEfficiency * plantStats.maxPowerProduction, plantStats.minPowerProduction);
@@ -39,7 +41,6 @@ public class PowerPlant_1 : InfrastructureBuilding
 
         return production;
     }
-
 
 }
 

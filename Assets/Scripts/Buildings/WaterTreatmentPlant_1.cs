@@ -8,6 +8,7 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
     public float currentTreatmentRate;// {get; private set;}
     public float currentEfficiency;// {get; private set;}
     public float currentMaxTreatmentRate;// {get; private set;} //not to be confused with maxTreatmentRate in WaterTreatmentPlantStats. This one is variable depending on other simulation factors.
+    public float availableGroundWater;// {get; private set;}
     //public float currentDemand = 0.0f;
 
 
@@ -30,8 +31,11 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
         //Efficiency affect how much is the currentMaxTreatmentRate compared to plantStats.maxTreatmentRate.
         
         //Sample groundWaterVolumeLayer in the main Grid
-        float availableGroundWater = Grid.grid.GetTotalGroundWaterVolume(occupiedCell[0], occupiedCell[1], plantStats.extractionRadius);
-        currentEfficiency = 0.8f;
+        availableGroundWater = Grid.grid.GetTotalGroundWaterVolume(occupiedCell[0], occupiedCell[1], plantStats.extractionRadius);
+        
+        //currentEfficiency = 0.8f;
+        float budgetEffect = (float)(budget - stats.minBudget) / (float) (stats.maxBudget - stats.minBudget); //linear interpolation
+        currentEfficiency = budgetEffect * (infraStats.maxEfficiency - infraStats.minEfficiency) + infraStats.minEfficiency; //linear interpolation
 
         if (availableGroundWater < plantStats.minGroundWaterVolume)
             return 0.0f;

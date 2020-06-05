@@ -6,8 +6,9 @@ public class InfrastructureBuilding : Building
 {
     [SerializeField] protected InfrastructureBuildingStats infraStats;
 
-    void Awake()
+    override protected void Awake()
     {
+        base.Awake();
         stats.type = BuildingType.infrastructure;
     }
 
@@ -27,4 +28,6 @@ public class InfrastructureBuilding : Building
 public class InfrastructureBuildingStats
 {
     public uint radiusOfInfluence = 0; //Measured in cells.
+    public float minEfficiency = 0.2f;
+    public float maxEfficiency = 1.0f;
 }
