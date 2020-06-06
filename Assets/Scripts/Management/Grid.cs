@@ -33,6 +33,7 @@ public class Grid : MonoBehaviour
     public GridLayer<uint> windDirectionLayer {get;private set;} //stored as a degree angle starting from the north (positive y) and going clockwise.
     //Others layer
     public GridLayer<float> pollutionLayer {get; private set;}
+    public GridLayer<float> rainFallLayer {get; private set;}
 
 
     void Awake()
@@ -198,7 +199,6 @@ public class Grid : MonoBehaviour
         cellsStatus[cellID_x, cellID_y] = state;
     }
 
-//helper methods:
     bool IsInfrastructureSet(InfrastructureService service, InfrastructureService cellServices)
     {
         if ((cellServices & service) == service) //TODO check this.
@@ -254,6 +254,10 @@ public class Grid : MonoBehaviour
         return sum;
     }
     
+    public void SetRainfall(uint cellID_x, uint cellID_y, float rainFall)
+    {
+        rainFallLayer.SetCellValue(cellID_x, cellID_y, rainFall);
+    }
 
 //testing metdhods
 
@@ -322,8 +326,6 @@ public class Grid : MonoBehaviour
 
         Gizmos.DrawCube(lastCellCentre, new Vector3(0.5f, 0.5f, 0.5f));
         
-
-
         if (UnityEditor.EditorApplication.isPlaying) 
         {
             for (uint i = 0; i < noOfCells.x; i++)
