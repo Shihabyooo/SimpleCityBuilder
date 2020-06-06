@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SimulationManager : MonoBehaviour
 {
-    
+
     //TODO divide the simulation to several runs. Example:
         //Resident Happiness run.
         //Infrastructure Use run: Loop over residents/buildings, update load on infrastructure building accordingly.
@@ -13,16 +13,26 @@ public class SimulationManager : MonoBehaviour
 
     public float timeBetweenUpdates = 0.5f; //the time between each update in sim in seconds.
     [SerializeField] bool isRunning = false;
-
-    Coroutine infrastructureSim = null, happinessSim = null, natResourceSim = null, budgetSim = null;
+    System.DateTime date; //Known issue, this struct supports as far as 31-12-9999.
+    [SerializeField] int dateUpdateRateDays = 0, dateUpdateRateHours = 0; //the hours increment should be something we can divide 24 with (to make days increment after same number
+                                                                            //update ticks for all days), the days increment should be 1. Either days or hours should be set, not both.
+                                                                            //System should work for any value though.
+                                                                            
+    Coroutine buildingsSim = null, happinessSim = null, natResourceSim = null, budgetSim = null, timeKeeper = null;
     
+    public void Awake()
+    {
+        date = new System.DateTime(2020, 1, 1, 0, 0, 0);
+    }
+
     public void StartSimulation()
     {
         isRunning = true;
-        infrastructureSim = StartCoroutine(InfrastructureSimRun());
+        buildingsSim = StartCoroutine(BuildingsSimRun());
         happinessSim = StartCoroutine(HappinessSimRun());
         natResourceSim = StartCoroutine(NaturalResourcesSimRun());
         budgetSim = StartCoroutine(BudgetSimRun());
+        timeKeeper = StartCoroutine(TimeKeeperRun());
     }
 
     public void PauseSimulation()
@@ -35,12 +45,32 @@ public class SimulationManager : MonoBehaviour
         isRunning = true;
     }
 
-    IEnumerator InfrastructureSimRun()
-    {
+    IEnumerator BuildingsSimRun() //the current logic assigns available resources prioritizing older buildings (those coming first in buildingsMan.constructedBuildings list)
+    {                           
+        //Current issue with this logic: It's expensive! Most buildings won't have their operational status and parameters changed each sim update cycle, yet we would still compute
+        //productions and consumptions for all buildings at every sim update. A better approach would be to let each building process changes on its own by updating global values
+        //or registering itself for processing by a central manager. Downside of this approach would be checking against race conditions, and a more complicated code.
+
         while (true)
         {
             if (isRunning)
             {
+
+            //General Buildings
+                float totalWaterDemand = 0.0f;
+                float totalPowerDemand = 0.0f;
+
+                foreach (Building building in GameManager.buildingsMan.constructedBuildings)
+                {
+                    totalWaterDemand += building.GetStats().requiredResources.water;
+                    totalPowerDemand += building.GetStats().requiredResources.power;
+                }
+
+                GameManager.resourceMan.UpdateWaterDemand(totalWaterDemand);
+                GameManager.resourceMan.UpdatePowerDemand(totalPowerDemand);
+
+      
+            //Computing production of infraStructure buildings
                 float totalWaterProduction = 0.0f;
                 float totalPowerProduction = 0.0f;
 
@@ -51,9 +81,43 @@ public class SimulationManager : MonoBehaviour
                     totalWaterProduction += building.ComputeProduction();
     
             //Update ResourcesManager
-                GameManager.resourceMan.UpdateWaterSupply(totalWaterProduction);
+                GameManager.resourceMan.UpdateAvailableWater(totalWaterProduction);
                 GameManager.resourceMan.UpdateAvailablePower(totalPowerProduction);
 
+            //Allocate resources to buildings based on production and priority
+                float totalWaterConsumption = 0.0f;
+                float totalPowerConsumption = 0.0f;
+
+            foreach (Building building in GameManager.buildingsMan.constructedBuildings)
+            {
+                BasicResources resources = new BasicResources(); 
+                
+                resources.power = Mathf.Clamp(building.GetStats().requiredResources.power, 0.0f, totalPowerProduction - totalPowerConsumption);
+                resources.water = Mathf.Clamp(building.GetStats().requiredResources.water, 0.0f, totalWaterProduction - totalWaterConsumption);
+
+                totalPowerConsumption += resources.power;
+                totalWaterConsumption += resources.water;
+                building.AllocateResources(resources);
+            }
+            
+            //update ResourceManager
+            GameManager.resourceMan.UpdateWaterConsumption(totalWaterConsumption);
+            GameManager.resourceMan.UpdatePowerConsumption(totalPowerConsumption);
+
+                yield return new WaitForSeconds(timeBetweenUpdates);
+            }
+            else
+                yield return new WaitForFixedUpdate();
+        }
+    }
+
+    IEnumerator TimeKeeperRun()
+    {
+        while (true)
+        {
+            if (isRunning)
+            {
+                date += new System.TimeSpan(dateUpdateRateDays, dateUpdateRateHours, 0, 0);
                 yield return new WaitForSeconds(timeBetweenUpdates);
             }
             else
@@ -104,4 +168,16 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
+
+    //testing visualization
+    void OnGUI()
+    {
+        int lineHeight = 25;
+        Rect rect = new Rect(150, Screen.height - lineHeight - 10, 200, lineHeight);
+        string message = "Date: " + date.Day.ToString() + "-" + date.Month.ToString() + "-" + date.Year.ToString() + " - " + date.Hour.ToString();
+        GUIStyle style = new GUIStyle();
+        style.fontSize = 30;
+
+        GUI.Label(rect, message, style);
+    }
 }
