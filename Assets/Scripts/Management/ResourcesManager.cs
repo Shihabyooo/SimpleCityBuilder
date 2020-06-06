@@ -14,7 +14,7 @@ public class ResourcesManager : MonoBehaviour
 
     public float AvailablePower()
     {
-        return resources.totalAvailablePower - resources.currentPowerDraw;
+        return resources.totalAvailablePower - resources.currentPowerConsumption;
     }
 
     public float AvailableWater()
@@ -40,9 +40,14 @@ public class ResourcesManager : MonoBehaviour
 
 
     //Setters
-    public void UpdatePowerDraw(float newDraw)
+    public void UpdatePowerDemand(float newDemand)
     {
-        resources.currentPowerDraw = newDraw;
+        resources.currentPowerDemand = newDemand;
+    }
+
+    public void UpdatePowerConsumption(float newConsumption)
+    {
+        resources.currentPowerConsumption = newConsumption;
     }
 
     public void UpdateAvailablePower(float newAvailable)
@@ -50,14 +55,19 @@ public class ResourcesManager : MonoBehaviour
         resources.totalAvailablePower = newAvailable;
     }
 
+    public void UpdateWaterDemand(float newDemand)
+    {
+        resources.currentWaterDemand = newDemand;
+    }
+
     public void UpdateWaterConsumption(float newConsumption)
     {
         resources.currentWaterConsumption = newConsumption;
     }
 
-    public void UpdateWaterSupply(float newSupply)
+    public void UpdateAvailableWater(float newAvailable)
     {
-        resources.totalAvailableWaterSupply = newSupply;
+        resources.totalAvailableWaterSupply = newAvailable;
     }
 
     public void UpdateStudentCount(ulong newCount)
@@ -84,55 +94,71 @@ public class ResourcesManager : MonoBehaviour
     //testing viz
     void OnGUI()
     {
-        
+        GUIStyle style = new GUIStyle();
+        style.fontSize = 20;
         int screenWidth  = Screen.width;
         
         int dataDispWidth = 250;
-        int lineHeight = 20;
-        Rect rect = new Rect(screenWidth - dataDispWidth - 130, 50, dataDispWidth, lineHeight);
+        int lineHeight = 21;
+        int lineSpacing = 7;
+        Rect rect = new Rect(screenWidth - dataDispWidth - 150, 50, dataDispWidth, lineHeight);
 
         string message = "Tresury: " + finances.treasury.ToString();
-        GUI.Label(rect, message);
+        GUI.Label(rect, message, style);
 
-        rect.y += lineHeight + 5;
+        rect.y += lineHeight + lineSpacing;
         message = "[PLACEHOLDER]";
-        GUI.Label(rect, message);
+        GUI.Label(rect, message, style);
 
-        rect.y += lineHeight + 5;
+        rect.y += lineHeight + lineSpacing;
         message = "Available Power: " + resources.totalAvailablePower.ToString();
-        GUI.Label(rect, message);
+        GUI.Label(rect, message, style);
 
-        rect.y += lineHeight + 5;
-        message = "Power Draw: " + resources.currentPowerDraw.ToString();
-        GUI.Label(rect, message);
+        rect.y += lineHeight + lineSpacing;
+        message = "Power Demand: " + resources.currentPowerDemand.ToString();
+        GUI.Label(rect, message, style);
 
-        rect.y += lineHeight + 5;
+        rect.y += lineHeight + lineSpacing;
+        message = "Power Draw: " + resources.currentPowerConsumption.ToString();
+        GUI.Label(rect, message, style);
+
+        rect.y += lineHeight + lineSpacing;
         message = "Water Supply: " + resources.totalAvailableWaterSupply.ToString();
-        GUI.Label(rect, message);
+        GUI.Label(rect, message, style);
 
-        rect.y += lineHeight + 5;
+        rect.y += lineHeight + lineSpacing;
+        message = "Water Demand: " + resources.currentWaterDemand.ToString();
+        GUI.Label(rect, message, style);
+
+        rect.y += lineHeight + lineSpacing;
+        message = "Water Consumption: " + resources.currentWaterConsumption.ToString();
+        GUI.Label(rect, message, style);
+
+        rect.y += lineHeight + lineSpacing;
         message = "Available Education Seats: " + resources.totalAvailableEducationSeats.ToString();
-        GUI.Label(rect, message);
+        GUI.Label(rect, message, style);
 
-        rect.y += lineHeight + 5;
+        rect.y += lineHeight + lineSpacing;
         message = "Current Students Count: " + resources.currentStudentsCount.ToString();
-        GUI.Label(rect, message);
+        GUI.Label(rect, message, style);
 
-        rect.y += lineHeight + 5;
+        rect.y += lineHeight + lineSpacing;
         message = "Available Hospital Beds: " + resources.totalAvailableHospitalBeds.ToString();
-        GUI.Label(rect, message);
+        GUI.Label(rect, message, style);
 
-        rect.y += lineHeight + 5;
+        rect.y += lineHeight + lineSpacing;
         message = "Filled Hospital Beds: " + resources.currentFilledHospitalBeds.ToString();
-        GUI.Label(rect, message);
+        GUI.Label(rect, message, style);
     }
 }
 
 [System.Serializable]
 public class CityResources
 {
-    public float currentPowerDraw = 0.0f;
+    public float currentPowerDemand = 0.0f;
+    public float currentPowerConsumption = 0.0f;
     public float totalAvailablePower = 0.0f;
+    public float currentWaterDemand = 0.0f;
     public float currentWaterConsumption = 0.0f;
     public float totalAvailableWaterSupply = 0.0f;
     public ulong currentStudentsCount = 0;
