@@ -97,12 +97,16 @@ MonoBehaviour:
     type: 3
     constructionTime: 5
     requireResourcesToConstruct: 0
-    powerRequirements: 0
-    waterRequirements: 1
+    requiredResources:
+      power: 0
+      water: 3
     minBudget: 5000
     maxBudget: 10000
   occupiedCell: 0000000000000000
   budget: 0
+  allocatedResources:
+    power: 0
+    water: 0
   infraStats:
     radiusOfInfluence: 5
     minEfficiency: 0.2

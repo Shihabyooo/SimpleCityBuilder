@@ -14,6 +14,7 @@ public class Building : MonoBehaviour
     public bool isUnderConstruction {get; private set;}
     public uint[] occupiedCell = new uint[2]; //the cell this building is constructed on, set by BuildingsManager (via ProposedBuilding).
     [SerializeField] protected uint budget; //IMPORTANT! budget must always be from stats.minBudget to stats.maxBudget
+    [SerializeField] protected BasicResources allocatedResources = new BasicResources(); //These resources will be allocated by the simulation based on availability and priority.
 
 
     virtual protected void Awake()
@@ -26,6 +27,12 @@ public class Building : MonoBehaviour
         return stats;
     }
 
+    public void AllocateResources(BasicResources resources)
+    {
+        //TODO research this: We know that the
+        allocatedResources = resources;
+    }
+
     public virtual bool CheckConstructionResourceRequirements(Cell cell) //this does NOT include checking whether cell is occupied or not, which is handled in BuildingsManager.
     {   
         
@@ -33,10 +40,10 @@ public class Building : MonoBehaviour
         {
             //There are two steps to this: Check that the cell is covered by required services (data contained in the cell),
             //and check that the available resources for the service are enought (from ResourcesManager)
-            if (stats.powerRequirements > GameManager.resourceMan.AvailablePower() && !cell.isPowered) //second check.
+            if (stats.requiredResources.power > GameManager.resourceMan.AvailablePower() && !cell.isPowered) //second check.
                 return false;
 
-            if (stats.waterRequirements > GameManager.resourceMan.AvailableWater() && !cell.isWatered) //second check.
+            if (stats.requiredResources.water > GameManager.resourceMan.AvailableWater() && !cell.isWatered) //second check.
                 return false;
         }
         
@@ -71,6 +78,7 @@ public class Building : MonoBehaviour
     protected virtual void OnConstructionComplete()
     {
         isUnderConstruction = false;
+        GameManager.buildingsMan.AddConstructedBuilding(this);
     }
 }
 
@@ -84,9 +92,9 @@ public class BuildingStats
 
     //requirements for operation 
     public bool requireResourcesToConstruct = false; //if set to true, building won't be constructed unless resources are enough, else building will be constructed, but won't operate fully (or at all)
-    public float powerRequirements = 1.0f; //in unit power per unit time.
-    public float waterRequirements = 1.0f; //in unit volume per unit time.
-
+    //public float powerRequirements = 1.0f; //in unit power per unit time.
+    //public float waterRequirements = 1.0f; //in unit volume per unit time.
+    public BasicResources requiredResources = new BasicResources();
 
     //IMPORATANT! maxBudget must always be greater than minBudget
     public uint minBudget = 1; //unit of money per unit time
@@ -94,4 +102,11 @@ public class BuildingStats
     //TODO add remaining requirements.
 
     //TODO add remaining -universal- parameters here.
+}
+
+[System.Serializable]
+public class BasicResources
+{
+    public float power = 0.0f; //in unit power per unit time.
+    public float water = 0.0f; //in unit volume per unit time.
 }

@@ -97,9 +97,13 @@ MonoBehaviour:
     type: 0
     constructionTime: 5
     requireResourcesToConstruct: 1
-    powerRequirements: 1
-    waterRequirements: 1
+    requiredResources:
+      power: 1
+      water: 1
     minBudget: 100
     maxBudget: 500
   occupiedCell: 0000000000000000
   budget: 0
+  allocatedResources:
+    power: 0
+    water: 0
