@@ -33,7 +33,7 @@ public class BuildingsManager : MonoBehaviour
         currentProposal = null;
     }
 
-    void AddConstructedBuilding(Building building)
+    public void AddConstructedBuilding(Building building)
     {
         constructedBuildings.Add(building);
     }
@@ -77,7 +77,7 @@ public class BuildingsManager : MonoBehaviour
             targetBuilding = GameObject.Instantiate(newProposedBuilding);
 
             if (targetBuilding == null)
-            print ("WARNING! targetBuildingProposal is set to null, meaning no building of provided ID could be found.");
+                print ("WARNING! targetBuildingProposal is set to null, meaning no building of provided ID could be found.");
         }
 
       public bool CanConstructHere(Cell cell)
@@ -98,7 +98,7 @@ public class BuildingsManager : MonoBehaviour
             //TODO handle object construction here (add to waiting queue, update relevant databases, etc)    
             Grid.grid.SetCellOccupiedState(cell, true);
             
-            buildingsManRef.AddConstructedBuilding(targetBuilding.GetComponent<Building>());
+            //buildingsManRef.AddConstructedBuilding(targetBuilding.GetComponent<Building>());
             targetBuilding.GetComponent<Building>().BeginConstruction(cell);
             targetBuilding = null;
                 
