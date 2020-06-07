@@ -48,8 +48,11 @@ public class SimulationManager : MonoBehaviour
     void NewDay()
     {
         GameManager.climateMan.UpdateClimate(date);
+        if (GameManager.climateMan.isRaining)
+            RechargeGroundWaterByRainfall();
     }
 
+    //Simulation runs coroutines.
     IEnumerator BuildingsSimRun() //the current logic assigns available resources prioritizing older buildings (those coming first in buildingsMan.constructedBuildings list)
     {                           
         //Current issue with this logic: It's expensive! Most buildings won't have their operational status and parameters changed each sim update cycle, yet we would still compute
@@ -137,7 +140,7 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
-    //To be implemented
+    //To be implemented sim run coroutines
     IEnumerator HappinessSimRun()
     {
         while (true)
@@ -181,11 +184,66 @@ public class SimulationManager : MonoBehaviour
     }
 
 
+
+    //natural resources updating
+    void RechargeGroundWaterByRainfall()
+    {
+        //Loop over all cells.
+        //First, each GW layer will be recharged using 
+
+        float adjaceCellsRechargePercentage = 0.5f;     //The percentage of excess rainfall volume (after substracting cell's recharge) that will recharge adjacent cells.
+                                                        //TODO make this as a global, game parameters.
+
+
+        for (uint i = 0; i < Grid.grid.noOfCells.x; i++)
+        {
+            for (uint j = 0; j < Grid.grid.noOfCells.y; j++)
+            {
+                float cellRainfall = Grid.grid.rainFallLayer.GetCellValue(i, j);
+                if (cellRainfall > 0.001f) //no need to do calculations for cells without rainfall..
+                {
+                    float capacity = Grid.grid.groundWaterCapacityLayer.GetCellValue(i, j);
+                    float recharge = Grid.grid.groundWaterRechargeLayer.GetCellValue(i, j);
+                    
+                    //Assume that, to convert rainfall depth to a volume, we multiply by 1000.0f (including unit adjustements).
+                    float rainfallVolume = 1000.0f * cellRainfall;
+
+                    float maxRechargeVolume =  Mathf.Clamp(rainfallVolume / dateUpdateRateHours, 0.0f, recharge) * dateUpdateRateHours; 
+                    float usedRechargeVolume = Mathf.Clamp(capacity - Grid.grid.groundWaterVolumeLayer.GetCellValue(i, j), 0.0f, maxRechargeVolume);
+                    
+                    Grid.grid.groundWaterVolumeLayer.GetCellRef(i, j) += usedRechargeVolume;
+                    
+                    //(percentage of) excess rainfall volume will recharge adjacent cells
+                    float excessRainfallVolume = adjaceCellsRechargePercentage * (rainfallVolume - usedRechargeVolume) / 4.0f; //divide by number of adjacent cells.
+
+                    uint lowerX = (uint)Mathf.Max((int)i - 1, 0);
+                    uint lowerY = (uint)Mathf.Max((int)j - 1, 0);
+                    uint upperX = (uint)Mathf.Min(i + 1, Grid.grid.noOfCells.x);
+                    uint upperY = (uint)Mathf.Min(j + 1, Grid.grid.noOfCells.y);
+                    for (uint k = lowerX; k <= upperX; k++)
+                    {
+                        for (uint l = lowerY; l <= upperY; l++)
+                        {
+                            capacity = Grid.grid.groundWaterCapacityLayer.GetCellValue(k, l);
+                            recharge = Grid.grid.groundWaterRechargeLayer.GetCellValue(k, l);
+                            maxRechargeVolume = Mathf.Clamp(excessRainfallVolume / dateUpdateRateHours, 0.0f, recharge) * dateUpdateRateHours; 
+                            usedRechargeVolume = Mathf.Clamp(capacity - Grid.grid.groundWaterVolumeLayer.GetCellValue(k, l), 0.0f, maxRechargeVolume);
+                            Grid.grid.groundWaterVolumeLayer.GetCellRef(k, l) += usedRechargeVolume;
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+
+
     //testing visualization
     void OnGUI()
     {
         int lineHeight = 20;
-        int padding = 7;
+        //int padding = 7;
         Rect rect = new Rect(150, Screen.height - lineHeight - 100, 200, lineHeight);
         GUIStyle style = new GUIStyle();
         style.fontSize = 25;
@@ -194,8 +252,8 @@ public class SimulationManager : MonoBehaviour
         string message = "Date: " + date.Day.ToString() + "-" + date.Month.ToString() + "-" + date.Year.ToString() + " - " + date.Hour.ToString();
         GUI.Label(rect, message, style);
 
-        rect.y += lineHeight + padding;
-        message = "Rainfall: " + GameManager.climateMan.currentRainfall.ToString();
-        GUI.Label(rect, message, style);
+        // rect.y += lineHeight + padding;
+        // message = "Rainfall: " + GameManager.climateMan.currentRainfall.ToString();
+        // GUI.Label(rect, message, style);
     }
 }
