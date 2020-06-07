@@ -16,7 +16,7 @@ public class Grid : MonoBehaviour
     static public Grid grid = null;
 
     Vector2Int boundary; //TODO consider removing this. So far, this is only usefull in editor visualization. 
-    public Vector2Int noOfCells; //TODO switch this to uint[2];
+    public Vector2Int noOfCells; //TODO switch this to uint[2]; //noOfCells should have a minimum value (10?)
     public const int cellSize = 1;
     BoxCollider gridCollider;
     float colliderPadding = 10.0f;
@@ -71,7 +71,7 @@ public class Grid : MonoBehaviour
         groundWaterRechargeLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
         windSpeedLayer  = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
         windDirectionLayer  = new GridLayer<uint>((uint)noOfCells.x, (uint)noOfCells.y);
-
+        rainFallLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
     }
 
     void InitializeOthersLayers()
@@ -136,6 +136,14 @@ public class Grid : MonoBehaviour
         //print ("dist in cells: " + distInCells + ", or: " + (rawDistInCells[0] * rawDistSigns[0]) + ", " + (rawDistInCells[1] * rawDistSigns[1]) ); //test
         //print ("cellID: " + cell.cellID[0] + ", " +cell.cellID[1]); //test
         return cell;
+    }
+
+    //TODO implement this
+    public Vector3 GetCellPosition (uint cellID_x, uint cellID_y)
+    {
+        Vector3 _position = this.transform.position;
+        Vector3 position = new Vector3(_position.x - boundary.x / 2.0f + cellID_x * cellSize + (float)cellSize / 2.0f, _position.y, _position.z - boundary.y / 2.0f + cellID_y * cellSize + (float)cellSize / 2.0f);
+        return position;
     }
 
     void GetAllCellStates(ref Cell cell)
@@ -254,9 +262,33 @@ public class Grid : MonoBehaviour
         return sum;
     }
     
-    public void SetRainfall(uint cellID_x, uint cellID_y, float rainFall)
+    public void ZeroRainfallLayer()
     {
-        rainFallLayer.SetCellValue(cellID_x, cellID_y, rainFall);
+        for (uint i = 0; i < noOfCells.x; i++)
+            for (uint j = 0; j < noOfCells.y; j++)
+                rainFallLayer.SetCellValue(i, j, 0.0f);
+    }
+
+    public void SetRainfallCummulitive(uint cellID_x, uint cellID_y, uint radius, float rainFall) //cummulitive with linear falloff, rainFall value is only used at central cell.
+    {
+
+        uint minY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y - (long)radius, 0, noOfCells.y - 1));
+        uint maxY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y + (long)radius, 0, noOfCells.y - 1));
+        
+        for (uint i = minY; i <= maxY; i++)
+        {
+            long sqrtVal = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow(radius, 2) - Mathf.Pow((long)i - (long)cellID_y, 2))); //cache this calculation, since its result will be used twice.
+
+            uint minX = (uint)Mathf.FloorToInt(Mathf.Clamp( (long)cellID_x - sqrtVal, 0, noOfCells.x - 1));
+            uint maxX = (uint)Mathf.CeilToInt(Mathf.Clamp( (long)cellID_x + sqrtVal, 0, noOfCells.x - 1));
+
+            for (uint j = minX; j <= maxX; j++)
+            {
+                float distanceFromCentre = Mathf.Sqrt(Mathf.Pow((float)i - (float)cellID_x, 2.0f) + Mathf.Pow((float)j - (float)cellID_y, 2.0f));
+                float rainfallAtCell = rainFall * (1.0f - (distanceFromCentre / (float) radius));
+                rainFallLayer.GetCellRef(i, j) += rainfallAtCell;
+            }
+        }    
     }
 
 //testing metdhods
