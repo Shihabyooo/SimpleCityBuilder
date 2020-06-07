@@ -14,7 +14,7 @@ public class SimulationManager : MonoBehaviour
     public float timeBetweenUpdates = 0.5f; //the time between each update in sim in seconds.
     [SerializeField] bool isRunning = false;
     System.DateTime date; //Known issue, this struct supports as far as 31-12-9999.
-    [SerializeField] int dateUpdateRateDays = 0, dateUpdateRateHours = 0; //the hours increment should be something we can divide 24 with (to make days increment after same number
+    [SerializeField] [Range(1,24)]  int dateUpdateRateHours = 0; //the hours increment should be something we can divide 24 with (to make days increment after same number
                                                                             //update ticks for all days), the days increment should be 1. Either days or hours should be set, not both.
                                                                             //System should work for any value though.
                                                                             
@@ -22,7 +22,7 @@ public class SimulationManager : MonoBehaviour
     
     public void Awake()
     {
-        date = new System.DateTime(2020, 1, 1, 0, 0, 0);
+        date = new System.DateTime(2020, 8, 1, 0, 0, 0);
     }
 
     public void StartSimulation()
@@ -43,6 +43,11 @@ public class SimulationManager : MonoBehaviour
     public void ResumeSimulation()
     {
         isRunning = true;
+    }
+
+    void NewDay()
+    {
+        GameManager.climateMan.UpdateClimate(date);
     }
 
     IEnumerator BuildingsSimRun() //the current logic assigns available resources prioritizing older buildings (those coming first in buildingsMan.constructedBuildings list)
@@ -115,9 +120,16 @@ public class SimulationManager : MonoBehaviour
     {
         while (true)
         {
+            int currentDay = date.Day;
             if (isRunning)
             {
-                date += new System.TimeSpan(dateUpdateRateDays, dateUpdateRateHours, 0, 0);
+                date += new System.TimeSpan(0, dateUpdateRateHours, 0, 0);
+                if (currentDay != date.Day)
+                {
+                    NewDay();
+                    currentDay = date.Day;
+                }
+
                 yield return new WaitForSeconds(timeBetweenUpdates);
             }
             else
@@ -172,12 +184,18 @@ public class SimulationManager : MonoBehaviour
     //testing visualization
     void OnGUI()
     {
-        int lineHeight = 25;
-        Rect rect = new Rect(150, Screen.height - lineHeight - 10, 200, lineHeight);
-        string message = "Date: " + date.Day.ToString() + "-" + date.Month.ToString() + "-" + date.Year.ToString() + " - " + date.Hour.ToString();
+        int lineHeight = 20;
+        int padding = 7;
+        Rect rect = new Rect(150, Screen.height - lineHeight - 100, 200, lineHeight);
         GUIStyle style = new GUIStyle();
-        style.fontSize = 30;
+        style.fontSize = 25;
+        
+        
+        string message = "Date: " + date.Day.ToString() + "-" + date.Month.ToString() + "-" + date.Year.ToString() + " - " + date.Hour.ToString();
+        GUI.Label(rect, message, style);
 
+        rect.y += lineHeight + padding;
+        message = "Rainfall: " + GameManager.climateMan.currentRainfall.ToString();
         GUI.Label(rect, message, style);
     }
 }
