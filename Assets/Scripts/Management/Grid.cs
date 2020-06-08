@@ -293,8 +293,8 @@ public class Grid : MonoBehaviour
 
 //testing metdhods
 
-    float minGWCap = 0.0f, maxGWCap = 100.0f;
-    float minGWRech = 0.0f, maxGWRech = 2.0f;
+    float minGWCap = 15.0f, maxGWCap = 100.0f;
+    float minGWRech = 0.05f, maxGWRech = 0.75f;
     float minWindSp = 1.0f, maxWindSp = 8.0f;
     uint minWindDeg = 0, maxWindDeg = 90;
     void AddRandomNaturalResources()
@@ -307,7 +307,7 @@ public class Grid : MonoBehaviour
             for (uint j = 0; j < halfMapY; j++)
             {
                 groundWaterCapacityLayer.GetCellRef(i,j) = Random.Range(minGWCap, maxGWCap);
-                groundWaterVolumeLayer.GetCellRef(i,j) = groundWaterCapacityLayer.GetCellValue(i,j);
+                groundWaterVolumeLayer.GetCellRef(i,j) = 0.5f * groundWaterCapacityLayer.GetCellValue(i,j);
                 groundWaterRechargeLayer.GetCellRef(i,j) = Random.Range(minGWRech, maxGWRech);
                 windSpeedLayer.GetCellRef(i,j) = Random.Range(minWindSp, maxWindSp);
                 windDirectionLayer.GetCellRef(i,j) = (uint)Mathf.FloorToInt(Random.Range((float)minWindDeg, (float)maxWindDeg));

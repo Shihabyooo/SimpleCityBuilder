@@ -22,7 +22,7 @@ public class SimulationManager : MonoBehaviour
     
     public void Awake()
     {
-        date = new System.DateTime(2020, 8, 1, 0, 0, 0);
+        date = new System.DateTime(2020, 6, 1, 0, 0, 0);
     }
 
     public void StartSimulation()
@@ -194,7 +194,10 @@ public class SimulationManager : MonoBehaviour
         float adjaceCellsRechargePercentage = 0.5f;     //The percentage of excess rainfall volume (after substracting cell's recharge) that will recharge adjacent cells.
                                                         //TODO make this as a global, game parameters.
 
-
+        GridLayer<float> potentialRecharge = new GridLayer<float>((uint)Grid.grid.noOfCells.x, (uint)Grid.grid.noOfCells.y);
+        //TODO modify the algorithm bellow to update potentialRecharge (without clampting to cell's recharge values), afterwords, append potentialRecharge cell values to 
+        //GW volume layer (while clamping for its recharge rate).
+        
         for (uint i = 0; i < Grid.grid.noOfCells.x; i++)
         {
             for (uint j = 0; j < Grid.grid.noOfCells.y; j++)

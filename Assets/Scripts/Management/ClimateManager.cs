@@ -116,7 +116,7 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
         StartCoroutine(StormEnd(storm));
     }
 
-    float stormFadeOutPeriod = 10.0f;    
+    float stormFadeOutPeriod = 3.0f;    
     IEnumerator StormEnd(Storm storm)
     {
         float helperTimer = 0.0f;
