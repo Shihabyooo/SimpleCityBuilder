@@ -22,7 +22,7 @@ public class BuildingsManager : MonoBehaviour
 
     public BuildingProposal StartNewBuildingProposal(int buildingID)
     {
-        print ("Starting building proposal for id: " + buildingID);
+        //print ("Starting building proposal for id: " + buildingID);
         currentProposal = new BuildingProposal(buildingID, this);
 
         return currentProposal;

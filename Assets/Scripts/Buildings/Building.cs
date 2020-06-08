@@ -15,7 +15,7 @@ public class Building : MonoBehaviour
     public uint[] occupiedCell = new uint[2]; //the cell this building is constructed on, set by BuildingsManager (via ProposedBuilding).
     [SerializeField] protected uint budget; //IMPORTANT! budget must always be from stats.minBudget to stats.maxBudget
     [SerializeField] protected BasicResources allocatedResources = new BasicResources(); //These resources will be allocated by the simulation based on availability and priority.
-
+    //[SerializeField] protected bool isWellSupplied = false;
 
     virtual protected void Awake()
     {
@@ -29,8 +29,17 @@ public class Building : MonoBehaviour
 
     public void AllocateResources(BasicResources resources)
     {
-        //TODO research this: We know that the
         allocatedResources = resources;
+    }
+
+    bool CheckResourcesSufficiency()
+    {
+        if (allocatedResources.power < stats.requiredResources.power)
+            return false;
+        else if (allocatedResources.water < stats.requiredResources.water)
+            return false;
+
+        return true;
     }
 
     public virtual bool CheckConstructionResourceRequirements(Cell cell) //this does NOT include checking whether cell is occupied or not, which is handled in BuildingsManager.
@@ -60,7 +69,7 @@ public class Building : MonoBehaviour
     float helperTimer = 0.0f;
     IEnumerator Construction()
     {
-        print ("Begining construction of: " + this.gameObject.name + ", finishes in: " + stats.constructionTime); //test
+        //print ("Begining construction of: " + this.gameObject.name + ", finishes in: " + stats.constructionTime); //test
         
         while (helperTimer < stats.constructionTime)
         {
@@ -70,7 +79,7 @@ public class Building : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
 
-        print ("Finshed construction of: " + this.gameObject.name ); //test
+        //print ("Finshed construction of: " + this.gameObject.name ); //test
         OnConstructionComplete();
         yield return null;
     }
@@ -79,6 +88,11 @@ public class Building : MonoBehaviour
     {
         isUnderConstruction = false;
         GameManager.buildingsMan.AddConstructedBuilding(this);
+    }
+
+    public virtual void UpdateEffectOnNature(int timeWindow)
+    {
+        
     }
 }
 

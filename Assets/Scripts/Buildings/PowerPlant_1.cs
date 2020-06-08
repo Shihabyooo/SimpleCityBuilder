@@ -42,6 +42,12 @@ public class PowerPlant_1 : InfrastructureBuilding
         return production;
     }
 
+
+    public override void UpdateEffectOnNature(int timeWindow)    
+    {
+        base.UpdateEffectOnNature(timeWindow);
+    }
+
 }
 
 

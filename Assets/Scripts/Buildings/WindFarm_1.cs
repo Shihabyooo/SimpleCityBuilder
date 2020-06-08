@@ -45,6 +45,13 @@ public class WindFarm_1 : InfrastructureBuilding
 
         return production;
     }
+
+    public override void UpdateEffectOnNature(int timeWindow)
+    {
+        base.UpdateEffectOnNature(timeWindow);
+        //TODO wind farms should reduce wind speed downstream (slightly).
+    }
+
 }
 
 [System.Serializable]

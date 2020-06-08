@@ -4,6 +4,8 @@ using UnityEngine;
 
 
 //TODO decouple extra grid layer from base grid (i.e. other layers can have coarser grids, to save memory/performance.)
+//TODO several methods bellow use Mathf.Clamp where only a single end bound check is required, replace those with Mathf.Min and Mathf.Max as appropriate.
+
 
 public enum InfrastructureService
 {
@@ -294,7 +296,8 @@ public class Grid : MonoBehaviour
 //testing metdhods
 
     float minGWCap = 0.0f, maxGWCap = 111690f;
-    float minGWRech = 2.26f, maxGWRech = 26.56f;
+    //float minGWCap = 10000f, maxGWCap = 10000f;
+    float minGWRech = 0.85f, maxGWRech = 8.5f;
     float minWindSp = 5.0f, maxWindSp = 25.0f;
     uint minWindDeg = 0, maxWindDeg = 90;
     void AddRandomNaturalResources()
@@ -324,6 +327,7 @@ public class Grid : MonoBehaviour
     public bool visualizeWindSpeed = false;
     public bool visualizeWindDirection = false;
     public bool visualizePollution = false;
+    public bool visualizeRainfall = false;
     void OnDrawGizmos() //unefficient, but not meant for production anyway...
     {
         //UpdateGridBoundary();
@@ -427,6 +431,12 @@ public class Grid : MonoBehaviour
                         Gizmos.color = Color.yellow;
                         //Gizmos.DrawCube(cellCentre + new Vector3(0.0f, windSpeedLayer.GetCellValue(i, j) / 2.0f, 0.0f), new Vector3(barSize, windSpeedLayer.GetCellValue(i, j), barSize));
                         float _size = barSize * windSpeedLayer.GetCellValue(i, j) / maxWindSp;
+                        Gizmos.DrawCube(cellCentre, new Vector3(_size, _size, _size));
+                    }
+                    if (visualizeRainfall && rainFallLayer.GetCellValue(i, j) > 0.01f)
+                    {
+                        Gizmos.color = Color.cyan;
+                        float _size = barSize * rainFallLayer.GetCellValue(i, j) / 100.0f;
                         Gizmos.DrawCube(cellCentre, new Vector3(_size, _size, _size));
                     }
                 }

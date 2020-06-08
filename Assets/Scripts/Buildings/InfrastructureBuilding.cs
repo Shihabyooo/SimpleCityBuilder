@@ -5,7 +5,7 @@ using UnityEngine;
 public class InfrastructureBuilding : Building
 {
     [SerializeField] protected InfrastructureBuildingStats infraStats;
-
+    [SerializeField] protected float currentLoad; //as a percentage of max production
     override protected void Awake()
     {
         base.Awake();
@@ -22,10 +22,17 @@ public class InfrastructureBuilding : Building
         return 0.0f;
     }
     
-    public virtual void UpdateEffectOnNaturalResources()
+    public virtual void SetLoad(float load)
+    {
+        currentLoad = load;
+    }
+
+    public virtual void UpdateEffectOnNaturalResources(int timeWindow)
     {
         
     }
+
+    
 
 }
 

@@ -22,7 +22,7 @@ public class SimulationManager : MonoBehaviour
     
     public void Awake()
     {
-        date = new System.DateTime(2020, 6, 1, 0, 0, 0);
+        date = new System.DateTime(2020, 1, 1, 0, 0, 0);
     }
 
     public void StartSimulation()
@@ -61,8 +61,7 @@ public class SimulationManager : MonoBehaviour
         {
             if (isRunning)
             {
-
-            //General Buildings
+                //General Buildings
                 float totalWaterDemand = 0.0f;
                 float totalPowerDemand = 0.0f;
 
@@ -76,39 +75,53 @@ public class SimulationManager : MonoBehaviour
                 GameManager.resourceMan.UpdatePowerDemand(totalPowerDemand);
 
       
-            //Computing production of infraStructure buildings
+                //Computing production of infraStructure buildings
                 float totalWaterProduction = 0.0f;
                 float totalPowerProduction = 0.0f;
 
-            //Compute production for all infra buildings
+                //Compute production for all infra buildings
                 foreach (InfrastructureBuilding building in GameManager.buildingsMan.powerProductionBuildings)
                     totalPowerProduction += building.ComputeProduction();
                 foreach (InfrastructureBuilding building in GameManager.buildingsMan.waterProductionBuildings)
                     totalWaterProduction += building.ComputeProduction();
     
-            //Update ResourcesManager
+                //Update ResourcesManager
                 GameManager.resourceMan.UpdateAvailableWater(totalWaterProduction);
                 GameManager.resourceMan.UpdateAvailablePower(totalPowerProduction);
 
-            //Allocate resources to buildings based on production and priority
+                //Allocate resources to buildings based on production and priority
                 float totalWaterConsumption = 0.0f;
                 float totalPowerConsumption = 0.0f;
 
-            foreach (Building building in GameManager.buildingsMan.constructedBuildings)
-            {
-                BasicResources resources = new BasicResources(); 
+                foreach (Building building in GameManager.buildingsMan.constructedBuildings)
+                {
+                    BasicResources resources = new BasicResources(); 
                 
-                resources.power = Mathf.Clamp(building.GetStats().requiredResources.power, 0.0f, totalPowerProduction - totalPowerConsumption);
-                resources.water = Mathf.Clamp(building.GetStats().requiredResources.water, 0.0f, totalWaterProduction - totalWaterConsumption);
+                    resources.power = Mathf.Clamp(building.GetStats().requiredResources.power, 0.0f, totalPowerProduction - totalPowerConsumption);
+                    resources.water = Mathf.Clamp(building.GetStats().requiredResources.water, 0.0f, totalWaterProduction - totalWaterConsumption);
 
-                totalPowerConsumption += resources.power;
-                totalWaterConsumption += resources.water;
-                building.AllocateResources(resources);
-            }
+                    totalPowerConsumption += resources.power;
+                    totalWaterConsumption += resources.water;
+                    building.AllocateResources(resources);
+                }
             
-            //update ResourceManager
-            GameManager.resourceMan.UpdateWaterConsumption(totalWaterConsumption);
-            GameManager.resourceMan.UpdatePowerConsumption(totalPowerConsumption);
+                //update ResourceManager
+                GameManager.resourceMan.UpdateWaterConsumption(totalWaterConsumption);
+                GameManager.resourceMan.UpdatePowerConsumption(totalPowerConsumption);
+
+                //Divide load on infrastructure buildings and assign it
+                float powerDemandToMaxProductionRatio = Mathf.Min(totalPowerDemand / totalPowerProduction, 1.0f );
+                float waterDemandToMaxProductionRatio = Mathf.Min(totalWaterDemand / totalWaterProduction, 1.0f );
+
+                foreach (InfrastructureBuilding building in GameManager.buildingsMan.powerProductionBuildings)
+                    building.SetLoad(powerDemandToMaxProductionRatio);
+                foreach (InfrastructureBuilding building in GameManager.buildingsMan.waterProductionBuildings)
+                    building.SetLoad(waterDemandToMaxProductionRatio);
+
+                //update building effect on natural resources and environment
+                foreach (Building building in GameManager.buildingsMan.constructedBuildings)
+                    building.UpdateEffectOnNature(dateUpdateRateHours);
+
 
                 yield return new WaitForSeconds(timeBetweenUpdates);
             }
@@ -183,8 +196,6 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
-
-
     //natural resources updating
     void RechargeGroundWaterByRainfall()
     {
@@ -238,7 +249,6 @@ public class SimulationManager : MonoBehaviour
             }
         }
     }
-
 
     //testing visualization
     void OnGUI()
