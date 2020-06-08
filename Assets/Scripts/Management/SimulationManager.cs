@@ -218,8 +218,8 @@ public class SimulationManager : MonoBehaviour
 
                     uint lowerX = (uint)Mathf.Max((int)i - 1, 0);
                     uint lowerY = (uint)Mathf.Max((int)j - 1, 0);
-                    uint upperX = (uint)Mathf.Min(i + 1, Grid.grid.noOfCells.x);
-                    uint upperY = (uint)Mathf.Min(j + 1, Grid.grid.noOfCells.y);
+                    uint upperX = (uint)Mathf.Min(i + 1, Grid.grid.noOfCells.x - 1);
+                    uint upperY = (uint)Mathf.Min(j + 1, Grid.grid.noOfCells.y - 1);
                     for (uint k = lowerX; k <= upperX; k++)
                     {
                         for (uint l = lowerY; l <= upperY; l++)
@@ -231,12 +231,10 @@ public class SimulationManager : MonoBehaviour
                             Grid.grid.groundWaterVolumeLayer.GetCellRef(k, l) += usedRechargeVolume;
                         }
                     }
-
                 }
             }
         }
     }
-
 
 
     //testing visualization

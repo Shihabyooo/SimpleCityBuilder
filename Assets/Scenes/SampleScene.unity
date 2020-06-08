@@ -587,7 +587,13 @@ MonoBehaviour:
   - 0.003
   - 0
   maxVariationInRainfall: 0.2
-  isRaining: 0
+  maxNoOfActiveStorms: 5
+  maxStormDuration: 7
+  minStormRadius: 2
+  activeStorms: []
+  rainfallNodePrefab: {fileID: 2532189234864196257, guid: 098c87f049f32814d8c14d64465b0da4,
+    type: 3}
+  cloudHeight: 10
 --- !u!1 &256751662
 GameObject:
   m_ObjectHideFlags: 0
