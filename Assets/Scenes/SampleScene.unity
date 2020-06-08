@@ -588,7 +588,8 @@ MonoBehaviour:
   - 0
   maxVariationInRainfall: 0.2
   maxNoOfActiveStorms: 5
-  maxStormDuration: 7
+  maxStormDuration: 10
+  minStormDuration: 2
   minStormRadius: 2
   activeStorms: []
   rainfallNodePrefab: {fileID: 2532189234864196257, guid: 098c87f049f32814d8c14d64465b0da4,

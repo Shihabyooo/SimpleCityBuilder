@@ -32,7 +32,6 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
         //First update existing storms
         UpdateStorms(date);
 
-
         //Then, see if we should add a new storm, based on probability of rainfall.
         if (activeStorms.Count < maxNoOfActiveStorms)
         { 
@@ -40,11 +39,13 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
             if (dieThrow <= dailyRainProbabilityPerMonth[date.Month - 1])
                 SpawnStorms(date);
         }
+
+        if (activeStorms.Count < 1)
+            isRaining = false;
     }
 
     void SpawnStorms(System.DateTime date)
     {
-        
         isRaining = true;
         int noNewOfStorms = Mathf.Min(Random.Range(1, maxNoOfActiveStorms), maxNoOfActiveStorms - activeStorms.Count);
         print ("Spawning: " + noNewOfStorms + " storms"); //test

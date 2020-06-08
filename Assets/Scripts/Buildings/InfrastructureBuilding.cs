@@ -22,6 +22,11 @@ public class InfrastructureBuilding : Building
         return 0.0f;
     }
     
+    public virtual void UpdateEffectOnNaturalResources()
+    {
+        
+    }
+
 }
 
 [System.Serializable]

@@ -48,8 +48,6 @@ public class SimulationManager : MonoBehaviour
     void NewDay()
     {
         GameManager.climateMan.UpdateClimate(date);
-        if (GameManager.climateMan.isRaining)
-            RechargeGroundWaterByRainfall();
     }
 
     //Simulation runs coroutines.
@@ -161,7 +159,9 @@ public class SimulationManager : MonoBehaviour
         {
             if (isRunning)
             {
-                
+                if (GameManager.climateMan.isRaining)
+                    RechargeGroundWaterByRainfall();
+
                 yield return new WaitForSeconds(timeBetweenUpdates);
             }
             else
@@ -191,7 +191,7 @@ public class SimulationManager : MonoBehaviour
         //Loop over all cells.
         //First, each GW layer will be recharged using 
 
-        float adjaceCellsRechargePercentage = 0.5f;     //The percentage of excess rainfall volume (after substracting cell's recharge) that will recharge adjacent cells.
+        //float adjaceCellsRechargePercentage = 0.5f;     //The percentage of excess rainfall volume (after substracting cell's recharge) that will recharge adjacent cells.
                                                         //TODO make this as a global, game parameters.
 
         GridLayer<float> potentialRecharge = new GridLayer<float>((uint)Grid.grid.noOfCells.x, (uint)Grid.grid.noOfCells.y);
@@ -209,31 +209,31 @@ public class SimulationManager : MonoBehaviour
                     float recharge = Grid.grid.groundWaterRechargeLayer.GetCellValue(i, j);
                     
                     //Assume that, to convert rainfall depth to a volume, we multiply by 1000.0f (including unit adjustements).
-                    float rainfallVolume = 1000.0f * cellRainfall;
+                    float rainfallVolume = 1000.0f * cellRainfall / (float)(24 / dateUpdateRateHours);
 
                     float maxRechargeVolume =  Mathf.Clamp(rainfallVolume / dateUpdateRateHours, 0.0f, recharge) * dateUpdateRateHours; 
                     float usedRechargeVolume = Mathf.Clamp(capacity - Grid.grid.groundWaterVolumeLayer.GetCellValue(i, j), 0.0f, maxRechargeVolume);
                     
                     Grid.grid.groundWaterVolumeLayer.GetCellRef(i, j) += usedRechargeVolume;
                     
-                    //(percentage of) excess rainfall volume will recharge adjacent cells
-                    float excessRainfallVolume = adjaceCellsRechargePercentage * (rainfallVolume - usedRechargeVolume) / 4.0f; //divide by number of adjacent cells.
+                    // //(percentage of) excess rainfall volume will recharge adjacent cells
+                    // float excessRainfallVolume = adjaceCellsRechargePercentage * (rainfallVolume - usedRechargeVolume) / 4.0f; //divide by number of adjacent cells.
 
-                    uint lowerX = (uint)Mathf.Max((int)i - 1, 0);
-                    uint lowerY = (uint)Mathf.Max((int)j - 1, 0);
-                    uint upperX = (uint)Mathf.Min(i + 1, Grid.grid.noOfCells.x - 1);
-                    uint upperY = (uint)Mathf.Min(j + 1, Grid.grid.noOfCells.y - 1);
-                    for (uint k = lowerX; k <= upperX; k++)
-                    {
-                        for (uint l = lowerY; l <= upperY; l++)
-                        {
-                            capacity = Grid.grid.groundWaterCapacityLayer.GetCellValue(k, l);
-                            recharge = Grid.grid.groundWaterRechargeLayer.GetCellValue(k, l);
-                            maxRechargeVolume = Mathf.Clamp(excessRainfallVolume / dateUpdateRateHours, 0.0f, recharge) * dateUpdateRateHours; 
-                            usedRechargeVolume = Mathf.Clamp(capacity - Grid.grid.groundWaterVolumeLayer.GetCellValue(k, l), 0.0f, maxRechargeVolume);
-                            Grid.grid.groundWaterVolumeLayer.GetCellRef(k, l) += usedRechargeVolume;
-                        }
-                    }
+                    // uint lowerX = (uint)Mathf.Max((int)i - 1, 0);
+                    // uint lowerY = (uint)Mathf.Max((int)j - 1, 0);
+                    // uint upperX = (uint)Mathf.Min(i + 1, Grid.grid.noOfCells.x - 1);
+                    // uint upperY = (uint)Mathf.Min(j + 1, Grid.grid.noOfCells.y - 1);
+                    // for (uint k = lowerX; k <= upperX; k++)
+                    // {
+                    //     for (uint l = lowerY; l <= upperY; l++)
+                    //     {
+                    //         capacity = Grid.grid.groundWaterCapacityLayer.GetCellValue(k, l);
+                    //         recharge = Grid.grid.groundWaterRechargeLayer.GetCellValue(k, l);
+                    //         maxRechargeVolume = Mathf.Clamp(excessRainfallVolume / dateUpdateRateHours, 0.0f, recharge) * dateUpdateRateHours; 
+                    //         usedRechargeVolume = Mathf.Clamp(capacity - Grid.grid.groundWaterVolumeLayer.GetCellValue(k, l), 0.0f, maxRechargeVolume);
+                    //         Grid.grid.groundWaterVolumeLayer.GetCellRef(k, l) += usedRechargeVolume;
+                    //     }
+                    // }
                 }
             }
         }

@@ -116,6 +116,6 @@ MonoBehaviour:
   currentMaxPowerProduction: 0
   currentEmissionRate: 0
   plantStats:
-    maxPowerProduction: 10
-    minPowerProduction: 2
+    maxPowerProduction: 23
+    minPowerProduction: 6
     baseEmissionPerPowerUnit: 1

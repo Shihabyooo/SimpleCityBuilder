@@ -116,6 +116,6 @@ MonoBehaviour:
   currentMaxTreatmentRate: 0
   availableGroundWater: 0
   plantStats:
-    maxTreatmentRate: 5
-    minGroundWaterVolume: 0.5
+    maxTreatmentRate: 17
+    minGroundWaterVolume: 30.6
     extractionRadius: 1

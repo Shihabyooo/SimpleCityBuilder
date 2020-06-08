@@ -96,7 +96,7 @@ MonoBehaviour:
     cost: 250
     type: 0
     constructionTime: 5
-    requireResourcesToConstruct: 1
+    requireResourcesToConstruct: 0
     requiredResources:
       power: 1
       water: 1
