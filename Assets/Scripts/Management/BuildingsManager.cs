@@ -65,6 +65,43 @@ public class BuildingsManager : MonoBehaviour
         return newID;
     }
 
+    public ResidentialBuilding GetResidentialBuildingWithEmptySlot(HousingClass _class, bool random = true)
+    {
+        //This is a stupid attempt at randomizing building pickup.
+        int count = 0;
+
+        while (count < 100) //tries 100 times to find a random building, if fails, grabs the first one it find from the foreach loop bellow.
+        {
+            int randomInt = Random.Range(0, constructedBuildings.Count);
+
+            if (constructedBuildings[randomInt].GetStats().type == BuildingType.residential
+                && constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>() != null
+                && constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>().ResidentClass() == _class
+                && constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>().CountEmptyHousingSlots() > 0)
+            {
+                return constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>();
+            }
+            count++;
+        }
+
+
+        //Reaching here means that that stupid randomization thing above failed.
+        foreach (Building building in constructedBuildings)
+        {
+            if (building.GetStats().type == BuildingType.residential
+                && building.gameObject.GetComponent<ResidentialBuilding>() != null
+                && building.gameObject.GetComponent<ResidentialBuilding>().ResidentClass() == _class
+                && building.gameObject.GetComponent<ResidentialBuilding>().CountEmptyHousingSlots() > 0)
+                {
+                    return building.gameObject.GetComponent<ResidentialBuilding>();
+                }
+        }
+
+
+        return null;
+    }
+
+
     //=======================================================================================================================
     //=======================================================================================================================
     //I made this class within BuildingsManager to access some of the latter's private members without extra lines of code...
