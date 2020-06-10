@@ -58,6 +58,19 @@ public class ResourcesManager : MonoBehaviour
         }
     }
 
+    public HousingSlots AvailableHousing()
+    {
+        HousingSlots availableHousing = new HousingSlots();
+
+        availableHousing.poor = resources.totalHousingSlots.poor - resources.occuppiedHousingSlots.poor;
+        availableHousing.low = resources.totalHousingSlots.low - resources.occuppiedHousingSlots.low;
+        availableHousing.middle = resources.totalHousingSlots.middle - resources.occuppiedHousingSlots.middle;
+        availableHousing.high = resources.totalHousingSlots.high - resources.occuppiedHousingSlots.high;
+        availableHousing.obscene = resources.totalHousingSlots.obscene - resources.occuppiedHousingSlots.obscene;
+
+        return availableHousing;
+    }
+
     //Setters
     public void UpdatePowerDemand(float newDemand)
     {
@@ -223,6 +236,25 @@ public class HousingSlots
     public ulong obscene = 0;
     
 
+    public HousingSlots()
+    {
+
+    }
+
+    public HousingSlots(ulong _poor, ulong _low, ulong _middle, ulong _high, ulong _obscene)
+    {
+        poor = _poor;
+        low = _low;
+        middle = _middle;
+        high = _high;
+        obscene = _obscene;
+    }
+
+    public HousingSlots(HousingSlots newSlots)
+    {
+        AssignNew(newSlots);
+    }
+
     public void AssignNew(HousingSlots newSlots) //since we can't overload the assignment op and we sometimes want to deep copy an object
     {
         poor = newSlots.poor;
@@ -280,6 +312,31 @@ public class HousingSlots
         }
     }
 
+    public ulong Sum()
+    {
+        //This is stupid
+        // ulong sum = poor + low;
+        // if (sum < poor || sum < low)
+        //     return ulong.MaxValue;
+        
+        // sum += middle;
+        // if (sum < poor + low || sum < middle)
+        //     return ulong.MaxValue;
+
+        // sum += high;
+        // if (sum < poor + low + middle || sum < high)
+        //     return ulong.MaxValue;
+        
+        // sum += obscene;
+        // if (sum < poor + low + middle + high  || sum < obscene)
+        //     return ulong.MaxValue;
+
+        // return sum;
+
+
+        //TODO find a way to limit the total number of housing slots to something that wouldn't cause ulong value to cycle back.
+        return (poor + low + middle + high + obscene); 
+    }
     
 }
 
