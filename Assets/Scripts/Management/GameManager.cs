@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     CursorHandler cursorHandler;
     static public BuildingsManager buildingsMan = null;
     static public ClimateManager climateMan = null;
-    SimulationManager simMan;
+    static public SimulationManager simMan;
     static public PopulationManager populationMan = null;
 
     void Awake()
