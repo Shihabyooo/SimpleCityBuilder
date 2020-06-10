@@ -23,7 +23,7 @@ public class BuildingsManager : MonoBehaviour
     public BuildingProposal StartNewBuildingProposal(int buildingID)
     {
         //print ("Starting building proposal for id: " + buildingID);
-        currentProposal = new BuildingProposal(buildingID, this);
+        currentProposal = new BuildingProposal(buildingID);//, this);
 
         return currentProposal;
     }
@@ -59,21 +59,26 @@ public class BuildingsManager : MonoBehaviour
         }
     }
 
+    public System.Guid GetNewGUID()
+    {
+        System.Guid newID = System.Guid.NewGuid();
+        return newID;
+    }
 
     //=======================================================================================================================
     //=======================================================================================================================
     //I made this class within BuildingsManager to access some of the latter's private members without extra lines of code...
     public class BuildingProposal
     {
-        public BuildingsManager buildingsManRef {get; private set;}
+        //public BuildingsManager buildingsManRef {get; private set;}
         public GameObject targetBuilding {get; private set;}
 
-        public BuildingProposal(int _targetBuildingID, BuildingsManager _buildingsManager)
+        public BuildingProposal(int _targetBuildingID)//, BuildingsManager _buildingsManager)
         {
-            buildingsManRef = _buildingsManager;
+            //buildingsManRef = _buildingsManager;
 
             //TODO once a mesh loader (or dedicated prefabs are created) for the mock avatar for the buildings, replace the line bellow.
-            GameObject newProposedBuilding = buildingsManRef.database.GetBuildingObject(_targetBuildingID).gameObject;
+            GameObject newProposedBuilding = GameManager.buildingsMan.database.GetBuildingObject(_targetBuildingID).gameObject;
             targetBuilding = GameObject.Instantiate(newProposedBuilding);
 
             if (targetBuilding == null)
@@ -110,7 +115,7 @@ public class BuildingsManager : MonoBehaviour
             //if (targetBuildingAvatar != null) //In a complete implementation, calling this method shouldn't be possible without a targetBuildingAvatar set.
             Destroy (targetBuilding);
         
-            buildingsManRef.currentProposal = null;
+            GameManager.buildingsMan.currentProposal = null;
         }
 
         public void MovePlan(Vector3 positition)

@@ -48,7 +48,7 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
     {
         isRaining = true;
         int noNewOfStorms = Mathf.Min(Random.Range(1, maxNoOfActiveStorms), maxNoOfActiveStorms - activeStorms.Count);
-        print ("Spawning: " + noNewOfStorms + " storms"); //test
+        //print ("Spawning: " + noNewOfStorms + " storms"); //test
 
         for (int i = 0; i < noNewOfStorms; i++)
         {
@@ -134,17 +134,6 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
 
         Destroy(storm.rainNode.gameObject);
         yield return null;
-    }
-
-
-    //Testing visualization
-    void OnDrawGizmos()
-    {
-        // Gizmos.color = Color.cyan;
-        // foreach(Storm storm in activeStorms)
-        // {
-        //     Gizmos.DrawSphere(Grid.grid.GetCellPosition(storm.centreCell[0], storm.centreCell[0]) + new Vector3(0.0f, 10.0f, 0.0f), storm.radius);
-        // }
     }
 
 }

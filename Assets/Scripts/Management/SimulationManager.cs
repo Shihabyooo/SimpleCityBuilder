@@ -64,15 +64,44 @@ public class SimulationManager : MonoBehaviour
                 //General Buildings
                 float totalWaterDemand = 0.0f;
                 float totalPowerDemand = 0.0f;
+                HousingSlots totalHousingSlots = new HousingSlots();
+                HousingSlots occuppiedHousingSlots = new HousingSlots();
 
+                //To avoid having multiple loops, the loop bellow will cover several, building-specific calls depending on building types. Some exceptions will have their
+                //own loops bellow, but in theory could also be merged with this loop.
+                //TODO consider mergin into a single loop with if-statements.
                 foreach (Building building in GameManager.buildingsMan.constructedBuildings)
                 {
+                    //Fill requirement resources 
+                    //TODO consider moving this to a function that only updates when its state changes (e.g. new building constructed, stats changed, etc). Would complicate 
+                    //the code elsewhere though.
                     totalWaterDemand += building.GetStats().requiredResources.water;
                     totalPowerDemand += building.GetStats().requiredResources.power;
+
+                    //update building effect on natural resources and environment
+                    building.UpdateEffectOnNature(dateUpdateRateHours);
+
+                    //for residential buildings,
+                    if (building.GetStats().type == BuildingType.residential)
+                    {
+                        ResidentialBuilding residentialBuilding = building.gameObject.GetComponent<ResidentialBuilding>();
+                        //update housing slots
+                        //totalHousingSlots += residentialBuilding.HousingCapacity();
+                        //occuppiedHousingSlots += residentialBuilding.CountResidents();
+                        totalHousingSlots.IncrementSlotValue(residentialBuilding.HousingCapacity(), residentialBuilding.ResidentClass());
+                        occuppiedHousingSlots.IncrementSlotValue(residentialBuilding.CountResidents(), residentialBuilding.ResidentClass());
+                        
+                        residentialBuilding.UpdateHousingQuality();
+                    }
+
                 }
 
+                //Update ResourceManager
                 GameManager.resourceMan.UpdateWaterDemand(totalWaterDemand);
                 GameManager.resourceMan.UpdatePowerDemand(totalPowerDemand);
+                GameManager.resourceMan.UpdateTotalHousingSlots(totalHousingSlots);
+                GameManager.resourceMan.UpdateOccupiedHousingSlots(occuppiedHousingSlots);
+
 
       
                 //Computing production of infraStructure buildings
@@ -117,10 +146,6 @@ public class SimulationManager : MonoBehaviour
                     building.SetLoad(powerDemandToMaxProductionRatio);
                 foreach (InfrastructureBuilding building in GameManager.buildingsMan.waterProductionBuildings)
                     building.SetLoad(waterDemandToMaxProductionRatio);
-
-                //update building effect on natural resources and environment
-                foreach (Building building in GameManager.buildingsMan.constructedBuildings)
-                    building.UpdateEffectOnNature(dateUpdateRateHours);
 
 
                 yield return new WaitForSeconds(timeBetweenUpdates);

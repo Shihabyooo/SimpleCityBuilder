@@ -27,10 +27,7 @@ public class InfrastructureBuilding : Building
         currentLoad = load;
     }
 
-    public virtual void UpdateEffectOnNaturalResources(int timeWindow)
-    {
-        
-    }
+    
 
     
 

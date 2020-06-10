@@ -16,6 +16,8 @@ public class Building : MonoBehaviour
     [SerializeField] protected uint budget; //IMPORTANT! budget must always be from stats.minBudget to stats.maxBudget
     [SerializeField] protected BasicResources allocatedResources = new BasicResources(); //These resources will be allocated by the simulation based on availability and priority.
     //[SerializeField] protected bool isWellSupplied = false;
+    public System.Guid uniqueID {get; private set;}
+
 
     virtual protected void Awake()
     {
@@ -87,6 +89,7 @@ public class Building : MonoBehaviour
     protected virtual void OnConstructionComplete()
     {
         isUnderConstruction = false;
+        uniqueID = GameManager.buildingsMan.GetNewGUID();
         GameManager.buildingsMan.AddConstructedBuilding(this);
     }
 
