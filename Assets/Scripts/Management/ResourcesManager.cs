@@ -7,6 +7,7 @@ public class ResourcesManager : MonoBehaviour
     [SerializeField] CityResources resources = new CityResources(); //The serialization is only for testing (to view parameters in editor while testing)
     [SerializeField] CityFinances finances = new CityFinances(); //The serialization is only for testing (to view parameters in editor while testing)
 
+    //Getters
     public CityResources GetCityResources()
     {
         return resources;
@@ -14,40 +15,58 @@ public class ResourcesManager : MonoBehaviour
 
     public float AvailablePower()
     {
-        return resources.totalAvailablePower - resources.currentPowerConsumption;
+        return resources.totalAvailablePower - resources.powerConsumption;
     }
 
     public float AvailableWater()
     {
-        return resources.totalAvailableWaterSupply - resources.currentWaterConsumption;
+        return resources.totalAvailableWaterSupply - resources.waterConsumption;
     }
 
     public ulong AvailableEducation()
     {
-        if (resources.totalAvailableEducationSeats == 0 || resources.totalAvailableEducationSeats <= resources.currentStudentsCount) //I don't trust computers, or myself....
+        if (resources.totalAvailableEducationSeats == 0 || resources.totalAvailableEducationSeats <= resources.studentsCount) //I don't trust computers, or myself....
             return 0;
 
-        return resources.totalAvailableEducationSeats - resources.currentStudentsCount;
+        return resources.totalAvailableEducationSeats - resources.studentsCount;
     }
 
     public ulong AvailableHealth()
     {
-        if (resources.totalAvailableHospitalBeds == 0 || resources.totalAvailableHospitalBeds <= resources.currentFilledHospitalBeds) //Same as above.
+        if (resources.totalAvailableHospitalBeds == 0 || resources.totalAvailableHospitalBeds <= resources.filledHospitalBeds) //Same as above.
             return 0;
 
-        return resources.totalAvailableHospitalBeds - resources.currentFilledHospitalBeds;    
+        return resources.totalAvailableHospitalBeds - resources.filledHospitalBeds;    
     }
 
+    public ulong AvailableHousing (HousingClass housingClass)
+    {
+        switch (housingClass)
+        {
+            case HousingClass.poor:
+                return resources.totalHousingSlots.poor - resources.occuppiedHousingSlots.poor;
+            case HousingClass.low:
+                return resources.totalHousingSlots.low - resources.occuppiedHousingSlots.low;
+            case HousingClass.middle:
+                return resources.totalHousingSlots.middle - resources.occuppiedHousingSlots.middle;
+            case HousingClass.high:
+                return resources.totalHousingSlots.high - resources.occuppiedHousingSlots.high;
+            case HousingClass.obscene:
+                return resources.totalHousingSlots.obscene - resources.occuppiedHousingSlots.obscene;
+            default:
+                return 0;
+        }
+    }
 
     //Setters
     public void UpdatePowerDemand(float newDemand)
     {
-        resources.currentPowerDemand = newDemand;
+        resources.powerDemand = newDemand;
     }
 
     public void UpdatePowerConsumption(float newConsumption)
     {
-        resources.currentPowerConsumption = newConsumption;
+        resources.powerConsumption = newConsumption;
     }
 
     public void UpdateAvailablePower(float newAvailable)
@@ -57,12 +76,12 @@ public class ResourcesManager : MonoBehaviour
 
     public void UpdateWaterDemand(float newDemand)
     {
-        resources.currentWaterDemand = newDemand;
+        resources.waterDemand = newDemand;
     }
 
     public void UpdateWaterConsumption(float newConsumption)
     {
-        resources.currentWaterConsumption = newConsumption;
+        resources.waterConsumption = newConsumption;
     }
 
     public void UpdateAvailableWater(float newAvailable)
@@ -72,7 +91,7 @@ public class ResourcesManager : MonoBehaviour
 
     public void UpdateStudentCount(ulong newCount)
     {
-        resources.currentStudentsCount = newCount;
+        resources.studentsCount = newCount;
     }
 
     public void UpdateAvailableEducationSeats(ulong newSeats)
@@ -87,15 +106,37 @@ public class ResourcesManager : MonoBehaviour
 
     public void UpdateFilledHospitalBeds(ulong newBeds)
     {
-        resources.currentFilledHospitalBeds = newBeds;
+        resources.filledHospitalBeds = newBeds;
     }
 
+    public void UpdateTotalHousingSlots (ulong count, HousingClass housingClass)
+    {
+        resources.totalHousingSlots.SetSlotValue(count, housingClass);
+    }
+
+    public void UpdateTotalHousingSlots (HousingSlots slots)
+    {
+        resources.totalHousingSlots.AssignNew(slots);
+    }
+
+    public void UpdateOccupiedHousingSlots (ulong count, HousingClass housingClass)
+    {
+        resources.occuppiedHousingSlots.SetSlotValue(count, housingClass);
+    }
+
+    public void UpdateOccupiedHousingSlots (HousingSlots slots)
+    {
+        resources.occuppiedHousingSlots.AssignNew(slots);
+    }
 
     //testing viz
     void OnGUI()
     {
         GUIStyle style = new GUIStyle();
+        GUIStyle styleSmall = new GUIStyle();
+
         style.fontSize = 20;
+        styleSmall.fontSize = 17;
         int screenWidth  = Screen.width;
         
         int dataDispWidth = 250;
@@ -115,11 +156,11 @@ public class ResourcesManager : MonoBehaviour
         GUI.Label(rect, message, style);
 
         rect.y += lineHeight + lineSpacing;
-        message = "Power Demand: " + resources.currentPowerDemand.ToString();
+        message = "Power Demand: " + resources.powerDemand.ToString();
         GUI.Label(rect, message, style);
 
         rect.y += lineHeight + lineSpacing;
-        message = "Power Draw: " + resources.currentPowerConsumption.ToString();
+        message = "Power Draw: " + resources.powerConsumption.ToString();
         GUI.Label(rect, message, style);
 
         rect.y += lineHeight + lineSpacing;
@@ -127,11 +168,11 @@ public class ResourcesManager : MonoBehaviour
         GUI.Label(rect, message, style);
 
         rect.y += lineHeight + lineSpacing;
-        message = "Water Demand: " + resources.currentWaterDemand.ToString();
+        message = "Water Demand: " + resources.waterDemand.ToString();
         GUI.Label(rect, message, style);
 
         rect.y += lineHeight + lineSpacing;
-        message = "Water Consumption: " + resources.currentWaterConsumption.ToString();
+        message = "Water Consumption: " + resources.waterConsumption.ToString();
         GUI.Label(rect, message, style);
 
         rect.y += lineHeight + lineSpacing;
@@ -139,7 +180,7 @@ public class ResourcesManager : MonoBehaviour
         GUI.Label(rect, message, style);
 
         rect.y += lineHeight + lineSpacing;
-        message = "Current Students Count: " + resources.currentStudentsCount.ToString();
+        message = "Current Students Count: " + resources.studentsCount.ToString();
         GUI.Label(rect, message, style);
 
         rect.y += lineHeight + lineSpacing;
@@ -147,24 +188,119 @@ public class ResourcesManager : MonoBehaviour
         GUI.Label(rect, message, style);
 
         rect.y += lineHeight + lineSpacing;
-        message = "Filled Hospital Beds: " + resources.currentFilledHospitalBeds.ToString();
+        message = "Filled Hospital Beds: " + resources.filledHospitalBeds.ToString();
         GUI.Label(rect, message, style);
+
+        rect.y += lineHeight + lineSpacing;
+        message = "Total Housing Slots: poor: " + resources.totalHousingSlots.poor.ToString();
+        GUI.Label(rect, message, style);
+        rect.y += lineHeight + lineSpacing;
+        message = "low: " + resources.totalHousingSlots.low.ToString();
+        message += " | mid: " + resources.totalHousingSlots.middle.ToString();
+        message += " | hi: " + resources.totalHousingSlots.high.ToString();
+        message += " | obs: " + resources.totalHousingSlots.obscene.ToString();
+        GUI.Label(rect, message, styleSmall);
+
+        rect.y += lineHeight + lineSpacing;
+        message = "Occuppied Housing Slots: poor: " + resources.occuppiedHousingSlots.poor.ToString();
+        GUI.Label(rect, message, style);
+        rect.y += lineHeight + lineSpacing;
+        message = "low: " + resources.occuppiedHousingSlots.low.ToString();
+        message += " | mid: " + resources.occuppiedHousingSlots.middle.ToString();
+        message += " | hi: " + resources.occuppiedHousingSlots.high.ToString();
+        message += " | obs: " + resources.occuppiedHousingSlots.obscene.ToString();
+        GUI.Label(rect, message, styleSmall);
     }
 }
 
 [System.Serializable]
+public class HousingSlots
+{
+    public ulong poor = 0;
+    public ulong low = 0;
+    public ulong middle = 0;
+    public ulong high = 0;
+    public ulong obscene = 0;
+    
+
+    public void AssignNew(HousingSlots newSlots) //since we can't overload the assignment op and we sometimes want to deep copy an object
+    {
+        poor = newSlots.poor;
+        low = newSlots.low;
+        middle = newSlots.middle;
+        high = newSlots.high;
+        obscene = newSlots.obscene;
+    }
+
+    public void SetSlotValue(ulong value, HousingClass housingClass)
+    {
+        switch (housingClass)
+        {
+            case HousingClass.poor:
+                poor = value;
+                break;
+            case HousingClass.low:
+                low = value;
+                break;
+            case HousingClass.middle:
+                middle = value;
+                break;
+            case HousingClass.high:
+                high = value;
+                break;
+            case HousingClass.obscene:
+                obscene = value;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void IncrementSlotValue(ulong increment, HousingClass housingClass)
+    {
+        switch (housingClass)
+        {
+            case HousingClass.poor:
+                poor += increment;
+                break;
+            case HousingClass.low:
+                low += increment;
+                break;
+            case HousingClass.middle:
+                middle += increment;
+                break;
+            case HousingClass.high:
+                high += increment;
+                break;
+            case HousingClass.obscene:
+                obscene += increment;
+                break;
+            default:
+                break;
+        }
+    }
+
+    
+}
+
+
+[System.Serializable]
 public class CityResources
 {
-    public float currentPowerDemand = 0.0f;
-    public float currentPowerConsumption = 0.0f;
+    public float powerDemand = 0.0f;
+    public float powerConsumption = 0.0f;
     public float totalAvailablePower = 0.0f;
-    public float currentWaterDemand = 0.0f;
-    public float currentWaterConsumption = 0.0f;
+    public float waterDemand = 0.0f;
+    public float waterConsumption = 0.0f;
     public float totalAvailableWaterSupply = 0.0f;
-    public ulong currentStudentsCount = 0;
+    public ulong studentsCount = 0;
     public ulong totalAvailableEducationSeats = 0;
-    public ulong currentFilledHospitalBeds = 0;
+    public ulong filledHospitalBeds = 0;
     public ulong totalAvailableHospitalBeds = 0;
+
+
+    public HousingSlots totalHousingSlots = new HousingSlots();
+    public HousingSlots occuppiedHousingSlots = new HousingSlots();
 }
 
 public class CityFinances
