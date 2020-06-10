@@ -434,6 +434,7 @@ GameObject:
   - component: {fileID: 224963320}
   - component: {fileID: 224963321}
   - component: {fileID: 224963322}
+  - component: {fileID: 224963323}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -505,7 +506,7 @@ MonoBehaviour:
     - {fileID: 329271276303203813, guid: 892025365c33e8b4f906dae3e330ab64, type: 3}
     - {fileID: 622912356041477303, guid: 3cc1712cee577c9488be6a90668730a7, type: 3}
     - {fileID: 855314826128607868, guid: f46101b6c78d9f4499e83a1190158146, type: 3}
-    - {fileID: 5207093688149400163, guid: a380fdc15764d0c468b7c9cd8b0e5487, type: 3}
+    - {fileID: -4102208194882701168, guid: a380fdc15764d0c468b7c9cd8b0e5487, type: 3}
     - {fileID: 6774016618159329691, guid: 6975d3ec4aa4afd45bdf534c56ec04fc, type: 3}
     - {fileID: 6801135501518552312, guid: c5451d0c6951fce4cb5842a766d42707, type: 3}
     - {fileID: 6865540290893926453, guid: 15d774d9f1bcd694abdfba7619900f72, type: 3}
@@ -538,16 +539,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resources:
-    currentPowerDemand: 0
-    currentPowerConsumption: 0
+    powerDemand: 0
+    powerConsumption: 0
     totalAvailablePower: 0
-    currentWaterDemand: 0
-    currentWaterConsumption: 0
+    waterDemand: 0
+    waterConsumption: 0
     totalAvailableWaterSupply: 0
-    currentStudentsCount: 0
+    studentsCount: 0
     totalAvailableEducationSeats: 0
-    currentFilledHospitalBeds: 0
+    filledHospitalBeds: 0
     totalAvailableHospitalBeds: 0
+    totalHousingSlots:
+      poor: 0
+      low: 0
+      middle: 0
+      high: 0
+      obscene: 0
+    occuppiedHousingSlots:
+      poor: 0
+      low: 0
+      middle: 0
+      high: 0
+      obscene: 0
 --- !u!114 &224963322
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -595,6 +608,19 @@ MonoBehaviour:
   rainfallNodePrefab: {fileID: 2532189234864196257, guid: 098c87f049f32814d8c14d64465b0da4,
     type: 3}
   cloudHeight: 10
+--- !u!114 &224963323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 224963315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd16030dcb22f5046b31ea56b4714ed8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  population: []
 --- !u!1 &256751662
 GameObject:
   m_ObjectHideFlags: 0
@@ -5330,6 +5356,7 @@ MonoBehaviour:
   visualizeWindSpeed: 0
   visualizeWindDirection: 0
   visualizePollution: 0
+  visualizeRainfall: 0
 --- !u!65 &1991680714
 BoxCollider:
   m_ObjectHideFlags: 0
