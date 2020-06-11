@@ -21,7 +21,7 @@ public class Citizen
 
     //public bool isInDebt;  //{get; private set;} 
 
-    public const int happinessChangeRatePerHour = 1;
+    public const int happinessChangeRatePerDay = 1;
     public const int lifeStyleExpensesPerDayPoor = 10; //in units of money per day
     public const int lifeStyleExpensesPerDayLow = 25; //in units of money per day
     public const int lifeStyleExpensesPerDayMiddle = 50; //in units of money per day

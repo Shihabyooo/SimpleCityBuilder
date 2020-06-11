@@ -18,7 +18,7 @@ public class SimulationManager : MonoBehaviour
                                                                             //update ticks for all days), the days increment should be 1. Either days or hours should be set, not both.
                                                                             //System should work for any value though.
                                                                             
-    Coroutine buildingsSim = null, happinessSim = null, natResourceSim = null, budgetSim = null, timeKeeper = null;
+    Coroutine buildingsSim = null, natResourceSim = null, budgetSim = null, timeKeeper = null;
     
     public void Awake()
     {
@@ -29,7 +29,6 @@ public class SimulationManager : MonoBehaviour
     {
         isRunning = true;
         buildingsSim = StartCoroutine(BuildingsSimRun());
-        happinessSim = StartCoroutine(HappinessSimRun());
         natResourceSim = StartCoroutine(NaturalResourcesSimRun());
         budgetSim = StartCoroutine(BudgetSimRun());
         timeKeeper = StartCoroutine(TimeKeeperRun());
@@ -48,8 +47,7 @@ public class SimulationManager : MonoBehaviour
     void NewDay()
     {
         GameManager.climateMan.UpdateClimate(date);
-        GameManager.populationMan.ProcessMigration();
-        GameManager.populationMan.UpdateCitizens();
+        GameManager.populationMan.UpdatePopulation();
     }
 
     //Simulation runs coroutines.
@@ -171,21 +169,6 @@ public class SimulationManager : MonoBehaviour
                     currentDay = date.Day;
                 }
 
-                yield return new WaitForSeconds(timeBetweenUpdates);
-            }
-            else
-                yield return new WaitForFixedUpdate();
-        }
-    }
-
-    //To be implemented sim run coroutines
-    IEnumerator HappinessSimRun()
-    {
-        while (true)
-        {
-            if (isRunning)
-            {
-                GameManager.populationMan.UpdateHappiness();
                 yield return new WaitForSeconds(timeBetweenUpdates);
             }
             else

@@ -9,7 +9,7 @@ public class PopulationManager : MonoBehaviour
      
     [SerializeField] List<Citizen> population = new List<Citizen>(); //TODO remove this serialization when testing is done.
     [SerializeField] PopulationGrowthMetrics growthStats = new PopulationGrowthMetrics();
-    [SerializeField] Happiness populationHappiness = new Happiness(50);
+    [SerializeField] Happiness populationHappiness = new Happiness(0);
     static uint maxPopulation = 10000000; //10 million
     static int maxImmigrationRate = 100; //citizens per day.
 
@@ -49,67 +49,68 @@ public class PopulationManager : MonoBehaviour
         }
     }
 
-    public void UpdateHappiness()
-    {
-        if (population.Count < 1)
-        {
-            populationHappiness = new Happiness(0);
-            return;
-        }
 
-        ulong overallHappiness = 0;
+    public void UpdatePopulation()
+    {        
+        //Update Citizens
+        //Update Happiness
+        //Process migration
+
+        ulong overallHappiness = 0; //Though, with maxPopulation being set to 10E7, uint would be more than enough to handle these sums.
         ulong healthHappines  = 0;
         ulong homeHappines = 0;
         ulong jobHappines = 0;
         ulong environmentHappiness = 0;
 
-        foreach(Citizen citizen in population)
-        {
-            //compute citizen's happiness here.
-            UpdateCitizenHappiness(citizen);
-            //add citizen's happines to sum
-            overallHappiness += citizen.happiness.overall;
-            healthHappines += citizen.happiness.health;
-            homeHappines += citizen.happiness.home;
-            jobHappines += citizen.happiness.job;
-            environmentHappiness += citizen.happiness.environment;
-        }
-
-        int _populationCount = population.Count;
-        populationHappiness.overall = (uint)Mathf.RoundToInt((float)overallHappiness / (float)_populationCount);
-        populationHappiness.health = (uint)Mathf.RoundToInt((float)healthHappines / (float)_populationCount);
-        populationHappiness.home = (uint)Mathf.RoundToInt((float)homeHappines / (float)_populationCount);
-        populationHappiness.job = (uint)Mathf.RoundToInt((float)jobHappines / (float)_populationCount);
-        populationHappiness.environment = (uint)Mathf.RoundToInt((float)environmentHappiness / (float)_populationCount);
-    }
-
-    void UpdateCitizenHappiness(Citizen citizen)
-    {
-        //TODO research whether Mathf.Sign with casting is more expensive than divind the value with its absolute.
-        int changeDirection = (int)Mathf.Sign((int)citizen.homeAddress.housingQuality - (int)citizen.happiness.home); 
-        citizen.happiness.home = (uint)Mathf.Clamp(citizen.happiness.home + (changeDirection * Citizen.happinessChangeRatePerHour), 0, 100);
-    }
-
-    public void UpdateCitizens() //Must be called once per day.
-    {
-        
-        //foreach (Citizen citizen in population)
         for (int i = population.Count - 1; i >= 0; i--)
         {
-            if (!population[i].ProcessFinances()) //in current ProcessFinances implementation, return false if citizen can't pay its life expenses. So we remove it from simulation.
+            Citizen citizen = population[i];
+            if (!citizen.ProcessFinances()) //in current ProcessFinances implementation, return false if citizen can't pay its life expenses. So we remove it from simulation.
             {
                 //print ("Citizen can't pay its expenses, removing it from simulation"); //test
-                population[i].Emigrate();
+                citizen.Emigrate();
                 population.RemoveAt(i);
             }
             else
             {
                 //TODO handle remaining citizen updates here. DO NOT DO THIS OUTSIDE THIS ELSE CLAUSE!
+                
+                //compute citizen's happiness here.
+                UpdateCitizenHappiness(citizen);
+                //add citizen's happines to sum
+                overallHappiness += citizen.happiness.overall;
+                healthHappines += citizen.happiness.health;
+                homeHappines += citizen.happiness.home;
+                jobHappines += citizen.happiness.job;
+                environmentHappiness += citizen.happiness.environment;
             }
         }
+
+        //Update populationHappiness
+        int _populationCount = Mathf.Min(population.Count, 1); //to avoid division-by-zero at start of game when there is no population.
+        populationHappiness.overall = (uint)Mathf.RoundToInt((float)overallHappiness / (float)_populationCount);
+        populationHappiness.health = (uint)Mathf.RoundToInt((float)healthHappines / (float)_populationCount);
+        populationHappiness.home = (uint)Mathf.RoundToInt((float)homeHappines / (float)_populationCount);
+        populationHappiness.job = (uint)Mathf.RoundToInt((float)jobHappines / (float)_populationCount);
+        populationHappiness.environment = (uint)Mathf.RoundToInt((float)environmentHappiness / (float)_populationCount);
+
+
+        //process migration
+        ProcessMigration();
     }
 
-    public void ProcessMigration() //called once per day.
+    void UpdateCitizenHappiness(Citizen citizen)
+    {
+        Happiness newHappiness = new Happiness(50);
+
+        //TODO research whether Mathf.Sign with casting is more expensive than divind the value with its absolute.
+        int changeDirection = (int)Mathf.Sign((int)citizen.homeAddress.housingQuality - (int)citizen.happiness.home); 
+        newHappiness.home = (uint)Mathf.Clamp(citizen.happiness.home + (changeDirection * Citizen.happinessChangeRatePerDay), 0, 100);
+
+        citizen.happiness.UpdateHappiness(newHappiness);
+    }
+
+    void ProcessMigration() //called once per day.
     {
         //compute immigration rate based on happiness and empty housing.
         HousingSlots availableHousing = GameManager.resourceMan.AvailableHousing();
@@ -255,6 +256,32 @@ public class PopulationManager : MonoBehaviour
 
         population.Add(newCitizen);
     }
+
+    //test visualization
+    void OnGUI()
+    {
+        int lineHeight = 20;
+        int padding = 7;
+        Rect rect = new Rect(Screen.width - 350, Screen.height - lineHeight * 5, 200, lineHeight);
+        GUIStyle style = new GUIStyle();
+        style.fontSize = 22;
+        GUIStyle styleSmall = new GUIStyle();
+        styleSmall.fontSize = 18;
+        
+        string message = "Population: " + population.Count.ToString();
+        GUI.Label(rect, message, style);
+
+        rect.y += lineHeight + padding;
+        message = "Population Happiness:";
+        GUI.Label(rect, message, style);
+        rect.y += lineHeight + padding;
+        message = "Overall: " + populationHappiness.overall.ToString() + " | health: " + populationHappiness.health.ToString()  + " | home: " + populationHappiness.home.ToString();
+        GUI.Label(rect, message, styleSmall);
+        rect.y += lineHeight;
+        message = "job: " + populationHappiness.job.ToString() + " | environment: " + populationHappiness.environment.ToString();
+        GUI.Label(rect, message, styleSmall);
+
+    }
 }
 
 
@@ -276,6 +303,21 @@ public struct Happiness
     public Happiness(uint fixedValue)
     {
         overall = health = home = job = environment = fixedValue;
+    }
+
+    public void UpdateHappiness(Happiness newHappiness)
+    {
+        health = newHappiness.health;
+        home = newHappiness.home;
+        job = newHappiness.job;
+        environment = newHappiness.environment;
+        ComputeOverallHappiness();
+    }
+
+    public void ComputeOverallHappiness()
+    {
+        overall = health + home + job + environment;
+        overall = (uint)Mathf.RoundToInt((float)overall / 4.0f);
     }
 }
 

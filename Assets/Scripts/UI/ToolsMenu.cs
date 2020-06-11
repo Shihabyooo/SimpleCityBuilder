@@ -47,6 +47,9 @@ public class ToolsMenu : MonoBehaviour
             case 7:
                 Grid.grid.visualizePollution = state;
                 break;
+            case 8:
+                Grid.grid.visualizeRainfall = state;
+                break;
         }
     }
 }
