@@ -321,8 +321,6 @@ public struct Happiness
     }
 }
 
-
-
 [System.Serializable]
 public class PopulationGrowthMetrics
 {

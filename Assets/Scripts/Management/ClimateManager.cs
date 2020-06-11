@@ -121,14 +121,17 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
     IEnumerator StormEnd(Storm storm)
     {
         float helperTimer = 0.0f;
-        float baseOpacity = storm.rainNode.opacity;
+        float baseRainOpacity = storm.rainNode.rainOpacity;
+        float baseCloudOpacity = storm.rainNode.cloudOpacity;
+        
         float baseRainfall = storm.rainNode.rainfall;
 
         while (helperTimer < stormFadeOutPeriod)
         {
             yield return new WaitForEndOfFrame();
             storm.rainNode.SetRainfall(baseRainfall * (1 - helperTimer / stormFadeOutPeriod));
-            storm.rainNode.SetOpacity(baseOpacity * (1 - helperTimer / stormFadeOutPeriod));
+            storm.rainNode.SetRainOpacity(baseRainOpacity * (1 - helperTimer / stormFadeOutPeriod));
+            storm.rainNode.SetCloudOpacity(baseCloudOpacity * (1 - helperTimer / stormFadeOutPeriod));
             helperTimer += Time.deltaTime;
         }
 

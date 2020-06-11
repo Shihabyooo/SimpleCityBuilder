@@ -14,6 +14,8 @@ public class SimulationManager : MonoBehaviour
     public float timeBetweenUpdates = 0.5f; //the time between each update in sim in seconds.
     [SerializeField] bool isRunning = false;
     public System.DateTime date {get; private set;} //Known issue, this struct supports as far as 31-12-9999.
+    [SerializeField] [Range(1990, 2030)] int startYear = 2000;
+    [SerializeField] [Range(1, 12)] int startMonth = 1;
     [SerializeField] [Range(1,24)]  int dateUpdateRateHours = 0; //the hours increment should be something we can divide 24 with (to make days increment after same number
                                                                             //update ticks for all days), the days increment should be 1. Either days or hours should be set, not both.
                                                                             //System should work for any value though.
@@ -22,7 +24,7 @@ public class SimulationManager : MonoBehaviour
     
     public void Awake()
     {
-        date = new System.DateTime(2020, 1, 1, 0, 0, 0);
+        date = new System.DateTime(startYear, startMonth, 1, 0, 0, 0);
     }
 
     public void StartSimulation()
