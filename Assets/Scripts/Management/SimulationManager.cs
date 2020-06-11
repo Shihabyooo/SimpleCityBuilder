@@ -49,6 +49,7 @@ public class SimulationManager : MonoBehaviour
     {
         GameManager.climateMan.UpdateClimate(date);
         GameManager.populationMan.ProcessMigration();
+        GameManager.populationMan.UpdateCitizens();
     }
 
     //Simulation runs coroutines.
@@ -90,7 +91,7 @@ public class SimulationManager : MonoBehaviour
                         //totalHousingSlots += residentialBuilding.HousingCapacity();
                         //occuppiedHousingSlots += residentialBuilding.CountResidents();
                         totalHousingSlots.IncrementSlotValue(residentialBuilding.HousingCapacity(), residentialBuilding.ResidentClass());
-                        occuppiedHousingSlots.IncrementSlotValue(residentialBuilding.CountResidents(), residentialBuilding.ResidentClass());
+                        occuppiedHousingSlots.IncrementSlotValue(residentialBuilding.ResidentsCount(), residentialBuilding.ResidentClass());
                         
                         residentialBuilding.UpdateHousingQuality();
                     }

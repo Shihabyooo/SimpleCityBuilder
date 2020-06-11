@@ -41,7 +41,7 @@ public class PopulationManager : MonoBehaviour
                 citizen.birthDay = newStats.birthDay;
                 citizen.educationalLevel = newStats.educationalLevel;
                 citizen.happiness = newStats.happiness;
-                citizen.income = newStats.income;
+                //citizen.income = newStats.income;
 
                 citizen.homeAddress = newStats.homeAddress;
                 citizen.workAddress = newStats.workAddress;
@@ -66,7 +66,7 @@ public class PopulationManager : MonoBehaviour
         foreach(Citizen citizen in population)
         {
             //compute citizen's happiness here.
-
+            UpdateCitizenHappiness(citizen);
             //add citizen's happines to sum
             overallHappiness += citizen.happiness.overall;
             healthHappines += citizen.happiness.health;
@@ -81,6 +81,32 @@ public class PopulationManager : MonoBehaviour
         populationHappiness.home = (uint)Mathf.RoundToInt((float)homeHappines / (float)_populationCount);
         populationHappiness.job = (uint)Mathf.RoundToInt((float)jobHappines / (float)_populationCount);
         populationHappiness.environment = (uint)Mathf.RoundToInt((float)environmentHappiness / (float)_populationCount);
+    }
+
+    void UpdateCitizenHappiness(Citizen citizen)
+    {
+        //TODO research whether Mathf.Sign with casting is more expensive than divind the value with its absolute.
+        int changeDirection = (int)Mathf.Sign((int)citizen.homeAddress.housingQuality - (int)citizen.happiness.home); 
+        citizen.happiness.home = (uint)Mathf.Clamp(citizen.happiness.home + (changeDirection * Citizen.happinessChangeRatePerHour), 0, 100);
+    }
+
+    public void UpdateCitizens() //Must be called once per day.
+    {
+        
+        //foreach (Citizen citizen in population)
+        for (int i = population.Count - 1; i >= 0; i--)
+        {
+            if (!population[i].ProcessFinances()) //in current ProcessFinances implementation, return false if citizen can't pay its life expenses. So we remove it from simulation.
+            {
+                //print ("Citizen can't pay its expenses, removing it from simulation"); //test
+                population[i].Emigrate();
+                population.RemoveAt(i);
+            }
+            else
+            {
+                //TODO handle remaining citizen updates here. DO NOT DO THIS OUTSIDE THIS ELSE CLAUSE!
+            }
+        }
     }
 
     public void ProcessMigration() //called once per day.
@@ -156,31 +182,31 @@ public class PopulationManager : MonoBehaviour
                                                                                 //This translates to: citizen has 60% chance of being illterate, 40% of having primary education.
                 averageAge = 28;
                 ageRange = 10;
-                _savings = 500;
+                _savings = Random.Range(400, 600);
                 break;
             case HousingClass.low:
                 educationLevelPropability = new float[4] {0.1f, 0.25f, 0.9f, 1.0f};
                 averageAge = 32;
                 ageRange = 14;
-                _savings = 1000;
+                _savings = Random.Range(800, 1200);
                 break;
             case HousingClass.middle:
                 educationLevelPropability = new float[4] {0.0f, 0.0f, 0.55f, 1.0f};
                 averageAge = 35;
                 ageRange = 15;
-                _savings = 5000;
+                _savings = Random.Range(4000, 6000);
                 break;
             case HousingClass.high:
                 educationLevelPropability = new float[4] {0.0f, 0.0f, 0.1f, 1.0f};
                 averageAge = 35;
                 ageRange = 10;
-                _savings = 20000;
+                _savings = Random.Range(15000, 25000);
                 break;
             case HousingClass.obscene:
                 educationLevelPropability = new float[4] {0.0f, 0.0f, 0.05f, 1.0f};
                 averageAge = 40;
                 ageRange = 10;
-                _savings = 100000;
+                _savings = Random.Range(80000, 120000);
                 break;
         }
 
@@ -197,6 +223,7 @@ public class PopulationManager : MonoBehaviour
 
         newCitizen.birthDay = new System.DateTime(GameManager.simMan.date.Year - Random.Range(averageAge - ageRange, averageAge + ageRange), Random.Range(1,12), Random.Range(1,28));
         newCitizen.savings = _savings;
+        newCitizen.citizenClass = _class;
 
         return newCitizen;
     }
@@ -214,8 +241,13 @@ public class PopulationManager : MonoBehaviour
         ResidentialBuilding home = GameManager.buildingsMan.GetResidentialBuildingWithEmptySlot(_class);
         if (home != null) //this shouldn't fail.
         {
-            newCitizen.homeAddress = home.uniqueID;
-            home.AddResident(newCitizen.id);
+            //newCitizen.homeAddress = home.uniqueID;
+            newCitizen.homeAddress = home;
+            home.AddResident(newCitizen);
+        }
+        else
+        {
+            print ("ERROR! Could not assign home to a citizen");
         }
 
         //TODO assign work
@@ -247,22 +279,7 @@ public struct Happiness
     }
 }
 
-[System.Serializable]
-public class Citizen
-{
-    //TODO reset the {get; private set;} once testing is done.
-    
-    public System.Guid id; //{get; private set;}
-    public System.DateTime birthDay; //{get; private set;}
-    public EducationLevel educationalLevel; //{get; private set;} 
-    public Happiness happiness; //{get; private set;}  
-    public float income; //{get; private set;} 
-    public long savings; //{get; private set;} 
 
-    public System.Guid homeAddress; //{get; private set;} 
-    public System.Guid workAddress; //{get; private set;} 
-
-}
 
 [System.Serializable]
 public class PopulationGrowthMetrics

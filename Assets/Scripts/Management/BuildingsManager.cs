@@ -77,7 +77,7 @@ public class BuildingsManager : MonoBehaviour
             if (constructedBuildings[randomInt].GetStats().type == BuildingType.residential
                 && constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>() != null
                 && constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>().ResidentClass() == _class
-                && constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>().CountEmptyHousingSlots() > 0)
+                && constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>().EmptyHousingSlots() > 0)
             {
                 return constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>();
             }
@@ -91,7 +91,7 @@ public class BuildingsManager : MonoBehaviour
             if (building.GetStats().type == BuildingType.residential
                 && building.gameObject.GetComponent<ResidentialBuilding>() != null
                 && building.gameObject.GetComponent<ResidentialBuilding>().ResidentClass() == _class
-                && building.gameObject.GetComponent<ResidentialBuilding>().CountEmptyHousingSlots() > 0)
+                && building.gameObject.GetComponent<ResidentialBuilding>().EmptyHousingSlots() > 0)
                 {
                     return building.gameObject.GetComponent<ResidentialBuilding>();
                 }

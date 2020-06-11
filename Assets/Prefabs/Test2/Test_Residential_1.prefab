@@ -107,3 +107,10 @@ MonoBehaviour:
   allocatedResources:
     power: 0
     water: 0
+  residentStats:
+    minHousingQuality: 5
+    maxHousingQuality: 75
+    housingClass: 2
+    residentCapacity: 100
+    rent: 100
+  housingQuality: 0

@@ -5,13 +5,13 @@ using UnityEngine;
 public class ResidentialBuilding : Building
 {
     [SerializeField] ResidentialBuildingStats residentStats = new ResidentialBuildingStats();
-    protected List<System.Guid> occupants;
-    public uint housingQuality;
+    protected List<Citizen> occupants;
+    public uint housingQuality; //quality should universally be from 0 to 100, though each building may specifiy tighter limits within.
 
    protected override void Awake()
    {
        base.Awake();
-       occupants = new List<System.Guid>();
+       occupants = new List<Citizen>();
        stats.type = BuildingType.residential;
    }
 
@@ -25,21 +25,21 @@ public class ResidentialBuilding : Building
         housingQuality = (uint)Mathf.RoundToInt(Mathf.Max(resourceRatio * residentStats.maxHousingQuality, residentStats.minHousingQuality));
     }
 
-    public virtual bool AddResident(System.Guid citizenID)
+    public virtual bool AddResident(Citizen citizen)
     {
         if (IsFull())
             return false;
 
-        occupants.Add(citizenID);
+        occupants.Add(citizen);
 
         return true;        
     }
 
-    public virtual bool RemoveResident(System.Guid citizenID) //returns false if no resident of citizenID is found, true otherwise.
+    public virtual bool RemoveResident(Citizen citizen) //returns false if no resident of citizenID is found, true otherwise.
     {
         for (int i = occupants.Count - 1; i >= 0; i--)
         {
-            if (occupants[i] == citizenID)
+            if (occupants[i] == citizen)
             {
                 occupants.RemoveAt(i);
                 return true;
@@ -54,7 +54,7 @@ public class ResidentialBuilding : Building
         return occupants.Count >= residentStats.residentCapacity;
     }
 
-    public uint CountEmptyHousingSlots()
+    public uint EmptyHousingSlots()
     {
         return (uint)Mathf.Max((long)residentStats.residentCapacity - occupants.Count, 0);
     }
@@ -64,7 +64,7 @@ public class ResidentialBuilding : Building
         return residentStats.residentCapacity;
     }
 
-    public uint CountResidents()
+    public uint ResidentsCount()
     {
         return (uint)occupants.Count;
     }
@@ -72,6 +72,11 @@ public class ResidentialBuilding : Building
     public HousingClass ResidentClass()
     {
         return residentStats.housingClass;
+    }
+
+    public uint Rent() //rent is in units fund per day
+    {
+        return residentStats.rent;
     }
 }
 
@@ -85,8 +90,8 @@ public enum HousingClass
 public class ResidentialBuildingStats
 {
     public uint minHousingQuality = 5;
-    public uint maxHousingQuality = 100;
+    public uint maxHousingQuality = 75; //Must not exceed 100, the heighest quality of a building in game.
     public HousingClass housingClass = HousingClass.middle;
     public uint residentCapacity = 100;
-    
+    public uint rent; //in units fund per day
 }
