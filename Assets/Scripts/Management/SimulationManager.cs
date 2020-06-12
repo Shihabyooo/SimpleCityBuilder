@@ -170,7 +170,7 @@ public class SimulationManager : MonoBehaviour
                     NewDay();
                     currentDay = date.Day;
                 }
-
+                GameManager.uiMan.UpdateTime(date);
                 yield return new WaitForSeconds(timeBetweenUpdates);
             }
             else
