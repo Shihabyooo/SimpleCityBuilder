@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+public enum Gender
+{
+    male, female
+}
+
 [System.Serializable]
 public class Citizen
 {
@@ -17,7 +23,7 @@ public class Citizen
 
     //public System.Guid homeAddress; //{get; private set;} 
     public ResidentialBuilding homeAddress; //{get; private set;} 
-    public System.Guid workAddress; //{get; private set;} 
+    public WorkPlace workAddress; //{get; private set;} 
 
     //public bool isInDebt;  //{get; private set;} 
 
@@ -28,18 +34,28 @@ public class Citizen
     public const int lifeStyleExpensesPerDayHigh = 250; //in units of money per day
     public const int lifeStyleExpensesPerDayObscene = 500; //in units of money per day
 
+    public Gender gender;
+    public Citizen spouse; //{get; private set;} 
 
-    // public Citizen()
-    // {
-    //     isInDebt = false;
-    // }
+
+
+    public Citizen()
+    {
+        //isInDebt = false;
+        spouse = null;
+        workAddress = null;
+    }
 
     public bool ProcessFinances() //Must be called once per day. Returns false if citizen can pay their expenses.
     {
         long income = 0;
         long expenses = 0;
+        
         //get paid
-        //TODO implement this after adding a jobs
+        if (workAddress != null)
+        {
+            income += workAddress.Wages();
+        }
         
 
         //add rent to expenses
@@ -65,7 +81,7 @@ public class Citizen
                 break;
         }
 
-        //TODO handle cases of integere overflow/cycling.
+        //TODO handle cases of integer overflow/cycling.
         expenses -= income; //if income > expenses, result will be negative, which will increase savings.
         savings -= expenses;
         
