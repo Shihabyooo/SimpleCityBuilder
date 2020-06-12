@@ -84,7 +84,6 @@ public class BuildingsManager : MonoBehaviour
             count++;
         }
 
-
         //Reaching here means that that stupid randomization thing above failed.
         foreach (Building building in constructedBuildings)
         {
@@ -97,10 +96,38 @@ public class BuildingsManager : MonoBehaviour
                 }
         }
 
-
         return null;
     }
 
+    public WorkPlace GetEmptyWorkSlot(EducationLevel educationLevel, bool random = true)
+    {
+        int count = 0;
+
+        while (count < 100) //tries 100 times to find a random building, if fails, grabs the first one it find from the foreach loop bellow.
+        {
+            int randomInt = Random.Range(0, constructedBuildings.Count);
+
+            if ( constructedBuildings[randomInt].gameObject.GetComponent<WorkPlace>() != null
+                && constructedBuildings[randomInt].gameObject.GetComponent<WorkPlace>().WorkerEducationLevel() == educationLevel
+                && constructedBuildings[randomInt].gameObject.GetComponent<WorkPlace>().AvailableWorkerSlots() > 0)
+            {
+                return constructedBuildings[randomInt].gameObject.GetComponent<WorkPlace>();
+            }
+            count++;
+        }
+
+        foreach (Building building in constructedBuildings)
+        {
+            if (building.gameObject.GetComponent<WorkPlace>() != null
+                && building.gameObject.GetComponent<WorkPlace>().WorkerEducationLevel() == educationLevel
+                && building.gameObject.GetComponent<WorkPlace>().AvailableWorkerSlots() > 0)
+                {
+                    return building.gameObject.GetComponent<WorkPlace>();
+                }
+        }
+
+        return null;
+    }
 
     //=======================================================================================================================
     //=======================================================================================================================

@@ -10,8 +10,8 @@ public class PopulationManager : MonoBehaviour
     [SerializeField] List<Citizen> population = new List<Citizen>(); //TODO remove this serialization when testing is done.
     [SerializeField] PopulationGrowthMetrics growthStats = new PopulationGrowthMetrics();
     [SerializeField] Happiness populationHappiness = new Happiness(0);
-    static uint maxPopulation = 10000000; //10 million
-    static int maxImmigrationRate = 100; //citizens per day.
+    static ulong maxPopulation = 10000000; //10 million
+    static int maxImmigrationRate = 10; //citizens per day.
 
     public int PopulationCount()
     {
@@ -20,7 +20,7 @@ public class PopulationManager : MonoBehaviour
 
     public bool IsPopulationFull()
     {
-        return population.Count >= maxPopulation;
+        return (ulong)population.Count >= maxPopulation;
     }
 
     public bool AddCitizen(Citizen citizen)
@@ -48,7 +48,6 @@ public class PopulationManager : MonoBehaviour
             }
         }
     }
-
 
     public void UpdatePopulation()
     {        
@@ -87,7 +86,7 @@ public class PopulationManager : MonoBehaviour
         }
 
         //Update populationHappiness
-        int _populationCount = Mathf.Min(population.Count, 1); //to avoid division-by-zero at start of game when there is no population.
+        int _populationCount = Mathf.Max(population.Count, 1); //to avoid division-by-zero at start of game when there is no population.
         populationHappiness.overall = (uint)Mathf.RoundToInt((float)overallHappiness / (float)_populationCount);
         populationHappiness.health = (uint)Mathf.RoundToInt((float)healthHappines / (float)_populationCount);
         populationHappiness.home = (uint)Mathf.RoundToInt((float)homeHappines / (float)_populationCount);
@@ -222,6 +221,13 @@ public class PopulationManager : MonoBehaviour
         else if (dieRoll < educationLevelPropability[3])
             newCitizen.educationalLevel = EducationLevel.tertiary;
 
+        dieRoll = Random.Range(0.0f, 1.0f);
+
+        if (dieRoll < 0.5f)
+            newCitizen.gender =  Gender.male;
+        else
+            newCitizen.gender =  Gender.female;
+
         newCitizen.birthDay = new System.DateTime(GameManager.simMan.date.Year - Random.Range(averageAge - ageRange, averageAge + ageRange), Random.Range(1,12), Random.Range(1,28));
         newCitizen.savings = _savings;
         newCitizen.citizenClass = _class;
@@ -252,6 +258,13 @@ public class PopulationManager : MonoBehaviour
         }
 
         //TODO assign work
+        WorkPlace workPlace = GameManager.buildingsMan.GetEmptyWorkSlot(newCitizen.educationalLevel);
+        if (workPlace != null) //contrary to the home case, this is a possibility.
+        {
+            newCitizen.workAddress = workPlace;
+            workPlace.AssignEmployee(newCitizen);
+        }
+
         //TODO compute income.
 
         population.Add(newCitizen);
@@ -329,3 +342,12 @@ public class PopulationGrowthMetrics
     public ulong deathRate = 0; //in citizens per day.
 
 }
+
+
+// public class PopulationStatistics
+// {
+//     public ulong count;
+//     public ulong maleCount;
+//     public ulong femaleCount;
+
+// }
