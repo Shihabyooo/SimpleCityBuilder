@@ -28,8 +28,8 @@ public class WindFarm_1 : InfrastructureBuilding
         //Efficiency affect how much is the currentMaxPowerProduction compared to plantStats.maxPowerProduction.
 
         //currentEfficiency = 0.8f;
-        float budgetEffect = (float)(budget - stats.minBudget) / (float) (stats.maxBudget - stats.minBudget); //linear interpolation
-        currentEfficiency = budgetEffect * (infraStats.maxEfficiency - infraStats.minEfficiency) + infraStats.minEfficiency; //linear interpolation
+
+        currentEfficiency = ComputeEfficiency();
 
         float cellWindSpeed = Grid.grid.windSpeedLayer.GetCellValue(occupiedCell[0], occupiedCell[1]);
         uint cellWindDirection = Grid.grid.windDirectionLayer.GetCellValue(occupiedCell[0], occupiedCell[1]);

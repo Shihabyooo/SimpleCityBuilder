@@ -30,9 +30,7 @@ public class PowerPlant_1 : InfrastructureBuilding
         
         //currentEfficiency = 0.8f;
 
-        float budgetEffect = (float)(budget - stats.minBudget) / (float) (stats.maxBudget - stats.minBudget); //linear interpolation
-        currentEfficiency = budgetEffect * (infraStats.maxEfficiency - infraStats.minEfficiency) + infraStats.minEfficiency; //linear interpolation
-
+        currentEfficiency = ComputeEfficiency();
 
         currentMaxPowerProduction = Mathf.Max(currentEfficiency * plantStats.maxPowerProduction, plantStats.minPowerProduction);
         production =  currentMaxPowerProduction;
