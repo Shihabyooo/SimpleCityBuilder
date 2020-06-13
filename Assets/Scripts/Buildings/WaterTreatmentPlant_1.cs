@@ -43,6 +43,7 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
         currentMaxTreatmentRate = currentEfficiency * plantStats.maxTreatmentRate;
         //production = Mathf.Min(currentMaxTreatmentRate, currentDemand);
         production = currentMaxTreatmentRate;
+        currentTreatmentRate = currentLoad * currentMaxTreatmentRate;
 
         return production;
     }
@@ -51,8 +52,7 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
     {
         base.UpdateEffectOnNature(timeWindow);
         
-        
-        float waterAbstraction = currentLoad * currentMaxTreatmentRate * timeWindow;
+        float waterAbstraction = currentTreatmentRate * timeWindow;
         
         if (waterAbstraction > 0.0001f) //no need to have the AbstracWater method run for nothing...
             AbstractWater(waterAbstraction);

@@ -34,8 +34,9 @@ public class PowerPlant_1 : InfrastructureBuilding
 
         currentMaxPowerProduction = Mathf.Max(currentEfficiency * plantStats.maxPowerProduction, plantStats.minPowerProduction);
         production =  currentMaxPowerProduction;
+        currentPowerProduction = Mathf.Max(currentMaxPowerProduction * currentLoad, plantStats.minPowerProduction);
 
-        currentEmissionRate = (2.0f - currentEfficiency) * plantStats.baseEmissionPerPowerUnit *  production; //basically, at 100% efficiecy, emission = base esmission * production.
+        currentEmissionRate = (2.0f - currentEfficiency) * plantStats.baseEmissionPerPowerUnit *  currentPowerProduction; //basically, at 100% efficiecy, emission = base esmission * production.
 
         return production;
     }

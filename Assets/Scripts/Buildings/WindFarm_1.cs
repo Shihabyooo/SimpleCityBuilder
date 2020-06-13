@@ -41,6 +41,7 @@ public class WindFarm_1 : InfrastructureBuilding
             currentEfficiency = 0.0f;
         
         currentMaxPowerProduction = currentEfficiency * farmStats.maxPowerProduction;
+        currentPowerProduction = currentMaxPowerProduction * currentLoad;
         production =  currentMaxPowerProduction;
 
         return production;

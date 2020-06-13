@@ -6639,7 +6639,7 @@ GameObject:
   - component: {fileID: 1875461101}
   - component: {fileID: 1875461100}
   m_Layer: 5
-  m_Name: TempBuildingInfo
+  m_Name: BuildingInfo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

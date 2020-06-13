@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//TODO rename this file/script to something more general (e.g. PlayerControls)
 public enum ControlMode
 {
     freeMode, buildingDrag, menu, cellInspection
 }
 
-public class CursorHandler : MonoBehaviour
+public class ControlManager : MonoBehaviour
 {
     [SerializeField] ControlMode currentCursorMode; //TODO remove serialization after testing is done.
     [SerializeField] LayerMask gridLayer;

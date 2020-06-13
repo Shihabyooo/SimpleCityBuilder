@@ -21,6 +21,9 @@ public class InfrastructureBuilding : Building
         return infraStats;
     }
 
+
+    //TODO rename this function to be clearer, it computes currentProduction and currentMaxProduction, and returns the latter, which is used by simulation manager to calculate
+    //total supply for resource-in-question and then assigns the demand.
     public virtual float ComputeProduction()
     {
         return 0.0f;
@@ -41,7 +44,7 @@ public class InfrastructureBuilding : Building
 
         float efficiency =  manpowerEffect * budgetEffect * (infraStats.maxEfficiency - infraStats.minEfficiency);// + infraStats.minEfficiency; //linear interpolation
 
-        if (manpowerEffect > 0.001f && budgetEffect > 0.001f) 
+        if (manpowerEffect > 0.001f && budgetEffect > 0.001f)
             efficiency = Mathf.Max(efficiency, infraStats.minEfficiency);
 
         return efficiency;

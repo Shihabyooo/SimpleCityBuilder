@@ -293,7 +293,8 @@ public class Grid : MonoBehaviour
     }
 
 //testing metdhods
-    float minGWCap = 0.0f, maxGWCap = 111690f;
+    float minGWCap = 50000f, maxGWCap = 111690f;
+    int noOfAquifers = 2, averageAquiferRadius = 5;
     //float minGWCap = 10000f, maxGWCap = 10000f;
     float minGWRech = 0.85f, maxGWRech = 8.5f;
     float minWindSp = 5.0f, maxWindSp = 25.0f;
@@ -303,12 +304,42 @@ public class Grid : MonoBehaviour
         uint halfMapX = (uint)Mathf.RoundToInt(noOfCells.x / 2.0f);
         //uint halfMapY = (uint)Mathf.RoundToInt(noOfCells.y / 2.0f);
 
-        for (uint i = 0; i < halfMapX; i++)
+
+        for (int _i = 0; _i < noOfAquifers; _i++)
+        {
+            uint radius = (uint)Random.Range(averageAquiferRadius * 0.7f, averageAquiferRadius * 1.3f ); //the lines bellow will bugout if radius > grid size
+            uint cellID_x = (uint)Random.Range(1, noOfCells.x - 2);
+            uint cellID_y = (uint)Random.Range(1, noOfCells.y - 2);;
+            float capacity = Random.Range(minGWCap, maxGWCap);
+
+
+            uint minY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y - (long)radius, 0, noOfCells.y - 1));
+            uint maxY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y + (long)radius, 0, noOfCells.y - 1));
+        
+            for (uint i = minY; i <= maxY; i++)
+            {
+                long sqrtVal = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow(radius, 2) - Mathf.Pow((long)i - (long)cellID_y, 2))); //cache this calculation, since its result will be used twice.
+
+                uint minX = (uint)Mathf.FloorToInt(Mathf.Clamp( (long)cellID_x - sqrtVal, 0, noOfCells.x - 1));
+                uint maxX = (uint)Mathf.CeilToInt(Mathf.Clamp( (long)cellID_x + sqrtVal, 0, noOfCells.x - 1));
+
+                for (uint j = minX; j <= maxX; j++)
+                {
+                    float distanceFromCentre = Mathf.Sqrt(Mathf.Pow((float)i - (float)cellID_x, 2.0f) + Mathf.Pow((float)j - (float)cellID_y, 2.0f));
+                    float capacityAtCell = capacity * (1.0f - (distanceFromCentre / (float) radius));
+                    groundWaterCapacityLayer.GetCellRef(i, j) = capacityAtCell;
+                    groundWaterVolumeLayer.GetCellRef(i, j) = 0.5f * capacityAtCell;
+                }
+            }
+        }   
+
+
+        for (uint i = 0; i < noOfCells.x; i++)
         {
             for (uint j = 0; j < noOfCells.y; j++)
             {
-                groundWaterCapacityLayer.GetCellRef(i,j) = Random.Range(minGWCap, maxGWCap);
-                groundWaterVolumeLayer.GetCellRef(i,j) = 0.1f * groundWaterCapacityLayer.GetCellValue(i,j);
+                //groundWaterCapacityLayer.GetCellRef(i,j) = Random.Range(minGWCap, maxGWCap);
+                //groundWaterVolumeLayer.GetCellRef(i,j) = 0.1f * groundWaterCapacityLayer.GetCellValue(i,j);
                 groundWaterRechargeLayer.GetCellRef(i,j) = Random.Range(minGWRech, maxGWRech);
                 windSpeedLayer.GetCellRef(i,j) = Random.Range(minWindSp, maxWindSp);
                 windDirectionLayer.GetCellRef(i,j) = (uint)Mathf.FloorToInt(Random.Range((float)minWindDeg, (float)maxWindDeg));

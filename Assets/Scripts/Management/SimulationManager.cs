@@ -271,21 +271,4 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
-    //testing visualization
-    void OnGUI()
-    {
-        int lineHeight = 20;
-        //int padding = 7;
-        Rect rect = new Rect(150, Screen.height - lineHeight - 100, 200, lineHeight);
-        GUIStyle style = new GUIStyle();
-        style.fontSize = 25;
-        
-        
-        string message = "Date: " + date.Day.ToString() + "-" + date.Month.ToString() + "-" + date.Year.ToString() + " - " + date.Hour.ToString();
-        GUI.Label(rect, message, style);
-
-        // rect.y += lineHeight + padding;
-        // message = "Rainfall: " + GameManager.climateMan.currentRainfall.ToString();
-        // GUI.Label(rect, message, style);
-    }
 }
