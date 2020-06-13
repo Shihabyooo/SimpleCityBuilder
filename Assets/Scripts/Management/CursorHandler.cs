@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
+//TODO rename this file/script to something more general (e.g. PlayerControls)
 public enum ControlMode
 {
     freeMode, buildingDrag, menu, cellInspection
@@ -12,16 +12,19 @@ public class CursorHandler : MonoBehaviour
 {
     [SerializeField] ControlMode currentCursorMode; //TODO remove serialization after testing is done.
     public LayerMask gridLayer;
+    public LayerMask ground;
     public LayerMask freeModeSelectables;
     const float maxRayCastDistance = 1000.0f;
     BuildingsManager.BuildingProposal buildingToPlace = null;
     Vector3 outOfViewPosition = new Vector3(0.0f, -10.0f, 0.0f); //Planned constructions will be moved to this location when the cursor is pointed outside allowable construction zone (outside grid boundaries)
 
+    CameraControl cameraControl;
 
     void Awake()
     {
         Cursor.lockState = CursorLockMode.Confined;
         //currentCursorMode = ControlMode.freeMode; 
+        cameraControl = Camera.main.gameObject.GetComponent<CameraControl>();
     }
 
     void Update()
@@ -48,6 +51,12 @@ public class CursorHandler : MonoBehaviour
 
 
 //Controls
+    //float middleButtonHoldTime = 0.0f;
+    //[SerializeField] float middleMoustHoldToPanTime = 0.5f;
+    Vector3 lastMiddleClickLocation;
+
+
+
     void FreeModeControl()
     {
         if (Input.GetMouseButtonDown(0)) 
@@ -56,7 +65,14 @@ public class CursorHandler : MonoBehaviour
             RaycastHit hit = CastRay(freeModeSelectables);
             if (hit.collider != null)
                 print ("hit: " + hit.collider.gameObject.name);
-
+        }
+        else if (Input.GetMouseButtonDown(2))
+        {
+            lastMiddleClickLocation = Input.mousePosition;
+        }
+        else if (Input.GetMouseButton(2))
+        {
+            CameraRotate();
         }
     }
 
@@ -108,6 +124,42 @@ public class CursorHandler : MonoBehaviour
             inspectedCell = null;
             SwitchToFreeMode();
         }
+    }
+
+
+//Camera controls
+
+    void zoom()
+    {
+
+    }
+
+    void CameraDrag()
+    {
+
+    }
+
+    void CameraRotate()
+    {
+
+        //first compute rotation origin
+        
+        Vector3 rotationOrigin;
+        RaycastHit hit = CastRay(gridLayer | ground);
+        //if (hit.collider != null)
+            //rotationOrigin = hit.point;
+        //else
+        //{
+            //print("Rotating about Grid centre"); //test
+            rotationOrigin = Grid.grid.gameObject.transform.position;
+        //}
+
+        //then compute rotation angle
+        Vector3 mouseDir = Input.mousePosition - lastMiddleClickLocation;
+        mouseDir.Normalize();
+
+        cameraControl.RotateView(mouseDir, rotationOrigin);
+        lastMiddleClickLocation = Input.mousePosition;
     }
 
 //Control Utilities
