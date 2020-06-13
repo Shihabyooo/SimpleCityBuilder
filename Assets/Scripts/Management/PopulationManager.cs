@@ -312,10 +312,11 @@ public struct Happiness
     public uint home;
     public uint job;
     public uint environment;
+    public uint safety;
 
     public Happiness(uint fixedValue)
     {
-        overall = health = home = job = environment = fixedValue;
+        overall = health = home = job = environment = safety = fixedValue;
     }
 
     public void UpdateHappiness(Happiness newHappiness)
@@ -324,13 +325,14 @@ public struct Happiness
         home = newHappiness.home;
         job = newHappiness.job;
         environment = newHappiness.environment;
+        safety = newHappiness.safety;
         ComputeOverallHappiness();
     }
 
     public void ComputeOverallHappiness()
     {
-        overall = health + home + job + environment;
-        overall = (uint)Mathf.RoundToInt((float)overall / 4.0f);
+        overall = health + home + job + environment + safety;
+        overall = (uint)Mathf.RoundToInt((float)overall / 5.0f);
     }
 }
 

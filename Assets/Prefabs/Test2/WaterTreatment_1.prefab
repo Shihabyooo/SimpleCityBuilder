@@ -93,8 +93,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
-    id: 7
-    cost: 1000
+    id: 6
+    cost: 15000
     type: 0
     constructionTime: 5
     requireResourcesToConstruct: 0

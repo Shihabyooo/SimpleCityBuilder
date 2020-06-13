@@ -140,7 +140,6 @@ public class Grid : MonoBehaviour
         return cell;
     }
 
-    //TODO implement this
     public Vector3 GetCellPosition (uint cellID_x, uint cellID_y)
     {
         Vector3 _position = this.transform.position;
@@ -217,7 +216,7 @@ public class Grid : MonoBehaviour
         return false;
     }
 
-    //TODO fix the function bellow. While for most of the radius it works correctly, it fails at the poles (@ymin and ymax), only painting a single cell each.
+    //TODO fix the functions bellow. While for most of the radius it works correctly, it fails at the poles (@ymin and ymax), only painting a single cell each.
     public void SetInfrastructureState(InfrastructureService service, uint cellID_x, uint cellID_y, uint radius) 
     {
         //Equation of circle: (x-a)^2 + (y-b)^2 = r^2
@@ -294,7 +293,6 @@ public class Grid : MonoBehaviour
     }
 
 //testing metdhods
-
     float minGWCap = 0.0f, maxGWCap = 111690f;
     //float minGWCap = 10000f, maxGWCap = 10000f;
     float minGWRech = 0.85f, maxGWRech = 8.5f;
@@ -303,11 +301,11 @@ public class Grid : MonoBehaviour
     void AddRandomNaturalResources()
     {
         uint halfMapX = (uint)Mathf.RoundToInt(noOfCells.x / 2.0f);
-        uint halfMapY = (uint)Mathf.RoundToInt(noOfCells.y / 2.0f);
+        //uint halfMapY = (uint)Mathf.RoundToInt(noOfCells.y / 2.0f);
 
         for (uint i = 0; i < halfMapX; i++)
         {
-            for (uint j = 0; j < halfMapY; j++)
+            for (uint j = 0; j < noOfCells.y; j++)
             {
                 groundWaterCapacityLayer.GetCellRef(i,j) = Random.Range(minGWCap, maxGWCap);
                 groundWaterVolumeLayer.GetCellRef(i,j) = 0.1f * groundWaterCapacityLayer.GetCellValue(i,j);
@@ -473,33 +471,32 @@ public class Cell
 [System.Serializable]
 public class GridLayer<T>
 {
-    public T[,] gridStatus;
+    public T[,] grid;
 
     public GridLayer(uint width, uint height)
     {
-        gridStatus = new T[width, height];
+        grid = new T[width, height];
     }
 
     virtual public T GetCellValue(uint cellID_x, uint cellID_y) //Returns default value of assigned type if index outside array range
     {
-        if (cellID_x >= gridStatus.GetLength(0) || cellID_y >= gridStatus.GetLength(1))
+        if (cellID_x >= grid.GetLength(0) || cellID_y >= grid.GetLength(1))
             return default(T);
         
-        return gridStatus[cellID_x, cellID_y];
+        return grid[cellID_x, cellID_y];
     }
 
     virtual public ref T GetCellRef(uint cellID_x, uint cellID_y) //used primarily for the infrastructureLayer in Grid class, since these will be processed with bitwise ops.
     {
-        return ref gridStatus[cellID_x, cellID_y];
+        return ref grid[cellID_x, cellID_y];
     }
 
     virtual public void SetCellValue(uint cellID_x, uint cellID_y, T value)
     {
-        if (cellID_x >= gridStatus.GetLength(0) || cellID_y >= gridStatus.GetLength(1))
+        if (cellID_x >= grid.GetLength(0) || cellID_y >= grid.GetLength(1))
             return;
-        gridStatus[cellID_x, cellID_y] = value;
+        grid[cellID_x, cellID_y] = value;
     }
-
 
     //TODO consider removing these methods:
     public void SetMultipleCellsValueConst(uint centralCellID_x, uint centralCellID_y, uint radius, T value)

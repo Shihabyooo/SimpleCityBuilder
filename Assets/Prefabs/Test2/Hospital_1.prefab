@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2217430442185783057
+--- !u!1 &4871215922784371891
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,47 +8,47 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2926984503648322818}
-  - component: {fileID: 6180550963200737076}
-  - component: {fileID: 502489121811121101}
-  - component: {fileID: 6865540290893926453}
-  - component: {fileID: -1340372303433573513}
+  - component: {fileID: 8485152002569729696}
+  - component: {fileID: 619902960646999190}
+  - component: {fileID: 6604211223935856751}
+  - component: {fileID: 1609966634516983189}
+  - component: {fileID: 7279818923698448740}
   m_Layer: 0
-  m_Name: PowerPlant_1
+  m_Name: Hospital_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2926984503648322818
+--- !u!4 &8485152002569729696
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2217430442185783057}
-  m_LocalRotation: {x: 0, y: 0.70710677, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 3.863477, y: -0.9873505, z: -15.633041}
+  m_GameObject: {fileID: 4871215922784371891}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &6180550963200737076
+--- !u!33 &619902960646999190
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2217430442185783057}
-  m_Mesh: {fileID: -745928167409971724, guid: 1dea008b72a1c56459374e501a3c66b7, type: 3}
---- !u!23 &502489121811121101
+  m_GameObject: {fileID: 4871215922784371891}
+  m_Mesh: {fileID: 3043982841751899260, guid: b5e01324631209b48bda7320f3c739b7, type: 3}
+--- !u!23 &6604211223935856751
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2217430442185783057}
+  m_GameObject: {fileID: 4871215922784371891}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: ff5e8a249a0f8284387381b60d23e27b, type: 2}
+  - {fileID: -876546973899608171, guid: b5e01324631209b48bda7320f3c739b7, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -80,27 +80,27 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &6865540290893926453
+--- !u!114 &1609966634516983189
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2217430442185783057}
+  m_GameObject: {fileID: 4871215922784371891}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd4b7ed9223b1144cb79414883908951, type: 3}
+  m_Script: {fileID: 11500000, guid: 26dd95fe230432647b4b91b10fe431d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
-    id: 4
+    id: 8
     cost: 25000
     type: 3
     constructionTime: 5
     requireResourcesToConstruct: 0
     requiredResources:
-      power: 0
-      water: 3
+      power: 3
+      water: 2
     minBudget: 5000
     maxBudget: 10000
   occupiedCell: 0000000000000000
@@ -109,33 +109,25 @@ MonoBehaviour:
     power: 0
     water: 0
   infraStats:
-    radiusOfInfluence: 5
+    radiusOfInfluence: 0
     minEfficiency: 0.2
-    maxEfficiency: 0.8
+    maxEfficiency: 1
   currentLoad: 0
   workPlace: {fileID: 0}
-  currentPowerProduction: 0
-  currentEfficiency: 0
-  currentMaxPowerProduction: 0
-  currentEmissionRate: 0
-  plantStats:
-    maxPowerProduction: 23
-    minPowerProduction: 6
-    baseEmissionPerPowerUnit: 1
---- !u!114 &-1340372303433573513
+--- !u!114 &7279818923698448740
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2217430442185783057}
+  m_GameObject: {fileID: 4871215922784371891}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6641ad34a5191b74b99aafa6ae62fb39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minManpower: 5
-  maxManpower: 100
+  minManpower: 15
+  maxManpower: 50
   minWorkerEducationLevel: 3
   wages: 100
   employees: []
