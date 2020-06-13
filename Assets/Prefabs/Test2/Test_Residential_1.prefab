@@ -95,7 +95,7 @@ MonoBehaviour:
     id: 1
     cost: 1500
     type: 0
-    constructionTime: 5
+    constructionTime: 24
     requireResourcesToConstruct: 0
     requiredResources:
       power: 1

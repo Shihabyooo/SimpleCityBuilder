@@ -19,7 +19,10 @@ public class SimulationManager : MonoBehaviour
     [SerializeField] [Range(1,24)]  int dateUpdateRateHours = 0; //the hours increment should be something we can divide 24 with (to make days increment after same number
                                                                             //update ticks for all days), the days increment should be 1. Either days or hours should be set, not both.
                                                                             //System should work for any value though.
-                                                                            
+
+    public delegate void OnTimeUpdate(int hours);
+    public static OnTimeUpdate onTimeUpdate;
+
     Coroutine buildingsSim = null, natResourceSim = null, budgetSim = null, timeKeeper = null;
     
     public void Awake()
@@ -171,6 +174,12 @@ public class SimulationManager : MonoBehaviour
                     currentDay = date.Day;
                 }
                 GameManager.uiMan.UpdateTime(date);
+                if (onTimeUpdate != null)
+                    {
+                        print("Checking delegate ");
+                        onTimeUpdate.Invoke(dateUpdateRateHours);
+                    }
+
                 yield return new WaitForSeconds(timeBetweenUpdates);
             }
             else

@@ -65,7 +65,28 @@ public class Building : MonoBehaviour
     {
         isUnderConstruction = true;
         occupiedCell = new uint[2]{cell.cellID[0], cell.cellID[1]};
-        StartCoroutine(Construction());
+        this.transform.localScale = Vector3.zero;
+        //StartCoroutine(Construction());
+        SimulationManager.onTimeUpdate += ProgressConstruction;
+    }
+
+    int constructionTimeElapsed = 0;
+    void ProgressConstruction(int hours)
+    {
+        if (!isUnderConstruction)
+        {
+            SimulationManager.onTimeUpdate -= ProgressConstruction;
+            return;
+        }
+
+        constructionTimeElapsed += hours;
+        float ratio = Mathf.Min((float)constructionTimeElapsed / (float)stats.constructionTime , 1.0f);
+        this.transform.localScale = new Vector3(ratio, ratio, ratio);
+
+        if (ratio >= 0.999f)
+            OnConstructionComplete();
+        
+
     }
 
     float helperTimer = 0.0f;
@@ -91,6 +112,7 @@ public class Building : MonoBehaviour
         isUnderConstruction = false;
         uniqueID = GameManager.buildingsMan.GetNewGUID();
         GameManager.buildingsMan.AddConstructedBuilding(this);
+        SimulationManager.onTimeUpdate -= ProgressConstruction;
     }
 
     public virtual void UpdateEffectOnNature(int timeWindow)
@@ -105,7 +127,7 @@ public class BuildingStats
     public int id;
     public uint cost = 0;
     public BuildingType type;
-    public float constructionTime = 0.0f;
+    public float constructionTime = 0.0f; //In hours
 
     //requirements for operation 
     public bool requireResourcesToConstruct = false; //if set to true, building won't be constructed unless resources are enough, else building will be constructed, but won't operate fully (or at all)

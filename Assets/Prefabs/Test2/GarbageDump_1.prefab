@@ -96,7 +96,7 @@ MonoBehaviour:
     id: 7
     cost: 10000
     type: 3
-    constructionTime: 5
+    constructionTime: 48
     requireResourcesToConstruct: 0
     requiredResources:
       power: 2
