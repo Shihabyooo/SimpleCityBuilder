@@ -19,32 +19,31 @@ public class WindFarm_1 : InfrastructureBuilding
         GameManager.buildingsMan.AddInfrastructureBuilding(this, InfrastructureService.power);
     }
 
-    public override float ComputeProduction()  //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
+    public override void ComputeProduction()  //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
     {
-        float production = 0.0f;
-
-        //Building Budget affects efficiency.
-        //Wind speed affects efficiency.
-        //Efficiency affect how much is the currentMaxPowerProduction compared to plantStats.maxPowerProduction.
-
-        //currentEfficiency = 0.8f;
-
         currentEfficiency = ComputeEfficiency();
-
-        float cellWindSpeed = Grid.grid.windSpeedLayer.GetCellValue(occupiedCell[0], occupiedCell[1]);
-        uint cellWindDirection = Grid.grid.windDirectionLayer.GetCellValue(occupiedCell[0], occupiedCell[1]);
-        
-        //Setting orientation of buildings is not yet implemented, so no adjustment based on wind direction will be implemented now.
-        if (cellWindSpeed >= farmStats.minWindSpeed)
-            currentEfficiency = currentEfficiency * Mathf.Clamp(cellWindSpeed / farmStats.maxWindSpeed, 0.0f, 1.0f);
-        else
-            currentEfficiency = 0.0f;
         
         currentMaxPowerProduction = currentEfficiency * farmStats.maxPowerProduction;
         currentPowerProduction = currentMaxPowerProduction * currentLoad;
-        production =  currentMaxPowerProduction;
+    }
 
-        return production;
+    public override float GetMaxProduction() 
+    {
+        return currentMaxPowerProduction;
+    }
+
+    protected override float ComputeEfficiency()
+    {
+        //TODO adjust windspeed for direction here.
+        float cellWindSpeed = Grid.grid.windSpeedLayer.GetCellValue(occupiedCell[0], occupiedCell[1]);
+        uint cellWindDirection = Grid.grid.windDirectionLayer.GetCellValue(occupiedCell[0], occupiedCell[1]);
+
+        float efficiency = base.ComputeEfficiency() *  Mathf.Clamp(cellWindSpeed / farmStats.maxWindSpeed, 0.0f, 1.0f);
+
+        if (efficiency > 0.001f)
+            efficiency = Mathf.Max(efficiency, infraStats.minEfficiency);
+
+        return efficiency;
     }
 
     public override void UpdateEffectOnNature(int timeWindow)
@@ -52,6 +51,7 @@ public class WindFarm_1 : InfrastructureBuilding
         base.UpdateEffectOnNature(timeWindow);
         //TODO wind farms should reduce wind speed downstream (slightly).
     }
+
 
 }
 

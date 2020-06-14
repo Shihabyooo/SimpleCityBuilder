@@ -21,14 +21,16 @@ public class InfrastructureBuilding : Building
         return infraStats;
     }
 
-
-    //TODO rename this function to be clearer, it computes currentProduction and currentMaxProduction, and returns the latter, which is used by simulation manager to calculate
-    //total supply for resource-in-question and then assigns the demand.
-    public virtual float ComputeProduction()
+    public virtual void ComputeProduction() //computes efficiency, then current max production (based on efficiency), then current actual production (based on load)
+    {
+    }
+    
+    public virtual float GetMaxProduction() //for use by simulation manager in estimating total available capacity and assigning load based on it.
     {
         return 0.0f;
     }
-    
+
+
     public virtual void SetLoad(float load)
     {
         currentLoad = load;
@@ -39,13 +41,20 @@ public class InfrastructureBuilding : Building
         float budgetEffect = (float)(budget - stats.minBudget) / (float) (stats.maxBudget - stats.minBudget); //linear interpolation
         
         float manpowerEffect = 0.0f;        
-        if (workPlace.CurrentManpower() >= workPlace.MinManpower())
+        if (workPlace.MaxManpower() == 0) //building does not need manpower
+            manpowerEffect = 1.0f;
+        else if (workPlace.CurrentManpower() >= workPlace.MinManpower())
             manpowerEffect = (float)workPlace.CurrentManpower() / (float)workPlace.MaxManpower();
 
-        float efficiency =  manpowerEffect * budgetEffect * (infraStats.maxEfficiency - infraStats.minEfficiency);// + infraStats.minEfficiency; //linear interpolation
 
-        if (manpowerEffect > 0.001f && budgetEffect > 0.001f)
-            efficiency = Mathf.Max(efficiency, infraStats.minEfficiency);
+        float resourceEffect = allocatedResources.CompareToBaseResource(stats.requiredResources);
+
+        float efficiency =  manpowerEffect * budgetEffect * resourceEffect * (infraStats.maxEfficiency - infraStats.minEfficiency) + infraStats.minEfficiency;
+        
+        if (manpowerEffect < 0.001f || budgetEffect < 0.001f || resourceEffect < 0.001f)
+            efficiency = 0.0f;
+
+        print (this.gameObject.name + ", manpowereffect: " + manpowerEffect + ", resourceEffect: " + resourceEffect + ", budgetEffect: " + budgetEffect + ", total effeicienct: " + efficiency);
 
         return efficiency;
     }

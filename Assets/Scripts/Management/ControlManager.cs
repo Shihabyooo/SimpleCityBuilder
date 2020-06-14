@@ -25,7 +25,6 @@ public class ControlManager : MonoBehaviour
     void Awake()
     {
         Cursor.lockState = CursorLockMode.Confined;
-        //currentCursorMode = ControlMode.freeMode; 
         cameraControl = Camera.main.gameObject.GetComponent<CameraControl>();
     }
 
@@ -144,6 +143,8 @@ public class ControlManager : MonoBehaviour
 
     void CellInspectionControl()
     {
+        //TODO switch this class to store the cell ID, which is then used to regularily sample the grid for the cell's stats (to get the newest value in grid).
+
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit = CastRay(gridLayer);
@@ -200,7 +201,7 @@ public class ControlManager : MonoBehaviour
     }
 
 //Control Utilities
-    Vector3 direction; //test. For vizualization in editor.
+    //Vector3 direction; //test. For vizualization in editor.
     RaycastHit CastRay(LayerMask mask)
     {
         RaycastHit hit;
@@ -211,8 +212,6 @@ public class ControlManager : MonoBehaviour
         Ray ray = new Ray (Camera.main.transform.position, (mousePosition - Camera.main.transform.position));
         Physics.Raycast(ray, out hit, maxRayCastDistance, mask);
         
-        direction = mousePosition - Camera.main.transform.position; //test. For vizualization in editor.
-        lastHitPosition = hit.point; //test. For vizualization in editor.
         return hit;
     }
 
@@ -241,30 +240,20 @@ public class ControlManager : MonoBehaviour
     {
         return currentCursorMode;
     }
+    
 //Other testing methods
-
-    Vector3 lastHitPosition = new Vector3(10.0f, 2.0f, 5.0f);
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.yellow;
-        //Gizmos.DrawSphere(lastHitPosition, 0.3f);
-        //Gizmos.color = Color.green;
-        //Gizmos.DrawSphere(mousePosition, 0.15f);
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawLine(Camera.main.transform.position, direction * maxRayCastDistance);
-    }
-
-
     bool showCellValue = false;
     Cell inspectedCell;
     void OnGUI()
     {
-        
-        GUI.Label(new Rect(10, 20, 100, 20), ("current control mode: " + currentCursorMode.ToString()));
+        GUIStyle style = new GUIStyle();
+        style.fontSize = 20;
+
+        GUI.Label(new Rect(10, 20, 100, 20), ("current control mode: " + ((int)currentCursorMode).ToString()), style);
         
         if (UnityEditor.EditorApplication.isPlaying && showCellValue)
         {
-            int lineHeight = 20;
+            int lineHeight = 22;
             Rect rect = new Rect(250, lineHeight, 500, lineHeight);
             if (inspectedCell != null)
             {
@@ -282,31 +271,31 @@ public class ControlManager : MonoBehaviour
                 if (inspectedCell.isOccupied)
                     text += "Occupied, ";
 
-                GUI.Label(nextLine, text);
+                GUI.Label(nextLine, text, style);
                 
                 nextLine.y += lineHeight + 5;
                 text = "GW Capacity: " + inspectedCell.groundwaterCapacity.ToString();
-                GUI.Label(nextLine, text);
+                GUI.Label(nextLine, text, style);
 
                 nextLine.y += lineHeight + 5;
                 text = "GW Volume: " + inspectedCell.groundwaterVolume.ToString();
-                GUI.Label(nextLine, text);
+                GUI.Label(nextLine, text, style);
 
                 nextLine.y += lineHeight + 5;
                 text = "GW Recharge: " + inspectedCell.groundwaterRecharge.ToString();
-                GUI.Label(nextLine, text);
+                GUI.Label(nextLine, text, style);
 
                 nextLine.y += lineHeight + 5;
                 text = "Wind Direction: " + inspectedCell.windDirection.ToString();
-                GUI.Label(nextLine, text);
+                GUI.Label(nextLine, text, style);
 
                 nextLine.y += lineHeight + 5;
                 text = "Wind Speed: " + inspectedCell.windSpeed.ToString();
-                GUI.Label(nextLine, text);
+                GUI.Label(nextLine, text, style);
 
             }
             else
-                GUI.Label(rect, "NULL");
+                GUI.Label(rect, "NULL", style);
         }
     }
 

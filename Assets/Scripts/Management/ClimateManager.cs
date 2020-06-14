@@ -48,12 +48,10 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
     {
         isRaining = true;
         int noNewOfStorms = Mathf.Min(Random.Range(1, maxNoOfActiveStorms), maxNoOfActiveStorms - activeStorms.Count);
-        //print ("Spawning: " + noNewOfStorms + " storms"); //test
 
         for (int i = 0; i < noNewOfStorms; i++)
         {
             Vector2 stormCentre = new Vector2(Random.Range(1, Grid.grid.noOfCells.x - 1), Random.Range(1, Grid.grid.noOfCells.y - 1));
-            //uint stormRadius = (uint)Random.Range(1, Mathf.RoundToInt((float)Mathf.Min(Grid.grid.noOfCells.x, Grid.grid.noOfCells.y) / 4.0f));
             uint stormRadius = (uint)Random.Range(minStormRadius, Mathf.RoundToInt((float)Mathf.Min(Grid.grid.noOfCells.x, Grid.grid.noOfCells.y) / 2.0f));
             uint stormDuration = (uint)Random.Range(minStormDuration, maxStormDuration);
             float averageStormRainfallAtCentre = Random.Range( Mathf.Max(averageDailyRainfallPerMonth[date.Month - 1] - maxVariationInRainfall * averageDailyRainfallPerMonth[date.Month - 1], 0.0f),
@@ -86,7 +84,6 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
                 if (activeDays > storm.duration)
                 {
                     EndStorm(storm);
-                    //activeStorms.Remove(storm);
                 }
                 else
                 {
@@ -102,6 +99,7 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
 
         //Second loop to remove storms that are ending
         //The foeach loop can't have item removal inside it. This is a workaround. Another one is to nix the entire foreach loop and replace it with the one bellow.
+        //TODO look into the proposal above
         for (int i = activeStorms.Count - 1; i >= 0; i--)
         {
             if (activeStorms[i].isEnding)
@@ -174,7 +172,7 @@ public class Storm
         duration = _duration;
         averageRainfall = _averageRainfall;
         dailyRainfallVariation = _dailyRainfallVariation;
-        startDate = new System.DateTime(_date.Year, _date.Month, _date.Day, _date.Hour, _date.Minute, _date.Second); //TODO figure out if there is an easier way to deep copy objects in C#
+        startDate = new System.DateTime(_date.Year, _date.Month, _date.Day, _date.Hour, _date.Minute, _date.Second);
         rainNode = _rainNode; //We know that the original List<RainNode> is temporarily created (outside this class) and will not have a ref living other than in this class.
 
         isEnding = false;

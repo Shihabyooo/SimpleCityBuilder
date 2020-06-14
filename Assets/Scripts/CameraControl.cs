@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-//TODO after implementing the Region class replacement, update this class
 public class CameraControl : MonoBehaviour
 {
-    [SerializeField] Transform focus; //assigned in editor. //TODO consider double checking this in void Awake()
+    [SerializeField] Transform focus; //assigned in editor, double checked on Awake().
     [SerializeField] float zoomSpeed = 65.0f; 
     [SerializeField] float cameraSpeed = 5.0f;
     [SerializeField] LayerMask cameraConstrainingLayers; //layers that the camera won't zoom past.
@@ -14,6 +12,18 @@ public class CameraControl : MonoBehaviour
     [SerializeField] float minCameraAngle = 10.0f;
     [SerializeField] float degreesPerTick = 5.0f;
     [SerializeField] CameraBoundary cameraBoundary = new CameraBoundary();
+
+    void Awake()
+    {
+        if (focus == null)
+        {
+            if (this.transform.Find("Focus") != null)
+                focus =this.transform.Find("Focus");
+            else
+                print ("ERROR! No focus transform is assigned to main Camera, and no child transform named \"Focus\" was found");
+        }
+    }
+
 
     public void Zoom(float zoomRate)
     {

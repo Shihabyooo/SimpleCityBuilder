@@ -131,8 +131,6 @@ public class BuildingStats
 
     //requirements for operation 
     public bool requireResourcesToConstruct = false; //if set to true, building won't be constructed unless resources are enough, else building will be constructed, but won't operate fully (or at all)
-    //public float powerRequirements = 1.0f; //in unit power per unit time.
-    //public float waterRequirements = 1.0f; //in unit volume per unit time.
     public BasicResources requiredResources = new BasicResources();
 
     //IMPORATANT! maxBudget must always be greater than minBudget
@@ -148,4 +146,30 @@ public class BasicResources
 {
     public float power = 0.0f; //in unit power per unit time.
     public float water = 0.0f; //in unit volume per unit time.
+
+    public float CompareToBaseResource(BasicResources baseResources) //used mostly in calculating efficiency, called when this object is the ALLOCATED resources. Returns average of
+    {                                                                 //percentages of satisfaction for each resource.
+        float percentage = 0.0f;
+        int counter = 0;
+
+        //The if statements are to make this method universal (useable in cases even when only part of the basic resources are set)
+        if (baseResources.power > 0.001f) //not zero
+        {
+            percentage += power / baseResources.power;
+            counter++;
+        }
+
+        if (baseResources.water > 0.001f)
+        {
+            percentage += water / baseResources.water;
+            counter++;
+        }
+
+        if (counter > 0)
+            percentage = percentage / (float)counter;
+        else
+            percentage = 1.0f;
+
+        return percentage;
+    }
 }

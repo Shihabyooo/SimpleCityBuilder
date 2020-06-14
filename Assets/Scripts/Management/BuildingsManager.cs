@@ -12,7 +12,6 @@ public class BuildingsManager : MonoBehaviour
     public List<InfrastructureBuilding> powerProductionBuildings {get; private set;} //contains only power producing buildings
     //TODO add lists for remaining infrastructure types and update the AddInfrastructureBuilding() method accordingly.
 
-
     void Awake()
     {
         constructedBuildings = new List<Building>();
@@ -22,9 +21,7 @@ public class BuildingsManager : MonoBehaviour
 
     public BuildingProposal StartNewBuildingProposal(int buildingID)
     {
-        //print ("Starting building proposal for id: " + buildingID);
-        currentProposal = new BuildingProposal(buildingID);//, this);
-
+        currentProposal = new BuildingProposal(buildingID);
         return currentProposal;
     }
 
@@ -53,6 +50,8 @@ public class BuildingsManager : MonoBehaviour
             case InfrastructureService.education:
                 break;
             case InfrastructureService.gas:
+                break;
+            case InfrastructureService.recreation:
                 break;
             default:
                 break;
@@ -132,15 +131,13 @@ public class BuildingsManager : MonoBehaviour
     //=======================================================================================================================
     //=======================================================================================================================
     //I made this class within BuildingsManager to access some of the latter's private members without extra lines of code...
+    //TODO review the choice above.
     public class BuildingProposal
     {
-        //public BuildingsManager buildingsManRef {get; private set;}
         public GameObject targetBuilding {get; private set;}
 
         public BuildingProposal(int _targetBuildingID)//, BuildingsManager _buildingsManager)
         {
-            //buildingsManRef = _buildingsManager;
-
             //TODO once a mesh loader (or dedicated prefabs are created) for the mock avatar for the buildings, replace the line bellow.
             GameObject newProposedBuilding = GameManager.buildingsMan.database.GetBuildingObject(_targetBuildingID).gameObject;
             targetBuilding = GameObject.Instantiate(newProposedBuilding);
@@ -151,12 +148,12 @@ public class BuildingsManager : MonoBehaviour
 
       public bool CanConstructHere(Cell cell)
        {
-          if (cell.isOccupied || !targetBuilding.GetComponent<Building>().CheckConstructionResourceRequirements(cell))
-               return false;
+            if (cell.isOccupied || !targetBuilding.GetComponent<Building>().CheckConstructionResourceRequirements(cell))
+                return false;
 
-           //TODO add logic to assess whether positition supports building of this type here.
+            //TODO add logic to assess whether positition supports building of this type here.
 
-         return true;
+            return true;
         }
 
         public bool Construct(Cell cell)
@@ -164,10 +161,7 @@ public class BuildingsManager : MonoBehaviour
             if (!CanConstructHere(cell))
                 return false;
             
-            //TODO handle object construction here (add to waiting queue, update relevant databases, etc)    
             Grid.grid.SetCellOccupiedState(cell, true);
-            
-            //buildingsManRef.AddConstructedBuilding(targetBuilding.GetComponent<Building>());
             targetBuilding.GetComponent<Building>().BeginConstruction(cell);
             targetBuilding = null;
                 
@@ -176,9 +170,7 @@ public class BuildingsManager : MonoBehaviour
 
         public void Cancel()
         {
-            //if (targetBuildingAvatar != null) //In a complete implementation, calling this method shouldn't be possible without a targetBuildingAvatar set.
             Destroy (targetBuilding);
-        
             GameManager.buildingsMan.currentProposal = null;
         }
 

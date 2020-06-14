@@ -74,7 +74,7 @@ public class SimulationManager : MonoBehaviour
 
                 //To avoid having multiple loops, the loop bellow will cover several, building-specific calls depending on building types. Some exceptions will have their
                 //own loops bellow, but in theory could also be merged with this loop.
-                //TODO consider mergin into a single loop with if-statements.
+                //TODO consider merging into a single loop with if-statements.
                 foreach (Building building in GameManager.buildingsMan.constructedBuildings)
                 {
                     //Fill requirement resources 
@@ -91,8 +91,6 @@ public class SimulationManager : MonoBehaviour
                     {
                         ResidentialBuilding residentialBuilding = building.gameObject.GetComponent<ResidentialBuilding>();
                         //update housing slots
-                        //totalHousingSlots += residentialBuilding.HousingCapacity();
-                        //occuppiedHousingSlots += residentialBuilding.CountResidents();
                         totalHousingSlots.IncrementSlotValue(residentialBuilding.HousingCapacity(), residentialBuilding.ResidentClass());
                         occuppiedHousingSlots.IncrementSlotValue(residentialBuilding.ResidentsCount(), residentialBuilding.ResidentClass());
                         
@@ -115,9 +113,15 @@ public class SimulationManager : MonoBehaviour
 
                 //Compute production for all infra buildings
                 foreach (InfrastructureBuilding building in GameManager.buildingsMan.powerProductionBuildings)
-                    totalPowerProduction += building.ComputeProduction();
+                    {
+                        building.ComputeProduction();
+                        totalPowerProduction += building.GetMaxProduction();
+                    }
                 foreach (InfrastructureBuilding building in GameManager.buildingsMan.waterProductionBuildings)
-                    totalWaterProduction += building.ComputeProduction();
+                    {
+                        building.ComputeProduction();
+                        totalWaterProduction += building.GetMaxProduction();
+                    }
     
                 //Update ResourcesManager
                 GameManager.resourceMan.UpdateAvailableWater(totalWaterProduction);

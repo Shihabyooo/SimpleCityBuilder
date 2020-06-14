@@ -22,39 +22,36 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
         GameManager.buildingsMan.AddInfrastructureBuilding(this, InfrastructureService.water);
     }
 
-    public override float ComputeProduction()  //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
+    public override void ComputeProduction()  //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
     {
-        float production = 0.0f;
-
-        //Compute the volume of water within the extractionRadius
-        //Building Budget affects efficiency.
-        //Efficiency affect how much is the currentMaxTreatmentRate compared to plantStats.maxTreatmentRate.
-        
         //Sample groundWaterVolumeLayer in the main Grid
         availableGroundWater = Grid.grid.GetTotalGroundWaterVolume(occupiedCell[0], occupiedCell[1], plantStats.extractionRadius);
-        
-        //currentEfficiency = 0.8f;
-      
+              
         currentEfficiency = ComputeEfficiency();
 
-        if (availableGroundWater < plantStats.minGroundWaterVolume)
-            return 0.0f;
+        if (availableGroundWater < plantStats.minGroundWaterVolume || currentEfficiency < 0.001f) //aproximatly zero. This happens when minimum operational requirements are not satisified, so we we set our production(s) to zero.
+        {
+            currentMaxTreatmentRate = 0.0f;
+            currentTreatmentRate = 0.0f;
+            return;
+        }
 
         currentMaxTreatmentRate = currentEfficiency * plantStats.maxTreatmentRate;
-        //production = Mathf.Min(currentMaxTreatmentRate, currentDemand);
-        production = currentMaxTreatmentRate;
         currentTreatmentRate = currentLoad * currentMaxTreatmentRate;
-
-        return production;
     }
     
+    public override float GetMaxProduction() 
+    {
+        return currentMaxTreatmentRate;
+    }
+
     public override void UpdateEffectOnNature(int timeWindow)
     {
         base.UpdateEffectOnNature(timeWindow);
         
         float waterAbstraction = currentTreatmentRate * timeWindow;
         
-        if (waterAbstraction > 0.0001f) //no need to have the AbstracWater method run for nothing...
+        if (waterAbstraction > 0.0001f) //no need to have the AbstractWater method run for nothing...
             AbstractWater(waterAbstraction);
     }
 

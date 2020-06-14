@@ -21,24 +21,26 @@ public class PowerPlant_1 : InfrastructureBuilding
         GameManager.buildingsMan.AddInfrastructureBuilding(this, InfrastructureService.power);
     }
 
-    public override float ComputeProduction() //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
+    public override void ComputeProduction() //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
     {
-        float production = 0.0f;
-
-        //Building Budget affects efficiency.
-        //Efficiency affect how much is the currentMaxPowerProduction compared to plantStats.maxPowerProduction.
-        
-        //currentEfficiency = 0.8f;
-
         currentEfficiency = ComputeEfficiency();
 
+        if (currentEfficiency < 0.001f) //aproximatly zero. This happens when minimum operational requirements are not satisified, so we we set our production(s) to zero.
+        {
+            currentMaxPowerProduction = 0.0f;
+            currentPowerProduction = 0.0f;
+            return;
+        }
+        
+        //Efficiency affect how much is the currentMaxPowerProduction compared to plantStats.maxPowerProduction.
         currentMaxPowerProduction = Mathf.Max(currentEfficiency * plantStats.maxPowerProduction, plantStats.minPowerProduction);
-        production =  currentMaxPowerProduction;
         currentPowerProduction = Mathf.Max(currentMaxPowerProduction * currentLoad, plantStats.minPowerProduction);
-
         currentEmissionRate = (2.0f - currentEfficiency) * plantStats.baseEmissionPerPowerUnit *  currentPowerProduction; //basically, at 100% efficiecy, emission = base esmission * production.
+    }
 
-        return production;
+    public override float GetMaxProduction() 
+    {
+        return currentPowerProduction;
     }
 
 
