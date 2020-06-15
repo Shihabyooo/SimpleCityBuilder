@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum ControlMode
 {
-    freeMode, buildingDrag, menu, cellInspection
+    freeMode, buildingPlacement, menu, cellInspection
 }
 
 public class ControlManager : MonoBehaviour
@@ -36,8 +36,8 @@ public class ControlManager : MonoBehaviour
             case ControlMode.freeMode:
                 FreeModeControl();
                 break;
-            case ControlMode.buildingDrag:
-                BuildingDragControl();
+            case ControlMode.buildingPlacement:
+                BuildingPlacementControl();
                 break;
             case ControlMode.menu:
                 MenuControl();
@@ -106,11 +106,14 @@ public class ControlManager : MonoBehaviour
             CameraEdgeMove();
         }
     }
-
-    void BuildingDragControl()
+    
+    [SerializeField] float timeBetweenScrollRotation = 0.05f;
+    float scrollHelperTimer = 1.0f;
+    void BuildingPlacementControl()
     {
         RaycastHit hit = CastRay(gridLayer);
         Cell cell = Grid.grid.SampleForCell(hit.point);
+        
         
         if (cell != null)
         {
@@ -122,6 +125,7 @@ public class ControlManager : MonoBehaviour
                 {
                     buildingToPlace = null;
                     SwitchToFreeMode();
+                    return;
                 }
             }
         }
@@ -134,6 +138,16 @@ public class ControlManager : MonoBehaviour
             buildingToPlace = null;
             SwitchToFreeMode();
         }
+        else if (Input.mouseScrollDelta.y > 0.1f || Input.mouseScrollDelta.y < -0.1f)
+        {
+            if (scrollHelperTimer >= timeBetweenScrollRotation)
+            {
+                scrollHelperTimer = 0.0f;
+                buildingToPlace.RotatePlan(Input.mouseScrollDelta.y);
+            }
+        }
+
+        scrollHelperTimer += Time.deltaTime;
     }
 
     void MenuControl()
@@ -221,7 +235,7 @@ public class ControlManager : MonoBehaviour
         if (currentCursorMode != ControlMode.freeMode) //can only switch to building placement from freemode.
             return;
 
-        currentCursorMode = ControlMode.buildingDrag;
+        currentCursorMode = ControlMode.buildingPlacement;
         buildingToPlace = building;
     }
 

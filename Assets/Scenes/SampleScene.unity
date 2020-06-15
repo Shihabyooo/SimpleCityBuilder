@@ -619,6 +619,7 @@ MonoBehaviour:
   mousePanMaxRange: 0.1
   rightClickHoldTime: 0
   rightClickHoldToPanTime: 0.05
+  timeBetweenScrollRotation: 0.05
 --- !u!4 &224963317
 Transform:
   m_ObjectHideFlags: 0

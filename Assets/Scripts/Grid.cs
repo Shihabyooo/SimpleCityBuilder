@@ -297,7 +297,8 @@ public class Grid : MonoBehaviour
     int noOfAquifers = 2, averageAquiferRadius = 5;
     //float minGWCap = 10000f, maxGWCap = 10000f;
     float minGWRech = 0.85f, maxGWRech = 8.5f;
-    float minWindSp = 5.0f, maxWindSp = 25.0f;
+    //float minWindSp = 5.0f, maxWindSp = 25.0f;
+    float minWindSp = 100.0f, maxWindSp = 100.0f;
     uint minWindDeg = 0, maxWindDeg = 90;
     void AddRandomNaturalResources()
     {
@@ -334,7 +335,8 @@ public class Grid : MonoBehaviour
             {
                 groundWaterRechargeLayer.GetCellRef(i,j) = Random.Range(minGWRech, maxGWRech);
                 windSpeedLayer.GetCellRef(i,j) = Random.Range(minWindSp, maxWindSp);
-                windDirectionLayer.GetCellRef(i,j) = (uint)Mathf.FloorToInt(Random.Range((float)minWindDeg, (float)maxWindDeg));
+                //windDirectionLayer.GetCellRef(i,j) = (uint)Mathf.FloorToInt(Random.Range((float)minWindDeg, (float)maxWindDeg));
+                windDirectionLayer.GetCellRef(i,j) = (uint)(i%8 * 45);
             }
         }
     }
@@ -446,6 +448,14 @@ public class Grid : MonoBehaviour
                     {
                         Gizmos.color = Color.white;
                         //Gizmos.DrawCube(cellCentre, new Vector3(cellSize, windDirectionLayer.GetCellValue(i, j), cellSize));
+                        Vector3 arrowEnd = cellCentre;
+                        uint angle = windDirectionLayer.GetCellValue(i, j);
+                        float compassRadius = (float)cellSize / 2.0f;
+                        
+                        arrowEnd += new Vector3(Mathf.Cos(Mathf.Deg2Rad * angle) * compassRadius, 0.0f, Mathf.Sin(Mathf.Deg2Rad * angle) * compassRadius);
+
+                        Gizmos.DrawLine(cellCentre, arrowEnd);
+                        Gizmos.DrawSphere(arrowEnd, 0.075f);
                     }
                     if (visualizeWindSpeed && windSpeedLayer.GetCellValue(i, j) > 0.1f)
                     {

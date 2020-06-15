@@ -135,6 +135,8 @@ public class BuildingsManager : MonoBehaviour
     public class BuildingProposal
     {
         public GameObject targetBuilding {get; private set;}
+        const float buildingRotationIncrements = 90.0f;
+
 
         public BuildingProposal(int _targetBuildingID)//, BuildingsManager _buildingsManager)
         {
@@ -177,6 +179,11 @@ public class BuildingsManager : MonoBehaviour
         public void MovePlan(Vector3 positition)
         {
             targetBuilding.transform.position = positition;
+        }
+
+        public void RotatePlan(float direction)
+        {
+            targetBuilding.transform.Rotate(0.0f, buildingRotationIncrements * Mathf.Sign(direction), 0.0f);
         }
     }
 }

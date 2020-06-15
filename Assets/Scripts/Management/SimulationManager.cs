@@ -179,10 +179,8 @@ public class SimulationManager : MonoBehaviour
                 }
                 GameManager.uiMan.UpdateTime(date);
                 if (onTimeUpdate != null)
-                    {
-                        print("Checking delegate ");
-                        onTimeUpdate.Invoke(dateUpdateRateHours);
-                    }
+                    onTimeUpdate.Invoke(dateUpdateRateHours);
+                
 
                 yield return new WaitForSeconds(timeBetweenUpdates);
             }

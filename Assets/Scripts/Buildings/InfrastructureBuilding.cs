@@ -54,8 +54,7 @@ public class InfrastructureBuilding : Building
         if (manpowerEffect < 0.001f || budgetEffect < 0.001f || resourceEffect < 0.001f)
             efficiency = 0.0f;
 
-        print (this.gameObject.name + ", manpowereffect: " + manpowerEffect + ", resourceEffect: " + resourceEffect + ", budgetEffect: " + budgetEffect + ", total effeicienct: " + efficiency);
-
+        //print (this.gameObject.name + ", manpowereffect: " + manpowerEffect + ", resourceEffect: " + resourceEffect + ", budgetEffect: " + budgetEffect + ", total effeicienct: " + efficiency);
         return efficiency;
     }
 
