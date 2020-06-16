@@ -191,6 +191,7 @@ public class Grid : MonoBehaviour
     void GetOtherCellStates(ref Cell cell)
     {
         cell.pollution = pollutionLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
+        cell.rainfall = rainFallLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
     }
 
     public void SetCellOccupiedState (Cell cell, bool isOccupied)
@@ -270,7 +271,7 @@ public class Grid : MonoBehaviour
                 rainFallLayer.SetCellValue(i, j, 0.0f);
     }
 
-    public void SetRainfallCummulitive(uint cellID_x, uint cellID_y, uint radius, float rainFall) //cummulitive with linear falloff, rainFall value is only used at central cell.
+    public void SetRainfallCummulative(uint cellID_x, uint cellID_y, uint radius, float rainFall) //cummulitive with linear falloff, rainFall value is only used at central cell.
     {
 
         uint minY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y - (long)radius, 0, noOfCells.y - 1));
@@ -292,14 +293,36 @@ public class Grid : MonoBehaviour
         }    
     }
 
+    public void SetPollutionCummilative(uint cellID_x, uint cellID_y, uint radius, float pollution)
+    {
+        uint minY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y - (long)radius, 0, noOfCells.y - 1));
+        uint maxY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y + (long)radius, 0, noOfCells.y - 1));
+        
+        for (uint i = minY; i <= maxY; i++)
+        {
+            long sqrtVal = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow(radius, 2) - Mathf.Pow((long)i - (long)cellID_y, 2))); //cache this calculation, since its result will be used twice.
+
+            uint minX = (uint)Mathf.FloorToInt(Mathf.Clamp( (long)cellID_x - sqrtVal, 0, noOfCells.x - 1));
+            uint maxX = (uint)Mathf.CeilToInt(Mathf.Clamp( (long)cellID_x + sqrtVal, 0, noOfCells.x - 1));
+
+            for (uint j = minX; j <= maxX; j++)
+            {
+                float distanceFromCentre = Mathf.Round(Mathf.Sqrt(Mathf.Pow((float)j - (float)cellID_x, 2.0f) + Mathf.Pow((float)i - (float)cellID_y, 2.0f)));
+                float pollutionAtCell = pollution * (1.0f - (distanceFromCentre / (float) radius));
+                pollutionLayer.GetCellRef(j, i) += pollutionAtCell;
+            }
+        } 
+    }
+
+
 //testing metdhods
     float minGWCap = 50000f, maxGWCap = 111690f;
     int noOfAquifers = 2, averageAquiferRadius = 5;
     //float minGWCap = 10000f, maxGWCap = 10000f;
     float minGWRech = 0.85f, maxGWRech = 8.5f;
-    //float minWindSp = 5.0f, maxWindSp = 25.0f;
-    float minWindSp = 100.0f, maxWindSp = 100.0f;
-    uint minWindDeg = 0, maxWindDeg = 90;
+    float minWindSp = 5.0f, maxWindSp = 30.0f;
+    //float minWindSp = 100.0f, maxWindSp = 100.0f;
+    uint minWindDeg = 45, maxWindDeg = 90;
     void AddRandomNaturalResources()
     {
         for (int _i = 0; _i < noOfAquifers; _i++)
@@ -335,8 +358,8 @@ public class Grid : MonoBehaviour
             {
                 groundWaterRechargeLayer.GetCellRef(i,j) = Random.Range(minGWRech, maxGWRech);
                 windSpeedLayer.GetCellRef(i,j) = Random.Range(minWindSp, maxWindSp);
-                //windDirectionLayer.GetCellRef(i,j) = (uint)Mathf.FloorToInt(Random.Range((float)minWindDeg, (float)maxWindDeg));
-                windDirectionLayer.GetCellRef(i,j) = (uint)(i%8 * 45);
+                windDirectionLayer.GetCellRef(i,j) = (uint)Mathf.FloorToInt(Random.Range((float)minWindDeg, (float)maxWindDeg));
+                //windDirectionLayer.GetCellRef(i,j) = (uint)(i%8 * 45);
             }
         }
     }
@@ -470,6 +493,12 @@ public class Grid : MonoBehaviour
                         float _size = barSize * rainFallLayer.GetCellValue(i, j) / 100.0f;
                         Gizmos.DrawCube(cellCentre, new Vector3(_size, _size, _size));
                     }
+                    if (visualizePollution && pollutionLayer.GetCellValue(i, j) > 0.01f)
+                    {
+                        Gizmos.color = Color.gray;
+                        float _size = Mathf.Min(barSize * pollutionLayer.GetCellValue(i, j) / 500.0f, 1.0f);
+                        Gizmos.DrawCube(cellCentre, new Vector3(_size, _size, _size));
+                    }
                 }
             }
         }
@@ -494,9 +523,7 @@ public class Cell
     public uint windDirection = 0;
     //others
     public float pollution = 0.0f;
-
-
-    
+    public float rainfall = 0.0f;    
 }
 
 //TODO revisit these classes
@@ -511,7 +538,7 @@ public class GridLayer<T>
         grid = new T[width, height];
     }
 
-    virtual public T GetCellValue(uint cellID_x, uint cellID_y) //Returns default value of assigned type if index outside array range
+    public T GetCellValue(uint cellID_x, uint cellID_y) //Returns default value of assigned type if index outside array range
     {
         if (cellID_x >= grid.GetLength(0) || cellID_y >= grid.GetLength(1))
             return default(T);
@@ -519,16 +546,33 @@ public class GridLayer<T>
         return grid[cellID_x, cellID_y];
     }
 
-    virtual public ref T GetCellRef(uint cellID_x, uint cellID_y) //used primarily for the infrastructureLayer in Grid class, since these will be processed with bitwise ops.
+    public ref T GetCellRef(uint cellID_x, uint cellID_y) //used primarily for the infrastructureLayer in Grid class, since these will be processed with bitwise ops.
     {
         return ref grid[cellID_x, cellID_y];
     }
 
-    virtual public void SetCellValue(uint cellID_x, uint cellID_y, T value)
+    public void SetCellValue(uint cellID_x, uint cellID_y, T value)
     {
         if (cellID_x >= grid.GetLength(0) || cellID_y >= grid.GetLength(1))
             return;
         grid[cellID_x, cellID_y] = value;
+    }
+
+    public Vector2Int GridSize()
+    {
+        return new Vector2Int(grid.GetLength(0), grid.GetLength(1));
+    }
+
+    public bool CopyToLayer(GridLayer<T> targetLayer)
+    {
+        if (GridSize() != targetLayer.GridSize())
+            return false;
+
+        for (uint i = 0; i < grid.GetLength(0); i++)
+            for (uint j = 0; j < grid.GetLength(1); j++)
+                targetLayer.SetCellValue(i, j, grid[i,j]);
+
+        return true;
     }
 
     //TODO consider removing these methods:
@@ -545,4 +589,6 @@ public class GridLayer<T>
     {
         //TODO add arguments and implement this.
     }
+
+   
 }
