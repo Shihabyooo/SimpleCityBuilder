@@ -47,6 +47,7 @@ public class PowerPlant_1 : InfrastructureBuilding
     public override void UpdateEffectOnNature(int timeWindow)    
     {
         base.UpdateEffectOnNature(timeWindow);
+        GameManager.climateMan.AddPollution(occupiedCell[0], occupiedCell[1], currentEmissionRate * timeWindow);
     }
 
 }

@@ -307,6 +307,15 @@ public class ControlManager : MonoBehaviour
                 text = "Wind Speed: " + inspectedCell.windSpeed.ToString();
                 GUI.Label(nextLine, text, style);
 
+                nextLine.y += lineHeight + 5;
+                text = "Pollution: " + inspectedCell.pollution.ToString();
+                GUI.Label(nextLine, text, style);
+
+                nextLine.y += lineHeight + 5;
+                text = "Rainfall: " + inspectedCell.rainfall.ToString();
+                GUI.Label(nextLine, text, style);
+
+
             }
             else
                 GUI.Label(rect, "NULL", style);

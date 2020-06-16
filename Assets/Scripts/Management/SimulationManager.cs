@@ -51,7 +51,7 @@ public class SimulationManager : MonoBehaviour
 
     void NewDay()
     {
-        GameManager.climateMan.UpdateClimate(date);
+        GameManager.climateMan.UpdateClimateDay(date);
         GameManager.populationMan.UpdatePopulation();
     }
 

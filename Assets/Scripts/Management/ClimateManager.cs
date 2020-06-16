@@ -20,13 +20,21 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
     void Awake()
     {
         isRaining = false;
+        SimulationManager.onTimeUpdate += UpdateClimateHour;
     }
 
-    public void UpdateClimate(System.DateTime date)
+    public void UpdateClimateDay(System.DateTime date)
     {
        ProcessRainfall(date);
     }
 
+    public void UpdateClimateHour(int timeFrame)
+    {
+       TransportPollution(timeFrame);
+    }
+
+
+//Rainfall
     void ProcessRainfall(System.DateTime date)
     {   
         //First update existing storms
@@ -68,7 +76,6 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
         }
     }
 
-
     void UpdateStorms(System.DateTime date)
     {
         if (activeStorms.Count < 1) //nothing to update
@@ -90,7 +97,7 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
                     //generate today's rainfall
                     float todaysRainfall = Random.Range(storm.averageRainfall - storm.dailyRainfallVariation, storm.averageRainfall + storm.dailyRainfallVariation);
                     //update rainfall layer
-                    Grid.grid.SetRainfallCummulitive(storm.centreCell[0], storm.centreCell[1], storm.radius, todaysRainfall);
+                    Grid.grid.SetRainfallCummulative(storm.centreCell[0], storm.centreCell[1], storm.radius, todaysRainfall);
                     //update particlesystem
                     storm.rainNode.SetRainfall(todaysRainfall);
                 }
@@ -137,6 +144,65 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
         yield return null;
     }
 
+
+//Pollution
+    public void AddPollution(uint cellID_x, uint cellID_y, float volume)
+    {
+        //Grid.grid.pollutionLayer.SetCellValue(cellID_x, cellID_y, volume);
+        Grid.grid.SetPollutionCummilative(cellID_x, cellID_y, 1, volume);
+    }
+
+    const float pollutionTransportPowerFactor = 2.2f;
+    const float pollutionTransportDenominator = 10.0f;
+    const float maxTransportPercent = 0.2f;
+    void TransportPollution(int timeFrame) //happens on a daily basis (24 hours).
+    {
+        //We need to copy the existing the pollution layer to avoid having changes we made in the loop bellow affect calculation of the next cells in the same loop.
+        //The other way is to calculate to the new layer, then add its values to the original layer at the end. 
+        GridLayer<float> newPollutionLayer = new GridLayer<float>((uint)Grid.grid.noOfCells.x, (uint)Grid.grid.noOfCells.y);
+        Grid.grid.pollutionLayer.CopyToLayer(newPollutionLayer);
+
+        for(uint i = 0; i < Grid.grid.noOfCells.x; i++)
+        {
+            for(uint j = 0; j < Grid.grid.noOfCells.y; j++)
+            {
+                float pollution = newPollutionLayer.GetCellValue(i, j);
+                if (pollution >= 0.01f)
+                {
+                    uint windDir = Grid.grid.windDirectionLayer.GetCellValue(i, j);
+                    float windSpeed = Grid.grid.windSpeedLayer.GetCellValue(i, j);
+                    
+                    float sinDegree = Mathf.Sin(Mathf.Deg2Rad * windDir);
+                    float cosDegree = Mathf.Cos(Mathf.Deg2Rad * windDir);
+                    
+                    long[,] cells = new long[2,2]; 
+                    cells[0,0] = ((long)i + (cosDegree > 0.001f? Mathf.CeilToInt(cosDegree) : Mathf.FloorToInt(cosDegree)));
+                    cells[0,1] = j;
+                    cells[1,0] = i;
+                    cells[1,1] = ((long)j + (sinDegree > 0.001f? Mathf.CeilToInt(sinDegree) : Mathf.FloorToInt(sinDegree)));
+
+                    float[] cellsShare = new float[2];
+                    cellsShare[0] = Mathf.Pow(cosDegree, 2.0f);
+                    cellsShare[1] = Mathf.Pow(sinDegree, 2.0f);
+                    //print ("Transporting from " + i + "," + j + " to " + cells[0,0] + "," + cells[0,1] + " and " + cells[1,0] + "," + cells[1,1]);
+
+                    float transportPercentage = (Mathf.Pow(pollution, pollutionTransportPowerFactor - 1.0f) / Mathf.Pow(pollutionTransportDenominator, pollutionTransportPowerFactor)) / pollution;
+                    transportPercentage = transportPercentage * windSpeed / 30.0f; //assuming max windspeed in game is set to 30.0f.
+                    transportPercentage = Mathf.Min(transportPercentage, maxTransportPercent);
+                    
+                    float transportedVolume = transportPercentage * pollution * timeFrame;
+
+                    Grid.grid.pollutionLayer.GetCellRef(i, j) -= transportedVolume;
+
+                    if (cells[0,0] > 0 && cells[0,0] < Grid.grid.noOfCells.x && cells[0,1] > 0 && cells[0,1] < Grid.grid.noOfCells.y)
+                        Grid.grid.pollutionLayer.GetCellRef((uint)cells[0,0], (uint)cells[0,1]) += cellsShare[0] * transportedVolume;
+                    
+                    if (cells[1,0] > 0 && cells[1,0] < Grid.grid.noOfCells.x && cells[1,1] > 0 && cells[1,1] < Grid.grid.noOfCells.y)
+                        Grid.grid.pollutionLayer.GetCellRef((uint)cells[1,0], (uint)cells[1,1]) += cellsShare[1] * transportedVolume;
+                }
+            }
+        }
+    }
 }
 
 [System.Serializable]
