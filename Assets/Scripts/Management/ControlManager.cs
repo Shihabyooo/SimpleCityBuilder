@@ -155,6 +155,7 @@ public class ControlManager : MonoBehaviour
 
     }
 
+    uint[] inspectedCellID = new uint[2];
     void CellInspectionControl()
     {
         //TODO switch this class to store the cell ID, which is then used to regularily sample the grid for the cell's stats (to get the newest value in grid).
@@ -163,13 +164,18 @@ public class ControlManager : MonoBehaviour
         {
             RaycastHit hit = CastRay(gridLayer);
             inspectedCell = Grid.grid.SampleForCell(hit.point);
+            inspectedCellID = inspectedCell.cellID;
         }
-        
-        if (Input.GetMouseButtonDown(1))
+        else if (Input.GetMouseButtonDown(1))
         {
             showCellValue = false;
             inspectedCell = null;
             SwitchToFreeMode();
+            return;
+        }
+        else if (inspectedCell != null) //update the cell's content
+        {
+            inspectedCell = Grid.grid.SampleForCell(inspectedCellID[0], inspectedCellID[1]);
         }
     }
 

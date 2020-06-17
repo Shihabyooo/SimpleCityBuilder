@@ -140,6 +140,19 @@ public class Grid : MonoBehaviour
         return cell;
     }
 
+    public Cell SampleForCell(uint cellID_x, uint cellID_y)
+    {
+        Cell cell = new Cell();
+
+        cell.cellCentre = GetCellPosition(cellID_x, cellID_y);
+        cell.cellID[0] = cellID_x;
+        cell.cellID[1] = cellID_y;
+
+        GetAllCellStates(ref cell);
+        
+        return cell;
+    }
+
     public Vector3 GetCellPosition (uint cellID_x, uint cellID_y)
     {
         Vector3 _position = this.transform.position;
