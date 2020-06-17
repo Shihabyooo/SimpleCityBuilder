@@ -25,8 +25,9 @@ public class Citizen
     //public System.Guid homeAddress; //{get; private set;} 
     public ResidentialBuilding homeAddress; //{get; private set;} 
     public WorkPlace workAddress; //{get; private set;} 
-
     //public bool isInDebt;  //{get; private set;} 
+    public Gender gender; //{get; private set;} 
+    public Citizen spouse; //{get; private set;} 
 
     public const int happinessChangeRatePerDay = 1;
     public const int lifeStyleExpensesPerDayPoor = 10; //in units of money per day
@@ -37,9 +38,10 @@ public class Citizen
 
     public const int minHealthBeforeSeekingHospitals = 50;
 
-    public Gender gender; //{get; private set;} 
-    public Citizen spouse; //{get; private set;} 
+    public const float minPollutionToAffectHealthHappiness = 100.0f;
+    public const float maxPollutionToAffectHealthHappiness = 2000.0f;
 
+   
     public Citizen()
     {
         //isInDebt = false;

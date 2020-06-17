@@ -105,7 +105,24 @@ public class PopulationManager : MonoBehaviour
 
         //TODO research whether Mathf.Sign with casting is more expensive than divind the value with its absolute.
         int changeDirection = (int)Mathf.Sign((int)citizen.homeAddress.housingQuality - (int)citizen.happiness.home); 
-        newHappiness.home = (uint)Mathf.Clamp(citizen.happiness.home + (changeDirection * Citizen.happinessChangeRatePerDay), 0, 100);
+        newHappiness.home = (uint)Mathf.Clamp((int)citizen.happiness.home + (changeDirection * Citizen.happinessChangeRatePerDay), 0, 100);
+
+        //compute environment happiness. We do that according to pollution in both house and work.
+        //Work pollution contributes to happiness half that of home.
+        int homeEnvironmentHappiness = 0, workEnvironmentHappiness = 0;
+
+        if (citizen.homeAddress != null) //Again, shouldn't happen, but better safe than sorry.
+        {
+            float pollutionAtHome = Grid.grid.pollutionLayer.GetCellValue(citizen.homeAddress.occupiedCell[0], citizen.homeAddress.occupiedCell[0]);
+            homeEnvironmentHappiness = Mathf.RoundToInt(Mathf.Clamp(100.0f - (100.0f * (pollutionAtHome - Citizen.minPollutionToAffectHealthHappiness) / (Citizen.maxPollutionToAffectHealthHappiness - Citizen.minPollutionToAffectHealthHappiness)), 0.0f, 100.0f));
+            newHappiness.environment = (uint)homeEnvironmentHappiness;
+        }
+        if (citizen.workAddress != null)
+        {
+            float pollutionAtWork = Grid.grid.pollutionLayer.GetCellValue(citizen.workAddress.GetComponent<Building>().occupiedCell[0], citizen.workAddress.GetComponent<Building>().occupiedCell[0]);
+            workEnvironmentHappiness = Mathf.RoundToInt(Mathf.Clamp(100.0f - (100.0f * (pollutionAtWork - Citizen.minPollutionToAffectHealthHappiness) / (Citizen.maxPollutionToAffectHealthHappiness - Citizen.minPollutionToAffectHealthHappiness)), 0.0f, 100.0f));
+            newHappiness.environment = (uint)Mathf.RoundToInt( (float)(2 * homeEnvironmentHappiness + workEnvironmentHappiness) / 3.0f);
+        }
 
         citizen.happiness.UpdateHappiness(newHappiness);
     }
@@ -114,22 +131,22 @@ public class PopulationManager : MonoBehaviour
     {
         //compute immigration rate based on happiness and empty housing.
         HousingSlots availableHousing = GameManager.resourceMan.AvailableHousing();
-        ulong totalHousing = availableHousing.Sum();
+        ulong totalAvailableHousing = availableHousing.Sum();
 
         int _immigration = Mathf.RoundToInt(((float)populationHappiness.overall / 100.0f) * (0.8f * maxImmigrationRate));
-        _immigration = Random.Range(Mathf.RoundToInt(_immigration - 0.2f * maxImmigrationRate),  Mathf.RoundToInt(_immigration + 0.2f * maxImmigrationRate));
-        _immigration = (int)Mathf.Min(_immigration, maxImmigrationRate, totalHousing);
+        _immigration = Mathf.Max(Random.Range(Mathf.RoundToInt(_immigration - 0.2f * maxImmigrationRate),  Mathf.RoundToInt(_immigration + 0.2f * maxImmigrationRate)), PopulationGrowthMetrics.minImmigrationRate);
+        _immigration = (int)Mathf.Min(_immigration, maxImmigrationRate, totalAvailableHousing);
 
 
-        if (growthStats.immigrationRate > 0 && totalHousing > 0)
+        if (growthStats.immigrationRate > 0 && totalAvailableHousing > 0)
         {
             //Spawn new citizens here.
             //This is a test implementation
-            float poorRatio = availableHousing.poor / totalHousing;
-            float lowRatio = availableHousing.low / totalHousing;
-            float middleRatio = availableHousing.middle / totalHousing;
-            float highRatio = availableHousing.high / totalHousing;
-            float obsceneRatio = availableHousing.obscene / totalHousing;
+            float poorRatio = availableHousing.poor / totalAvailableHousing;
+            float lowRatio = availableHousing.low / totalAvailableHousing;
+            float middleRatio = availableHousing.middle / totalAvailableHousing;
+            float highRatio = availableHousing.high / totalAvailableHousing;
+            float obsceneRatio = availableHousing.obscene / totalAvailableHousing;
            
 
             for (int i = 0; i < Mathf.FloorToInt(_immigration * poorRatio); i++)
@@ -343,7 +360,8 @@ public class PopulationGrowthMetrics
     public int immigrationRate = 0; //in citizens per day. Positive for immigration, negative for emigration.
     public ulong birthRate = 0; //in citizens per day.
     public ulong deathRate = 0; //in citizens per day.
-
+    
+    public const int minImmigrationRate = 2;
 }
 
 

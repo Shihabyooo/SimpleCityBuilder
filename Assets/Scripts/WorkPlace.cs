@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Building))]
 public class WorkPlace : MonoBehaviour
 {
     [SerializeField] uint minManpower = 0; //minimum amount of workers required for this building to operate.
@@ -9,7 +10,6 @@ public class WorkPlace : MonoBehaviour
     [SerializeField] EducationLevel minWorkerEducationLevel = EducationLevel.secondery;
     [SerializeField] uint wages = 0; //in units of money per day.
     [SerializeField] protected List<Citizen> employees = new List<Citizen>(); //TODO remove serialization when testing is done.
-
 
 //getters
     public uint AvailableWorkerSlots()
@@ -60,7 +60,5 @@ public class WorkPlace : MonoBehaviour
         }
         return false;
     }
-
-
 
 }
