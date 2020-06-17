@@ -49,7 +49,7 @@ public class PopulationManager : MonoBehaviour
         }
     }
 
-    public void UpdatePopulation()
+    public void UpdatePopulation() //daily routine
     {        
         //Update Citizens
         //Update Happiness
@@ -73,7 +73,9 @@ public class PopulationManager : MonoBehaviour
             else
             {
                 //TODO handle remaining citizen updates here. DO NOT DO THIS OUTSIDE THIS ELSE CLAUSE!
-                
+                //Check if needing work, or if needing hospitalization
+                citizen.Lookups();
+
                 //compute citizen's happiness here.
                 UpdateCitizenHappiness(citizen);
                 //add citizen's happines to sum
@@ -93,12 +95,11 @@ public class PopulationManager : MonoBehaviour
         populationHappiness.job = (uint)Mathf.RoundToInt((float)jobHappines / (float)_populationCount);
         populationHappiness.environment = (uint)Mathf.RoundToInt((float)environmentHappiness / (float)_populationCount);
 
-
         //process migration
         ProcessMigration();
     }
 
-    void UpdateCitizenHappiness(Citizen citizen)
+    void UpdateCitizenHappiness(Citizen citizen) //TODO consider moving this method to Citizen class.
     {
         Happiness newHappiness = new Happiness(50);
 

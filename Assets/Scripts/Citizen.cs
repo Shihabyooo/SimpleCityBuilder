@@ -20,6 +20,7 @@ public class Citizen
     public Happiness happiness; //{get; private set;}  
     //public float income; //{get; private set;} 
     public long savings; //{get; private set;} 
+    public int health; //{get; private set;} 
 
     //public System.Guid homeAddress; //{get; private set;} 
     public ResidentialBuilding homeAddress; //{get; private set;} 
@@ -34,16 +35,17 @@ public class Citizen
     public const int lifeStyleExpensesPerDayHigh = 250; //in units of money per day
     public const int lifeStyleExpensesPerDayObscene = 500; //in units of money per day
 
-    public Gender gender;
+    public const int minHealthBeforeSeekingHospitals = 50;
+
+    public Gender gender; //{get; private set;} 
     public Citizen spouse; //{get; private set;} 
-
-
 
     public Citizen()
     {
         //isInDebt = false;
         spouse = null;
         workAddress = null;
+        health = 100;
     }
 
     public bool ProcessFinances() //Must be called once per day. Returns false if citizen can pay their expenses.
@@ -94,6 +96,24 @@ public class Citizen
         return true;
     }
 
+
+    public void Lookups() //searches for work, health if needed, etc.s
+    {
+        if (workAddress == null)
+        {
+            WorkPlace workPlace = GameManager.buildingsMan.GetEmptyWorkSlot(educationalLevel);
+            if (workPlace != null) //contrary to the home case, this is a possibility.
+            {
+                workAddress = workPlace;
+                workPlace.AssignEmployee(this);
+            }
+        }
+        if (health < minHealthBeforeSeekingHospitals)
+        {
+            //TODO handle hopsital lookups and visits here.
+        }
+
+    }
     // void AssignDebt()
     // {
     //     isInDebt = true;
@@ -110,6 +130,8 @@ public class Citizen
         if (homeAddress !=null)
             homeAddress.RemoveResident(this);
 
-        //TODO add call to remove citizen from work here.
+        if (workAddress != null)
+            workAddress.RemoveEmployee(this);
+
     }
 }
