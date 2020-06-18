@@ -820,7 +820,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfa6d09165992e9429fa28caef42704d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  commercialTaxRate: 0
+  housingTaxRates:
+    poor: 1
+    low: 1
+    middle: 0
+    high: 1
+    obscene: 1
+  industryTaxRates:
+    poor: 1
+    low: 1
+    middle: 1
+    high: 1
+    obscene: 1
+  commercialTaxRate:
+    poor: 1
+    low: 1
+    middle: 1
+    high: 1
+    obscene: 1
 --- !u!1 &256751662
 GameObject:
   m_ObjectHideFlags: 0

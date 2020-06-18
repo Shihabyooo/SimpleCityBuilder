@@ -37,6 +37,11 @@ public class WorkPlace : MonoBehaviour
         return (uint)employees.Count;
     }
 
+    public List<Citizen> Employees()
+    {
+        return employees;
+    }
+
     public uint Wages()
     {
         return wages;
