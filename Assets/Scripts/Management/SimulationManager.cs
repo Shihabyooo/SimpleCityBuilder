@@ -21,7 +21,9 @@ public class SimulationManager : MonoBehaviour
                                                                             //System should work for any value though.
 
     public delegate void OnTimeUpdate(int hours);
+    //public delegate void OnNewDay(System.DateTime date);
     public static OnTimeUpdate onTimeUpdate;
+    // public static OnNewDay onNewDay;
 
     Coroutine buildingsSim = null, natResourceSim = null, budgetSim = null, timeKeeper = null;
     
@@ -49,10 +51,13 @@ public class SimulationManager : MonoBehaviour
         isRunning = true;
     }
 
+
+    //It's tempting to turn NewDay() into a delegate that other objects' methods subscribe to, but since those methods will always run, hardcoding them here is better (clearer).
     void NewDay()
     {
         GameManager.climateMan.UpdateClimateDay(date);
         GameManager.populationMan.UpdatePopulation();
+        GameManager.econMan.UpdateEconomyDay();
     }
 
     //Simulation runs coroutines.
@@ -177,11 +182,11 @@ public class SimulationManager : MonoBehaviour
                     NewDay();
                     currentDay = date.Day;
                 }
-                GameManager.uiMan.UpdateTime(date);
                 if (onTimeUpdate != null)
                     onTimeUpdate.Invoke(dateUpdateRateHours);
                 
-
+                UpdateUI();
+                
                 yield return new WaitForSeconds(timeBetweenUpdates);
             }
             else
@@ -273,4 +278,10 @@ public class SimulationManager : MonoBehaviour
         }
     }
 
+    //UI update
+    void UpdateUI()
+    {
+        GameManager.uiMan.UpdateTime(date);
+        GameManager.uiMan.UpdateTreasury(GameManager.resourceMan.AvailableTreasury());
+    }
 }

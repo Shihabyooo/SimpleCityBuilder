@@ -10,16 +10,18 @@ using UnityEngine;
 [RequireComponent(typeof(ClimateManager))]
 [RequireComponent(typeof(PopulationManager))]
 [RequireComponent(typeof(UIManager))]
+[RequireComponent(typeof(EconomyManager))]
 public class GameManager : MonoBehaviour
 {
     static public GameManager gameMan = null;
     static public ResourcesManager resourceMan = null;
-    ControlManager controlMan;
+    ControlManager controlMan = null;
     static public BuildingsManager buildingsMan = null;
     static public ClimateManager climateMan = null;
     static public SimulationManager simMan;
     static public PopulationManager populationMan = null;
     static public UIManager uiMan = null;
+    static public EconomyManager econMan = null;
 
     void Awake()
     {
@@ -33,6 +35,7 @@ public class GameManager : MonoBehaviour
             climateMan = this.gameObject.GetComponent<ClimateManager>();
             populationMan = this.gameObject.GetComponentInChildren<PopulationManager>();
             uiMan = this.gameObject.GetComponentInChildren<UIManager>();
+            econMan = this.gameObject.GetComponent<EconomyManager>();
         }
         else
         {

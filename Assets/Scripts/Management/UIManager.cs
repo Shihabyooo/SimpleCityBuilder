@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour
     Text dateField;
     Text hourField;
     Text cityNameField;
+    Text treasuryField;
 
     void Awake()
     {
@@ -16,6 +17,7 @@ public class UIManager : MonoBehaviour
         dateField = header.Find("Date").GetComponent<Text>();
         hourField = header.Find("Hour").GetComponent<Text>();
         cityNameField = header.Find("CityName").GetComponent<Text>();
+        treasuryField = header.Find("Treasury").GetComponent<Text>();
     }
     
     public void UpdateTime(System.DateTime date)
@@ -31,6 +33,12 @@ public class UIManager : MonoBehaviour
     {
         cityNameField.text = name;
     }
+
+    public void UpdateTreasury(long funds)
+    {
+        treasuryField.text = "$" + funds.ToString("N0");
+    }
+
 
     string GetMonthAbbr(int month)
     {

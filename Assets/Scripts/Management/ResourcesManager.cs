@@ -71,6 +71,10 @@ public class ResourcesManager : MonoBehaviour
         return availableHousing;
     }
 
+    public long AvailableTreasury()
+    {
+        return finances.treasury;
+    }
     //Setters
     public void UpdatePowerDemand(float newDemand)
     {
