@@ -10,6 +10,7 @@ public class BuildingsManager : MonoBehaviour
     public List<Building> constructedBuildings {get; private set;} //containers ALL constructed buildings.
     public List<InfrastructureBuilding> waterProductionBuildings {get; private set;} //contains only water producing buildings
     public List<InfrastructureBuilding> powerProductionBuildings {get; private set;} //contains only power producing buildings
+    public List<WorkPlace> workPlaces {get; private set;} //contains list of all workplaces. Adding buildings to this list is done when adding building to constructedBuildings. 
     //TODO add lists for remaining infrastructure types and update the AddInfrastructureBuilding() method accordingly.
 
     void Awake()
@@ -17,6 +18,7 @@ public class BuildingsManager : MonoBehaviour
         constructedBuildings = new List<Building>();
         waterProductionBuildings = new List<InfrastructureBuilding>();
         powerProductionBuildings = new List<InfrastructureBuilding>();
+        workPlaces = new List<WorkPlace>();
     }
 
     public BuildingProposal StartNewBuildingProposal(int buildingID)
@@ -33,6 +35,9 @@ public class BuildingsManager : MonoBehaviour
     public void AddConstructedBuilding(Building building)
     {
         constructedBuildings.Add(building);
+        
+        if (building.gameObject.GetComponent<WorkPlace>() != null)
+            workPlaces.Add(building.gameObject.GetComponent<WorkPlace>());
     }
 
     public void AddInfrastructureBuilding(InfrastructureBuilding building, InfrastructureService type)
@@ -104,24 +109,22 @@ public class BuildingsManager : MonoBehaviour
 
         while (count < 100) //tries 100 times to find a random building, if fails, grabs the first one it find from the foreach loop bellow.
         {
-            int randomInt = Random.Range(0, constructedBuildings.Count);
+            int randomInt = Random.Range(0, workPlaces.Count);
 
-            if ( constructedBuildings[randomInt].gameObject.GetComponent<WorkPlace>() != null
-                && constructedBuildings[randomInt].gameObject.GetComponent<WorkPlace>().WorkerEducationLevel() == educationLevel
-                && constructedBuildings[randomInt].gameObject.GetComponent<WorkPlace>().AvailableWorkerSlots() > 0)
+            if (workPlaces[randomInt].WorkerEducationLevel() == educationLevel
+                && workPlaces[randomInt].AvailableWorkerSlots() > 0)
             {
-                return constructedBuildings[randomInt].gameObject.GetComponent<WorkPlace>();
+                return workPlaces[randomInt];
             }
             count++;
         }
 
-        foreach (Building building in constructedBuildings)
+        foreach (WorkPlace workPlace in workPlaces)
         {
-            if (building.gameObject.GetComponent<WorkPlace>() != null
-                && building.gameObject.GetComponent<WorkPlace>().WorkerEducationLevel() == educationLevel
-                && building.gameObject.GetComponent<WorkPlace>().AvailableWorkerSlots() > 0)
+            if (workPlace.WorkerEducationLevel() == educationLevel
+                && workPlace.AvailableWorkerSlots() > 0)
                 {
-                    return building.gameObject.GetComponent<WorkPlace>();
+                    return workPlace;
                 }
         }
 
