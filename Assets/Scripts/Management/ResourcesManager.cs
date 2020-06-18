@@ -75,6 +75,7 @@ public class ResourcesManager : MonoBehaviour
     {
         return finances.treasury;
     }
+    
     //Setters
     public void UpdatePowerDemand(float newDemand)
     {
@@ -144,6 +145,11 @@ public class ResourcesManager : MonoBehaviour
     public void UpdateOccupiedHousingSlots (HousingSlots slots)
     {
         resources.occuppiedHousingSlots.AssignNew(slots);
+    }
+
+    public void AddToTreasury(int newFunds)
+    {
+        finances.treasury += newFunds;
     }
 
     //testing viz
