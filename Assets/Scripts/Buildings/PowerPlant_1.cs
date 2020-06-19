@@ -10,8 +10,18 @@ public class PowerPlant_1 : InfrastructureBuilding
     public float currentEfficiency;// {get; private set;}
     public float currentMaxPowerProduction;// {get; private set;} //not to be confused with maxPowerProduction in PowerPlantStats. This one is variable depending on other simulation factors.
     public float currentEmissionRate; // {get; private set;} //unity volume per unit time.
-
+    [SerializeField][Range(0.0f, 10.0f)] float minEmissionToGenerateSmoke = 6.0f; //bellow or equall to this, smoke particle system would be turned off.
+    [SerializeField][Range(20.0f, 60.0f)] float maxEmissionToGenerateSmoke = 30.0f; 
+    [SerializeField][Range(0.5f, 1.0f)] float maxSmokeOpacity = 0.75f;
+    public ParticleSystem smoke;    
     [SerializeField] PowerPlantStats plantStats = new PowerPlantStats();
+
+    override protected void Awake()
+    {
+        base.Awake();
+        smoke = this.transform.Find("Smoke").GetComponent<ParticleSystem>();
+        UpdateEmissionVisuals(0.0f);
+    }
 
     protected override void OnConstructionComplete()
     {
@@ -36,6 +46,7 @@ public class PowerPlant_1 : InfrastructureBuilding
         currentMaxPowerProduction = Mathf.Max(currentEfficiency * plantStats.maxPowerProduction, plantStats.minPowerProduction);
         currentPowerProduction = Mathf.Max(currentMaxPowerProduction * currentLoad, plantStats.minPowerProduction);
         currentEmissionRate = (2.0f - currentEfficiency) * plantStats.baseEmissionPerPowerUnit *  currentPowerProduction; //basically, at 100% efficiecy, emission = base esmission * production.
+        UpdateEmissionVisuals(currentEmissionRate);
     }
 
     public override float GetMaxProduction() 
@@ -48,6 +59,25 @@ public class PowerPlant_1 : InfrastructureBuilding
     {
         base.UpdateEffectOnNature(timeWindow);
         GameManager.climateMan.AddPollution(occupiedCell[0], occupiedCell[1], currentEmissionRate * timeWindow);
+    }
+
+    void UpdateEmissionVisuals(float emission) //leaving the emission value as an argument instead of 0 to give option of turning the emission visuals off without setting global parameters to zero
+    {
+        float emissionToVisualize = Mathf.Clamp(emission, minEmissionToGenerateSmoke, maxEmissionToGenerateSmoke);
+        ParticleSystem.EmissionModule particleEmission = smoke.emission;
+
+        if (emissionToVisualize - minEmissionToGenerateSmoke < 0.001f) //nearly zero, in this case, no need to do remaining calculation or have particle system running.
+        {
+            particleEmission.enabled = false;
+            
+            return;
+        }
+
+        particleEmission.enabled = true;
+        float emissionVisualPercentage = (emissionToVisualize - minEmissionToGenerateSmoke) / (maxEmissionToGenerateSmoke - minEmissionToGenerateSmoke);
+
+        ParticleSystem.MainModule particleMain = smoke.main;
+        particleMain.startColor = new Color(particleMain.startColor.color.r, particleMain.startColor.color.g, particleMain.startColor.color.b, emissionVisualPercentage * maxSmokeOpacity);
     }
 
 }
