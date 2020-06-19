@@ -152,6 +152,11 @@ public class ResourcesManager : MonoBehaviour
         finances.treasury += newFunds;
     }
 
+    public void UpdateIncomeTaxes(IncomeTaxes incomeTaxes)
+    {
+        finances.incomeTaxes.SetIncomeTaxes(incomeTaxes);
+    }
+
     //testing viz
     void OnGUI()
     {
@@ -255,9 +260,11 @@ public class CityResources
     public HousingSlots occuppiedHousingSlots = new HousingSlots();
 }
 
+[System.Serializable]
 public class CityFinances
 {
     public long treasury;
-
+    public IncomeTaxes incomeTaxes; //Not used for any calculations, the actuall incomeTaxes computation is local to a method in EconomyManager, this version is
+                                    //solely for future statistics display to player.
     //TODO add other finances/economy related parameters here
 }

@@ -36,31 +36,28 @@ public class EconomyManager : MonoBehaviour
 
     int ComputeIncomeTaxes()
     {
-        Income income = new Income();
+        IncomeTaxes incomeTaxes = new IncomeTaxes();
         //Since we already have WorkPlace classes holding both the number of workers AND the wages, we'll simply loop over them.
         //This approach would make it easier to, in the future, complexify the wage computation (leaving it to the Workplace class)
 
         foreach(WorkPlace workPlace in GameManager.buildingsMan.workPlaces)
         {
             foreach(Citizen employee in workPlace.Employees())   
-                income.AddToIncome(employee.citizenClass, workPlace.Wages());
+            {
+                int employeeTax = incomeTaxes.AddToIncomeTaxes(employee.citizenClass, (int)workPlace.Wages(), incomeTaxRates); //AddToIncomeTaxes() returns amount that was added.
+                employee.SubstractTax(employeeTax);
+            }
         }
 
-        int incomeTaxes = 0;
-        incomeTaxes += Mathf.RoundToInt(income.poor * incomeTaxRates.poor / 100.0f);
-        incomeTaxes += Mathf.RoundToInt(income.low * incomeTaxRates.low / 100.0f);
-        incomeTaxes += Mathf.RoundToInt(income.middle * incomeTaxRates.middle / 100.0f);
-        incomeTaxes += Mathf.RoundToInt(income.high * incomeTaxRates.high / 100.0f);
-        incomeTaxes += Mathf.RoundToInt(income.obscene * incomeTaxRates.obscene / 100.0f);
-
-        return incomeTaxes;
+        GameManager.resourceMan.UpdateIncomeTaxes(incomeTaxes);
+        return incomeTaxes.Sum();
     }
 
 }
 
 
 [System.Serializable]
-struct TaxRates //Tax rates are per day
+public struct TaxRates //Tax rates are per day
 {
     public const float minTaxRate = 1.0f;
     public const float maxTaxRate = 30.0f;
@@ -123,35 +120,60 @@ struct TaxRates //Tax rates are per day
 }
 
 
-struct Income
+[System.Serializable]
+public struct IncomeTaxes
 {
-    public ulong poor;
-    public ulong low;
-    public ulong middle;
-    public ulong high;
-    public ulong obscene;
+    public int poor;
+    public int low;
+    public int middle;
+    public int high;
+    public int obscene;
 
-    public void AddToIncome(HousingClass _class, ulong value)
+    public int AddToIncomeTaxes(HousingClass _class, int baseIncome, TaxRates taxRates)
     {
+        int newAddition = 0;
         switch(_class)
         {
             case HousingClass.poor:
-                poor += value;
+                newAddition = Mathf.RoundToInt((float)baseIncome * taxRates.poor);
+                poor += newAddition;
                 break;
             case HousingClass.low:
-                low += value;
+                newAddition = Mathf.RoundToInt((float)baseIncome * taxRates.low);
+                low += newAddition;
                 break;
             case HousingClass.middle:
-                middle += value;
+                newAddition = Mathf.RoundToInt((float)baseIncome * taxRates.middle);
+                middle += newAddition;
                 break;
             case HousingClass.high:
-                high += value;
+                newAddition = Mathf.RoundToInt((float)baseIncome * taxRates.high);
+                high += newAddition;
                 break;
             case HousingClass.obscene:
-                obscene += value;
+                newAddition = Mathf.RoundToInt((float)baseIncome * taxRates.obscene);
+                obscene += newAddition;
                 break;
             default:
                 break;
         }
+
+        return newAddition;
     }
+
+    public int Sum()
+    {
+        return poor + low + middle + high + obscene; //TODO consider integer limits.
+    }
+
+    public void SetIncomeTaxes(IncomeTaxes newIncomeTaxes)
+    {
+        poor = newIncomeTaxes.poor;
+        low = newIncomeTaxes.low;
+        middle = newIncomeTaxes.middle;
+        high = newIncomeTaxes.high;
+        obscene = newIncomeTaxes.obscene;
+    }
+
+
 }
