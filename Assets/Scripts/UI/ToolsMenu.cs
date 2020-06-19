@@ -46,6 +46,7 @@ public class ToolsMenu : MonoBehaviour
                 break;
             case 7:
                 Grid.grid.visualizePollution = state;
+                GameManager.climateMan.TogglePollutionDisplay(state);
                 break;
             case 8:
                 Grid.grid.visualizeRainfall = state;

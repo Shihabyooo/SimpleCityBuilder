@@ -11,9 +11,16 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
     [SerializeField] int maxStormDuration = 7;
     [SerializeField] int minStormDuration = 1;
     [SerializeField] int minStormRadius = 2;
-    [SerializeField] List<Storm> activeStorms = new List<Storm>();
     [SerializeField] GameObject rainfallNodePrefab;
+    [SerializeField] GameObject smogNodePrefab;
+    [SerializeField] List<Storm> activeStorms = new List<Storm>(); //serialization for testing only.
+    GameObject[,] smogNodes;// = new GameObject[Grid.grid.noOfCells.x, Grid.grid.noOfCells.y];
     [SerializeField] float cloudHeight = 10.0f;
+    [SerializeField] float smogHeight = 2.0f;
+    bool isShowingPollution = false;
+    [SerializeField] float minPollutionToVisualize = 150.0f;
+    [SerializeField] float maxPollutionToVisualize = 1000.0f;
+
 
     public bool isRaining {get; private set;}
 
@@ -23,6 +30,21 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
         SimulationManager.onTimeUpdate += UpdateClimateHour;
     }
 
+    void Start()
+    {
+        smogNodes = new GameObject[Grid.grid.noOfCells.x, Grid.grid.noOfCells.y];
+        
+        float smogPSystemHeight = smogNodePrefab.GetComponent<ParticleSystem>().shape.scale.y;
+        for (uint i = 0; i < Grid.grid.noOfCells.x; i++)
+            for (uint j = 0; j < Grid.grid.noOfCells.y; j++)
+                smogNodes[i, j] = GameObject.Instantiate(smogNodePrefab,
+                                                        Grid.grid.GetCellPosition(i, j) + new Vector3(0.0f, smogHeight + smogPSystemHeight / 2.0f, 0.0f),
+                                                        Grid.grid.transform.rotation,
+                                                        this.transform);
+        
+        TogglePollutionDisplay(false);
+    }
+
     public void UpdateClimateDay(System.DateTime date)
     {
        ProcessRainfall(date);
@@ -30,7 +52,10 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
 
     public void UpdateClimateHour(int timeFrame)
     {
-       TransportPollution(timeFrame);
+        TransportPollution(timeFrame);
+
+        if (isShowingPollution)
+            UpdatePollutionNodes();
     }
 
 
@@ -202,6 +227,46 @@ public class ClimateManager : MonoBehaviour //for the sake of simplicity, assume
                 }
             }
         }
+    }
+
+
+    public void TogglePollutionDisplay(bool state)
+    {
+        isShowingPollution = state;
+        for (uint i = 0; i < Grid.grid.noOfCells.x; i++)
+            for (uint j = 0; j < Grid.grid.noOfCells.y; j++)
+            {
+                // ParticleSystem.EmissionModule emissionModule = smogNodes[i, j].GetComponent<ParticleSystem>().emission;
+                // emissionModule.enabled = state;
+                smogNodes[i, j].SetActive(state);
+            }
+
+    }
+
+    public void UpdatePollutionNodes()
+    {
+        if (!isShowingPollution)
+            return;
+
+        for (uint i = 0; i < Grid.grid.noOfCells.x; i++)
+            for (uint j = 0; j < Grid.grid.noOfCells.y; j++)
+            {
+                GameObject node = smogNodes[i, j];                
+                float pollutionAtCell = Grid.grid.pollutionLayer.GetCellValue(i, j);
+
+                if(pollutionAtCell < minPollutionToVisualize)
+                {
+                    node.SetActive(false);
+                }
+                else
+                {
+                    node.SetActive(true);
+                    ParticleSystem.MainModule mainModule = node.GetComponent<ParticleSystem>().main;
+                    Color newColour = smogNodePrefab.GetComponent<ParticleSystem>().main.startColor.color;
+                    newColour.a = newColour.a * Mathf.Clamp((pollutionAtCell - minPollutionToVisualize) / (maxPollutionToVisualize - minPollutionToVisualize), 0.0f, 1.0f);
+                    mainModule.startColor = newColour;
+                }
+            }
     }
 }
 
