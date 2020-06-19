@@ -87,7 +87,7 @@ public class Citizen
 
         //TODO handle cases of integer overflow/cycling.
         expenses -= income; //if income > expenses, result will be negative, which will increase savings.
-        savings -= expenses;
+        savings -= expenses; //TODO handle integer overflow here.
         
         if (savings < 0)
         {
@@ -98,6 +98,11 @@ public class Citizen
         return true;
     }
 
+    public void SubstractTax(int tax)
+    {
+        //leave checking whether citizen is broke to the ProcessFinances() call.
+        savings -= tax;
+    }
 
     public void Lookups() //searches for work, health if needed, etc.s
     {
@@ -116,6 +121,7 @@ public class Citizen
         }
 
     }
+    
     // void AssignDebt()
     // {
     //     isInDebt = true;
