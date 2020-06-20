@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//TODO consider moving emission from derived classes to this class, since all buildings have some form of emission, and have a virtual ComputeEmission method that each
+//derived class overrides however it suits (without invoking the base)
+//This includes moving the contents of AddPollution (which are currently similar between PowerPlant_1 and IndustrialBuilding_1) to this class.
+
 public enum BuildingType //TODO add remaining types.
 {
     residential, commercial, industrial, infrastructure
