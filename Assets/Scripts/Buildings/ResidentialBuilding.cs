@@ -6,7 +6,7 @@ public class ResidentialBuilding : Building
 {
     [SerializeField] ResidentialBuildingStats residentStats = new ResidentialBuildingStats();
     protected List<Citizen> occupants;
-    public uint housingQuality; //quality should universally be from 0 to 100, though each building may specifiy tighter limits within.
+    public uint housingQuality {get; private set;} //quality should universally be from 0 to 100, though each building may specifiy tighter limits within.
 
    protected override void Awake()
    {
@@ -21,7 +21,6 @@ public class ResidentialBuilding : Building
         //Multiplying seperate resource ratios has an effect that, insufficiency in one resource would still significantly impact quality even if all other resources are maxmized.
         //In the future, this estimate could be changed to a weighted average.
         float resourceRatio = (allocatedResources.power / stats.requiredResources.power) * (allocatedResources.water / stats.requiredResources.water);
-
         housingQuality = (uint)Mathf.RoundToInt(Mathf.Max(resourceRatio * residentStats.maxHousingQuality, residentStats.minHousingQuality));
     }
 

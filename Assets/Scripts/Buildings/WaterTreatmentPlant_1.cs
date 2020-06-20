@@ -4,13 +4,10 @@ using UnityEngine;
 
 public class WaterTreatmentPlant_1 : InfrastructureBuilding
 {
-    //TODO reset (uncomment) the {get; private set;} parts bellow:
-    public float currentTreatmentRate;// {get; private set;}
-    public float currentEfficiency;// {get; private set;}
-    public float currentMaxTreatmentRate;// {get; private set;} //not to be confused with maxTreatmentRate in WaterTreatmentPlantStats. This one is variable depending on other simulation factors.
-    public float availableGroundWater;// {get; private set;}
-    //public float currentDemand = 0.0f;
-
+    float currentTreatmentRate;
+    float currentEfficiency;
+    float currentMaxTreatmentRate; //not to be confused with maxTreatmentRate in WaterTreatmentPlantStats. This one is variable depending on other simulation factors.
+    float availableGroundWater;
 
     [SerializeField] WaterTreatmentPlantStats plantStats = new WaterTreatmentPlantStats();
 
@@ -85,7 +82,6 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
             }   
         }
     }
-    
 }
 
 [System.Serializable]

@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class WindFarm_1 : InfrastructureBuilding
 {
-    //TODO reset (uncomment) the {get; private set;} parts bellow:
-    public float currentPowerProduction;// {get; private set;}
-    public float currentEfficiency;// {get; private set;}
-    public float currentMaxPowerProduction;// {get; private set;} //not to be confused with maxPowerProduction in WindFarmStats. This one is variable depending on other simulation factors.
+    float currentPowerProduction;
+    float currentEfficiency;
+    float currentMaxPowerProduction; //not to be confused with maxPowerProduction in WindFarmStats. This one is variable depending on other simulation factors.
 
     [SerializeField] WindFarmStats farmStats = new WindFarmStats();
 
@@ -34,7 +33,6 @@ public class WindFarm_1 : InfrastructureBuilding
 
     protected override float ComputeEfficiency()
     {
-        
         float cellWindSpeed = Grid.grid.windSpeedLayer.GetCellValue(occupiedCell[0], occupiedCell[1]);
         int cellWindDirection = (int)Grid.grid.windDirectionLayer.GetCellValue(occupiedCell[0], occupiedCell[1]); //Wind direction should be limited between 0 and 360, this casting should be safe.
         //  Note that localRot returns value from 0 to 360 always.
@@ -42,18 +40,7 @@ public class WindFarm_1 : InfrastructureBuilding
         //Note that "turbineFacing" bellow calculates the inverse facing, that is, the direction the end of the turbine is pointing at.
 
         int turbineFacing = Mathf.RoundToInt( this.transform.eulerAngles.y);// - 270;  //TODO remember to adjust this 90 value if changed the wind farm's model 0 rotation facing.
-
-        // if (turbineFacing < 0)
-        // {
-        //     turbineFacing = (Mathf.FloorToInt(Mathf.Abs((float)turbineFacing / 360.0f)) + 1) * 360 + turbineFacing;
-        // }
-        // else if (turbineFacing > 360)
-        // {
-        //     turbineFacing = turbineFacing - (Mathf.FloorToInt((float)turbineFacing / 360.0f) ) * 360;
-        // }
-
         print (this.gameObject.name + "  || facing: " + turbineFacing + ", localRot: " + this.transform.eulerAngles.y); //test
-        //int angleDifference = Mathf.Abs(cellWindDirection - turbineFacing) - 90;
         int angleDifference = (Mathf.Max(cellWindDirection, Mathf.Abs(turbineFacing - 90)) - Mathf.Min(cellWindDirection, Mathf.Abs(turbineFacing - 90))) % 360;
         angleDifference = angleDifference > 180? 360 - angleDifference : angleDifference;
         
@@ -82,8 +69,6 @@ public class WindFarm_1 : InfrastructureBuilding
         base.UpdateEffectOnNature(timeWindow);
         //TODO wind farms should reduce wind speed downstream (slightly).
     }
-
-
 }
 
 [System.Serializable]

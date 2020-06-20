@@ -4,16 +4,14 @@ using UnityEngine;
 
 public class PowerPlant_1 : InfrastructureBuilding
 {
-
-    //TODO reset (uncomment) the {get; private set;} parts bellow:
-    public float currentPowerProduction;// {get; private set;}
-    public float currentEfficiency;// {get; private set;}
-    public float currentMaxPowerProduction;// {get; private set;} //not to be confused with maxPowerProduction in PowerPlantStats. This one is variable depending on other simulation factors.
-    public float currentEmissionRate; // {get; private set;} //unity volume per unit time.
+    float currentPowerProduction;
+    float currentEfficiency;
+    float currentMaxPowerProduction; //not to be confused with maxPowerProduction in PowerPlantStats. This one is variable depending on other simulation factors.
+    float currentEmissionRate; //unit volume per unit time.
     [SerializeField][Range(0.0f, 10.0f)] float minEmissionToGenerateSmoke = 6.0f; //bellow or equall to this, smoke particle system would be turned off.
     [SerializeField][Range(20.0f, 60.0f)] float maxEmissionToGenerateSmoke = 30.0f; 
     [SerializeField][Range(0.5f, 1.0f)] float maxSmokeOpacity = 0.75f;
-    public ParticleSystem smoke;    
+    ParticleSystem smoke;    
     [SerializeField] PowerPlantStats plantStats = new PowerPlantStats();
 
     override protected void Awake()
@@ -54,7 +52,6 @@ public class PowerPlant_1 : InfrastructureBuilding
         return currentPowerProduction;
     }
 
-
     public override void UpdateEffectOnNature(int timeWindow)    
     {
         base.UpdateEffectOnNature(timeWindow);
@@ -69,7 +66,6 @@ public class PowerPlant_1 : InfrastructureBuilding
         if (emissionToVisualize - minEmissionToGenerateSmoke < 0.001f) //nearly zero, in this case, no need to do remaining calculation or have particle system running.
         {
             particleEmission.enabled = false;
-            
             return;
         }
 

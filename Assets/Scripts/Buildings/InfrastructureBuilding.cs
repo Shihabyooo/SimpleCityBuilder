@@ -23,6 +23,7 @@ public class InfrastructureBuilding : Building
 
     public virtual void ComputeProduction() //computes efficiency, then current max production (based on efficiency), then current actual production (based on load)
     {
+
     }
     
     public virtual float GetMaxProduction() //for use by simulation manager in estimating total available capacity and assigning load based on it.
@@ -46,18 +47,14 @@ public class InfrastructureBuilding : Building
         else if (workPlace.CurrentManpower() >= workPlace.MinManpower())
             manpowerEffect = (float)workPlace.CurrentManpower() / (float)workPlace.MaxManpower();
 
-
         float resourceEffect = allocatedResources.CompareToBaseResource(stats.requiredResources);
-
         float efficiency =  manpowerEffect * budgetEffect * resourceEffect * (infraStats.maxEfficiency - infraStats.minEfficiency) + infraStats.minEfficiency;
         
         if (manpowerEffect < 0.001f || budgetEffect < 0.001f || resourceEffect < 0.001f)
             efficiency = 0.0f;
 
-        //print (this.gameObject.name + ", manpowereffect: " + manpowerEffect + ", resourceEffect: " + resourceEffect + ", budgetEffect: " + budgetEffect + ", total effeicienct: " + efficiency);
         return efficiency;
     }
-
 }
 
 [System.Serializable]
