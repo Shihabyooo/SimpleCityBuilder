@@ -32,7 +32,7 @@ public class IndustrialBuilding_1 : Building
         currentProduction = Mathf.FloorToInt(ComputeEfficiency() * industryStats.maxProductionPerDay);
         currentEmissionRate = industryStats.emissionPerProductUnit * (float)currentProduction;
         UpdateEmissionVisuals(currentEmissionRate);
-        
+
         return (float)currentProduction * industryStats.incomePerProduct;
     }
 
@@ -41,7 +41,7 @@ public class IndustrialBuilding_1 : Building
         base.UpdateEffectOnNature(timeWindow);
         GameManager.climateMan.AddPollution(occupiedCell[0], occupiedCell[1], currentEmissionRate * timeWindow);
     }
-
+    
     void UpdateEmissionVisuals(float emission) //leaving the emission value as an argument instead of 0 to give option of turning the emission visuals off without setting global parameters to zero
     {
         float emissionToVisualize = Mathf.Clamp(emission, minEmissionToGenerateSmoke, maxEmissionToGenerateSmoke);

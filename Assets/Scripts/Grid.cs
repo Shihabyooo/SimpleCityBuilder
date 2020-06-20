@@ -23,6 +23,8 @@ public class Grid : MonoBehaviour
     BoxCollider gridCollider;
     float colliderPadding = 10.0f;
     int[,] cellsStatus; //Main grid layer, basically tells whether the cell is empty or not. 0 = empty, 1 = occupied by building. TODO add more status codes.
+    SpriteRenderer baseGridRenderer;
+    bool isShowingGrid = true; 
 
     //Extra grid layers, each layer targets specific element (e.g. water supply, pollution, health coverage, education coverage, etc)
     //Services and infrastructure
@@ -49,6 +51,7 @@ public class Grid : MonoBehaviour
             Destroy(this.gameObject);
         }
 
+        baseGridRenderer = this.transform.Find("GridView").GetComponent<SpriteRenderer>();
         gridCollider = this.gameObject.GetComponent<BoxCollider>();
         UpdateGridBoundary();
 
@@ -87,11 +90,19 @@ public class Grid : MonoBehaviour
         boundary.x = noOfCells.x * cellSize;
         boundary.y = noOfCells.y * cellSize;
 
+        baseGridRenderer.size = noOfCells;
+
         //update collider boundary
         Vector3 _centre = this.transform.position;
         _centre.y = -0.5f; //half the thickness, so the collider is spawned with its surface (which the raycast will hit matches the sufrace of the grid).
         gridCollider.center = _centre;
         gridCollider.size = new Vector3(boundary.x + colliderPadding, 1.0f, boundary.y + colliderPadding);
+    }
+
+    public void ToggleBaseGridView(bool state)
+    {
+        baseGridRenderer.enabled = state;
+        isShowingGrid = state;
     }
 
     public Cell SampleForCell(Vector3 position)

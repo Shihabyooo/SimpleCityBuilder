@@ -51,6 +51,9 @@ public class ToolsMenu : MonoBehaviour
             case 8:
                 Grid.grid.visualizeRainfall = state;
                 break;
+            case 100:
+                Grid.grid.ToggleBaseGridView(state);
+                break;
         }
     }
 }
