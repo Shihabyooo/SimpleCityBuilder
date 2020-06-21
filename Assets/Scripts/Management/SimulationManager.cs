@@ -90,7 +90,8 @@ public class SimulationManager : MonoBehaviour
 
                     //update building effect on natural resources and environment
                     building.UpdateEffectOnNature(dateUpdateRateHours);
-
+                    building.CheckAndShowResourceShortages();
+                    
                     //for residential buildings,
                     if (building.GetStats().type == BuildingType.residential)
                     {
@@ -101,7 +102,6 @@ public class SimulationManager : MonoBehaviour
                         
                         residentialBuilding.UpdateHousingQuality();
                     }
-
                 }
 
                 //Update ResourceManager

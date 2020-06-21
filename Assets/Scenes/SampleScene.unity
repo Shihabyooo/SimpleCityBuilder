@@ -648,6 +648,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf2c8a559e1cfa34ea55d0893092865a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  waterSign: {fileID: 277237618177952615, guid: a330adec55af8ea43b34cbcc4cad082a,
+    type: 3}
+  powerSign: {fileID: 7463499582311921010, guid: d3300d92d1df8484dafff1daa5b1e0f6,
+    type: 3}
 --- !u!114 &224963319
 MonoBehaviour:
   m_ObjectHideFlags: 0

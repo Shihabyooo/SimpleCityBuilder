@@ -11,6 +11,7 @@ public enum BuildingType //TODO add remaining types.
     residential, commercial, industrial, infrastructure
 }
 
+[RequireComponent(typeof(BoxCollider))]
 public class Building : MonoBehaviour
 {
     public GameObject model {get; private set;}
@@ -21,11 +22,15 @@ public class Building : MonoBehaviour
     [SerializeField] protected BasicResources allocatedResources = new BasicResources(); //These resources will be allocated by the simulation based on availability and priority.
     //[SerializeField] protected bool isWellSupplied = false;
     public System.Guid uniqueID {get; private set;}
+    
+    BoxCollider buildingCollider;
+    GameObject waterSign, powerSign;
 
 
     virtual protected void Awake()
     {
         budget = (uint)Mathf.FloorToInt((float)(stats.minBudget + stats.maxBudget) / 2.0f);
+        buildingCollider = this.gameObject.GetComponent<BoxCollider>();
     }
 
     public BuildingStats GetStats()
@@ -93,23 +98,24 @@ public class Building : MonoBehaviour
 
     }
 
-    float helperTimer = 0.0f;
-    IEnumerator Construction()
-    {
-        //print ("Begining construction of: " + this.gameObject.name + ", finishes in: " + stats.constructionTime); //test
+ //   //Deprecated
+//     float helperTimer = 0.0f;
+//     IEnumerator Construction()
+//     {
+//         //print ("Begining construction of: " + this.gameObject.name + ", finishes in: " + stats.constructionTime); //test
         
-        while (helperTimer < stats.constructionTime)
-        {
-            helperTimer += Time.fixedDeltaTime;
-            float ratio = Mathf.Clamp(helperTimer/stats.constructionTime, 0.0f, 1.0f);//test
-            this.transform.transform.localScale = new Vector3(ratio, ratio, ratio);//test
-            yield return new WaitForFixedUpdate();
-        }
+//         while (helperTimer < stats.constructionTime)
+//         {
+//             helperTimer += Time.fixedDeltaTime;
+//             float ratio = Mathf.Clamp(helperTimer/stats.constructionTime, 0.0f, 1.0f);//test
+//             this.transform.transform.localScale = new Vector3(ratio, ratio, ratio);//test
+//             yield return new WaitForFixedUpdate();
+//         }
 
-        //print ("Finshed construction of: " + this.gameObject.name ); //test
-        OnConstructionComplete();
-        yield return null;
-    }
+//         //print ("Finshed construction of: " + this.gameObject.name ); //test
+//         OnConstructionComplete();
+//         yield return null;
+//     }
 
     protected virtual void OnConstructionComplete()
     {
@@ -117,11 +123,50 @@ public class Building : MonoBehaviour
         uniqueID = GameManager.buildingsMan.GetNewGUID();
         GameManager.buildingsMan.AddConstructedBuilding(this);
         SimulationManager.onTimeUpdate -= ProgressConstruction;
+
+        //Instantiate and disable the resources signs object
+        float bufferOverColliderHeight = 0.75f;
+        powerSign = GameObject.Instantiate(GameManager.gameMan.powerSign,
+                                            this.transform.position + new Vector3((float)Grid.cellSize / 4.0f, buildingCollider.size.y + bufferOverColliderHeight, 0.0f),
+                                            this.transform.rotation,
+                                            this.transform
+                                            );
+        waterSign = GameObject.Instantiate(GameManager.gameMan.waterSign,
+                                            this.transform.position + new Vector3(-1.0f * (float)Grid.cellSize / 4.0f, buildingCollider.size.y + bufferOverColliderHeight, 0.0f),
+                                            this.transform.rotation,
+                                            this.transform
+                                            );
+
+        powerSign.SetActive(false);
+        waterSign.SetActive(false);
     }
 
     public virtual void UpdateEffectOnNature(int timeWindow)
     {
         
+    }
+
+    public void CheckAndShowResourceShortages()
+    {
+        if (stats.requiredResources.power - allocatedResources.power > 0.01f)
+        {
+            powerSign.SetActive(true);
+            powerSign.transform.Find("Avatar").gameObject.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(0, 100.0f * (1.0f - allocatedResources.power/stats.requiredResources.power));
+        }
+        else
+        {
+            powerSign.SetActive(false);
+        }
+
+        if (stats.requiredResources.water - allocatedResources.water > 0.01f)
+        {
+            waterSign.SetActive(true);
+            waterSign.transform.Find("Avatar").gameObject.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(0, 100.0f * (1.0f - allocatedResources.water/stats.requiredResources.water));
+        }
+        else
+        {
+            waterSign.SetActive(false);
+        }
     }
 }
 
