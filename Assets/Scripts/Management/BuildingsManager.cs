@@ -105,6 +105,9 @@ public class BuildingsManager : MonoBehaviour
 
     public WorkPlace GetEmptyWorkSlot(EducationLevel educationLevel, bool random = true)
     {
+        if (workPlaces.Count < 1)
+            return null;
+
         int count = 0;
 
         while (count < 100) //tries 100 times to find a random building, if fails, grabs the first one it find from the foreach loop bellow.
