@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 671423509}
   - component: {fileID: 671423511}
   - component: {fileID: 671423510}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Smoke
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4766,6 +4766,7 @@ GameObject:
   - component: {fileID: 3827812445761027144}
   - component: {fileID: -7227954880319117795}
   - component: {fileID: 331507844283640092}
+  - component: {fileID: 3598504750011880940}
   m_Layer: 9
   m_Name: Industrial_1
   m_TagString: Untagged
@@ -4862,6 +4863,13 @@ MonoBehaviour:
   allocatedResources:
     power: 0
     water: 0
+  waterSign: {fileID: 0}
+  powerSign: {fileID: 0}
+  minEmissionToGenerateSmoke: 6
+  maxEmissionToGenerateSmoke: 30
+  maxSmokeOpacity: 0.75
+  currentEmissionRate: 0
+  currentProduction: 0
 --- !u!114 &331507844283640092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4879,3 +4887,16 @@ MonoBehaviour:
   minWorkerEducationLevel: 2
   wages: 50
   employees: []
+--- !u!65 &3598504750011880940
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3252664560631777428}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.9, y: 0.19822633, z: 0.9}
+  m_Center: {x: 0, y: 0.09911317, z: 0}
