@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     static public PopulationManager populationMan = null;
     static public UIManager uiMan = null;
     static public EconomyManager econMan = null;
+    public GameObject waterSign, powerSign; //Must be serializable to editor, must be accessible by other scripts.
 
     void Awake()
     {
@@ -63,4 +64,5 @@ public class GameManager : MonoBehaviour
     {
         controlMan.SwitchToCellInspection();
     }
+
 }
