@@ -108,12 +108,10 @@ MonoBehaviour:
   allocatedResources:
     power: 0
     water: 0
-  waterSign: {fileID: 0}
-  powerSign: {fileID: 0}
   residentStats:
     minHousingQuality: 5
     maxHousingQuality: 75
-    housingClass: 2
+    housingClass: 1
     residentCapacity: 100
     rent: 100
 --- !u!65 &2276492753714801043

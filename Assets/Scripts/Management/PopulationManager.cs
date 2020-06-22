@@ -142,40 +142,28 @@ public class PopulationManager : MonoBehaviour
         {
             //Spawn new citizens here.
             //This is a test implementation
-            float poorRatio = availableHousing.poor / totalAvailableHousing;
             float lowRatio = availableHousing.low / totalAvailableHousing;
             float middleRatio = availableHousing.middle / totalAvailableHousing;
             float highRatio = availableHousing.high / totalAvailableHousing;
-            float obsceneRatio = availableHousing.obscene / totalAvailableHousing;
            
-
-            for (int i = 0; i < Mathf.FloorToInt(_immigration * poorRatio); i++)
-            {
-                GenerateImmigrationCase(HousingClass.poor);               
-            }
             for (int i = 0; i < Mathf.FloorToInt(_immigration * lowRatio); i++)
             {
-                GenerateImmigrationCase(HousingClass.low);
+                GenerateImmigrationCase(CitizenClass.low);
             }
             for (int i = 0; i < Mathf.FloorToInt(_immigration * middleRatio); i++)
             {
-                GenerateImmigrationCase(HousingClass.middle);
+                GenerateImmigrationCase(CitizenClass.middle);
             }
             for (int i = 0; i < Mathf.FloorToInt(_immigration * highRatio); i++)
             {
-                GenerateImmigrationCase(HousingClass.high);
+                GenerateImmigrationCase(CitizenClass.high);
             }
-            for (int i = 0; i < Mathf.FloorToInt(_immigration * obsceneRatio); i++)
-            {
-                GenerateImmigrationCase(HousingClass.obscene);
-            }
-            
         }
         
         growthStats.immigrationRate = _immigration;
     }
 
-    Citizen GenerateCitizen(HousingClass _class)
+    Citizen GenerateCitizen(CitizenClass _class)
     {
         //Housing, work and income will not be set here.
 
@@ -195,36 +183,26 @@ public class PopulationManager : MonoBehaviour
 
         switch (_class)
         {
-            case HousingClass.poor:
-                educationLevelPropability = new float[4] {0.4f, 1.0f, 1.1f, 1.1f};  //Any element following one with 1.0f probability will never happen (check the if-statements bellow)
-                                                                                //This translates to: citizen has 60% chance of being illterate, 40% of having primary education.
-                averageAge = 28;
-                ageRange = 10;
-                _savings = Random.Range(400, 600);
-                break;
-            case HousingClass.low:
-                educationLevelPropability = new float[4] {0.1f, 0.25f, 0.9f, 1.0f};
+            case CitizenClass.low:
+                educationLevelPropability = new float[4] {0.1f, 0.25f, 0.9f, 1.0f}; //Any element following one with 1.0f probability will never happen (check the if-statements bellow)
+                                                                                    //This translates to: citizen has 60% chance of being illterate, 40% of having primary education.
                 averageAge = 32;
                 ageRange = 14;
                 _savings = Random.Range(800, 1200);
                 break;
-            case HousingClass.middle:
+            case CitizenClass.middle:
                 educationLevelPropability = new float[4] {0.0f, 0.0f, 0.55f, 1.0f};
                 averageAge = 35;
                 ageRange = 15;
                 _savings = Random.Range(4000, 6000);
                 break;
-            case HousingClass.high:
+            case CitizenClass.high:
                 educationLevelPropability = new float[4] {0.0f, 0.0f, 0.1f, 1.0f};
                 averageAge = 35;
                 ageRange = 10;
                 _savings = Random.Range(15000, 25000);
                 break;
-            case HousingClass.obscene:
-                educationLevelPropability = new float[4] {0.0f, 0.0f, 0.05f, 1.0f};
-                averageAge = 40;
-                ageRange = 10;
-                _savings = Random.Range(80000, 120000);
+            default:
                 break;
         }
 
@@ -253,9 +231,9 @@ public class PopulationManager : MonoBehaviour
         return newCitizen;
     }
 
-    void GenerateImmigrationCase(HousingClass _class)
+    void GenerateImmigrationCase(CitizenClass _class)
     {
-    //for each citizen class:
+        //for each citizen class:
                 //generate citizen.
                 //assign home.
                 //assign work.

@@ -39,20 +39,16 @@ public class ResourcesManager : MonoBehaviour
         return resources.totalAvailableHospitalBeds - resources.filledHospitalBeds;    
     }
 
-    public ulong AvailableHousing (HousingClass housingClass)
+    public ulong AvailableHousing (CitizenClass housingClass)
     {
         switch (housingClass)
         {
-            case HousingClass.poor:
-                return resources.totalHousingSlots.poor - resources.occuppiedHousingSlots.poor;
-            case HousingClass.low:
+            case CitizenClass.low:
                 return resources.totalHousingSlots.low - resources.occuppiedHousingSlots.low;
-            case HousingClass.middle:
+            case CitizenClass.middle:
                 return resources.totalHousingSlots.middle - resources.occuppiedHousingSlots.middle;
-            case HousingClass.high:
+            case CitizenClass.high:
                 return resources.totalHousingSlots.high - resources.occuppiedHousingSlots.high;
-            case HousingClass.obscene:
-                return resources.totalHousingSlots.obscene - resources.occuppiedHousingSlots.obscene;
             default:
                 return 0;
         }
@@ -62,11 +58,9 @@ public class ResourcesManager : MonoBehaviour
     {
         HousingSlots availableHousing = new HousingSlots();
 
-        availableHousing.poor = resources.totalHousingSlots.poor - resources.occuppiedHousingSlots.poor;
         availableHousing.low = resources.totalHousingSlots.low - resources.occuppiedHousingSlots.low;
         availableHousing.middle = resources.totalHousingSlots.middle - resources.occuppiedHousingSlots.middle;
         availableHousing.high = resources.totalHousingSlots.high - resources.occuppiedHousingSlots.high;
-        availableHousing.obscene = resources.totalHousingSlots.obscene - resources.occuppiedHousingSlots.obscene;
 
         return availableHousing;
     }
@@ -127,7 +121,7 @@ public class ResourcesManager : MonoBehaviour
         resources.filledHospitalBeds = newBeds;
     }
 
-    public void UpdateTotalHousingSlots (ulong count, HousingClass housingClass)
+    public void UpdateTotalHousingSlots (ulong count, CitizenClass housingClass)
     {
         resources.totalHousingSlots.SetSlotValue(count, housingClass);
     }
@@ -137,7 +131,7 @@ public class ResourcesManager : MonoBehaviour
         resources.totalHousingSlots.AssignNew(slots);
     }
 
-    public void UpdateOccupiedHousingSlots (ulong count, HousingClass housingClass)
+    public void UpdateOccupiedHousingSlots (ulong count, CitizenClass housingClass)
     {
         resources.occuppiedHousingSlots.SetSlotValue(count, housingClass);
     }
@@ -220,23 +214,21 @@ public class ResourcesManager : MonoBehaviour
         GUI.Label(rect, message, style);
 
         rect.y += lineHeight + lineSpacing;
-        message = "Total Housing Slots: poor: " + resources.totalHousingSlots.poor.ToString();
+        message = "Total Housing Slots:";
         GUI.Label(rect, message, style);
         rect.y += lineHeight + lineSpacing;
         message = "low: " + resources.totalHousingSlots.low.ToString();
         message += " | mid: " + resources.totalHousingSlots.middle.ToString();
         message += " | hi: " + resources.totalHousingSlots.high.ToString();
-        message += " | obs: " + resources.totalHousingSlots.obscene.ToString();
         GUI.Label(rect, message, styleSmall);
 
         rect.y += lineHeight + lineSpacing;
-        message = "Occuppied Housing Slots: poor: " + resources.occuppiedHousingSlots.poor.ToString();
+        message = "Occuppied Housing Slots:";
         GUI.Label(rect, message, style);
         rect.y += lineHeight + lineSpacing;
         message = "low: " + resources.occuppiedHousingSlots.low.ToString();
         message += " | mid: " + resources.occuppiedHousingSlots.middle.ToString();
         message += " | hi: " + resources.occuppiedHousingSlots.high.ToString();
-        message += " | obs: " + resources.occuppiedHousingSlots.obscene.ToString();
         GUI.Label(rect, message, styleSmall);
     }
 }

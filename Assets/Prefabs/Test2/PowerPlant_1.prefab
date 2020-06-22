@@ -110,8 +110,6 @@ MonoBehaviour:
   allocatedResources:
     power: 0
     water: 0
-  waterSign: {fileID: 0}
-  powerSign: {fileID: 0}
   infraStats:
     radiusOfInfluence: 5
     minEfficiency: 0.2
@@ -139,7 +137,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minManpower: 5
   maxManpower: 100
-  minWorkerEducationLevel: 3
+  minWorkerEducationLevel: 2
   wages: 100
   employees: []
 --- !u!65 &6831662241992203462

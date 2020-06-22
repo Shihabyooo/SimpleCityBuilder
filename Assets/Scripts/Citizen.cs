@@ -15,7 +15,7 @@ public class Citizen
     
     public System.Guid id; //{get; private set;}
     public System.DateTime birthDay; //{get; private set;}
-    public HousingClass citizenClass; //{get; private set;} 
+    public CitizenClass citizenClass; //{get; private set;} 
     public EducationLevel educationalLevel; //{get; private set;} 
     public Happiness happiness; //{get; private set;}  
     //public float income; //{get; private set;} 
@@ -30,11 +30,9 @@ public class Citizen
     public Citizen spouse; //{get; private set;} 
 
     public const int happinessChangeRatePerDay = 1;
-    public const int lifeStyleExpensesPerDayPoor = 10; //in units of money per day
     public const int lifeStyleExpensesPerDayLow = 25; //in units of money per day
     public const int lifeStyleExpensesPerDayMiddle = 50; //in units of money per day
     public const int lifeStyleExpensesPerDayHigh = 250; //in units of money per day
-    public const int lifeStyleExpensesPerDayObscene = 500; //in units of money per day
 
     public const int minHealthBeforeSeekingHospitals = 50;
 
@@ -68,20 +66,14 @@ public class Citizen
         //add other life expenses
         switch (citizenClass)
         {
-            case HousingClass.poor:
-                expenses += lifeStyleExpensesPerDayPoor;
-                break;
-            case HousingClass.low:
+            case CitizenClass.low:
                 expenses += lifeStyleExpensesPerDayLow;
                 break;
-            case HousingClass.middle:
+            case CitizenClass.middle:
                 expenses += lifeStyleExpensesPerDayMiddle;
                 break;
-            case HousingClass.high:
+            case CitizenClass.high:
                 expenses += lifeStyleExpensesPerDayHigh;
-                break;
-            case HousingClass.obscene:
-                expenses += lifeStyleExpensesPerDayObscene;
                 break;
         }
 
@@ -142,4 +134,10 @@ public class Citizen
             workAddress.RemoveEmployee(this);
 
     }
+}
+
+
+public enum CitizenClass
+{
+    low, middle, high
 }

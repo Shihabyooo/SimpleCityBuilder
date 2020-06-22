@@ -718,25 +718,19 @@ MonoBehaviour:
     filledHospitalBeds: 0
     totalAvailableHospitalBeds: 0
     totalHousingSlots:
-      poor: 0
       low: 0
       middle: 0
       high: 0
-      obscene: 0
     occuppiedHousingSlots:
-      poor: 0
       low: 0
       middle: 0
       high: 0
-      obscene: 0
   finances:
     treasury: 0
     incomeTaxes:
-      poor: 0
       low: 0
       middle: 0
       high: 0
-      obscene: 0
 --- !u!114 &224963322
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -838,11 +832,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   incomeTaxRates:
-    poor: 1
-    low: 1
-    middle: 1
-    high: 1
-    obscene: 1
+    low: 20
+    middle: 20
+    high: 20
 --- !u!1 &256751662
 GameObject:
   m_ObjectHideFlags: 0

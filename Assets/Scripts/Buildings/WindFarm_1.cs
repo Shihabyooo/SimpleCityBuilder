@@ -40,13 +40,13 @@ public class WindFarm_1 : InfrastructureBuilding
         //Note that "turbineFacing" bellow calculates the inverse facing, that is, the direction the end of the turbine is pointing at.
 
         int turbineFacing = Mathf.RoundToInt( this.transform.eulerAngles.y);// - 270;  //TODO remember to adjust this 90 value if changed the wind farm's model 0 rotation facing.
-        print (this.gameObject.name + "  || facing: " + turbineFacing + ", localRot: " + this.transform.eulerAngles.y); //test
+        //print (this.gameObject.name + "  || facing: " + turbineFacing + ", localRot: " + this.transform.eulerAngles.y); //test
         int angleDifference = (Mathf.Max(cellWindDirection, Mathf.Abs(turbineFacing - 90)) - Mathf.Min(cellWindDirection, Mathf.Abs(turbineFacing - 90))) % 360;
         angleDifference = angleDifference > 180? 360 - angleDifference : angleDifference;
         
         if (cellWindSpeed < farmStats.minWindSpeed || angleDifference > farmStats.maxWindSpeed)
         {
-            print ("returning 0.0f for farm " + this.gameObject.name + ", difference: " + angleDifference); //test
+            //print ("returning 0.0f for farm " + this.gameObject.name + ", difference: " + angleDifference); //test
             return 0.0f;
         }
 
@@ -60,7 +60,7 @@ public class WindFarm_1 : InfrastructureBuilding
             efficiency = Mathf.Max(efficiency, infraStats.minEfficiency);
 
 
-        print (this.gameObject.name + "  || windDirectionEffect: " + windDirectionEffect + ", difference: " + angleDifference); //test
+        //print (this.gameObject.name + "  || windDirectionEffect: " + windDirectionEffect + ", difference: " + angleDifference); //test
         return efficiency;
     }
 

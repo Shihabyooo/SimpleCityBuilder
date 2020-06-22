@@ -69,7 +69,7 @@ public class BuildingsManager : MonoBehaviour
         return newID;
     }
 
-    public ResidentialBuilding GetResidentialBuildingWithEmptySlot(HousingClass _class, bool random = true)
+    public ResidentialBuilding GetResidentialBuildingWithEmptySlot(CitizenClass _class, bool random = true)
     {
         //This is a stupid attempt at randomizing building pickup.
         int count = 0;

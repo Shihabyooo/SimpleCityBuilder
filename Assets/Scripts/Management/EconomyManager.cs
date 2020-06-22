@@ -63,55 +63,43 @@ public struct TaxRates //Tax rates are per day
     public const float maxTaxRate = 30.0f;
 
     //TODO uncomment the {get; private set;} when testing is done.
-    [Range(minTaxRate, maxTaxRate)] public float poor; //{get; private set;}
     [Range(minTaxRate, maxTaxRate)] public float low; //{get; private set;}
     [Range(minTaxRate, maxTaxRate)] public float middle; //{get; private set;}
     [Range(minTaxRate, maxTaxRate)] public float high; //{get; private set;}
-    [Range(minTaxRate, maxTaxRate)] public float obscene; //{get; private set;}
 
     public TaxRates(float fixedValue)
     {
-        poor = low = middle = high = obscene = fixedValue;
+        low = middle = high = fixedValue;
     }
 
-    public TaxRates(float _poor, float _low, float _middle, float _high, float _obscene)
+    public TaxRates(float _low, float _middle, float _high)
     {
-        poor = _poor;
         low = _low;
         middle = _middle;
         high = _high;
-        obscene = _obscene;
     }
 
     public TaxRates(TaxRates taxRates)
     {
-        poor = taxRates.poor;
         low = taxRates.low;
         middle = taxRates.middle;
         high = taxRates.high;
-        obscene = taxRates.obscene;
     }
 
-    public void SetRate(HousingClass _class, float rate) //rate will be clamped to minTaxRate and maxTaxRate
+    public void SetRate(CitizenClass _class, float rate) //rate will be clamped to minTaxRate and maxTaxRate
     {
         rate = Mathf.Clamp(rate, minTaxRate, maxTaxRate);
 
         switch (_class)
         {
-            case HousingClass.poor:
-                poor = rate;
-                break;
-            case HousingClass.low:
+            case CitizenClass.low:
                 low = rate;
                 break;
-            case HousingClass.middle:
+            case CitizenClass.middle:
                 middle = rate;
                 break;
-            case HousingClass.high:
+            case CitizenClass.high:
                 high = rate;
-                break;
-            case HousingClass.obscene:
-                obscene = rate;
                 break;
             default:
                 break;
@@ -123,36 +111,26 @@ public struct TaxRates //Tax rates are per day
 [System.Serializable]
 public struct IncomeTaxes
 {
-    public int poor;
     public int low;
     public int middle;
     public int high;
-    public int obscene;
 
-    public int AddToIncomeTaxes(HousingClass _class, int baseIncome, TaxRates taxRates)
+    public int AddToIncomeTaxes(CitizenClass _class, int baseIncome, TaxRates taxRates)
     {
         int newAddition = 0;
         switch(_class)
         {
-            case HousingClass.poor:
-                newAddition = Mathf.RoundToInt((float)baseIncome * taxRates.poor);
-                poor += newAddition;
-                break;
-            case HousingClass.low:
+            case CitizenClass.low:
                 newAddition = Mathf.RoundToInt((float)baseIncome * taxRates.low);
                 low += newAddition;
                 break;
-            case HousingClass.middle:
+            case CitizenClass.middle:
                 newAddition = Mathf.RoundToInt((float)baseIncome * taxRates.middle);
                 middle += newAddition;
                 break;
-            case HousingClass.high:
+            case CitizenClass.high:
                 newAddition = Mathf.RoundToInt((float)baseIncome * taxRates.high);
                 high += newAddition;
-                break;
-            case HousingClass.obscene:
-                newAddition = Mathf.RoundToInt((float)baseIncome * taxRates.obscene);
-                obscene += newAddition;
                 break;
             default:
                 break;
@@ -163,16 +141,14 @@ public struct IncomeTaxes
 
     public int Sum()
     {
-        return poor + low + middle + high + obscene; //TODO consider integer limits.
+        return low + middle + high; //TODO consider integer limits.
     }
 
     public void SetIncomeTaxes(IncomeTaxes newIncomeTaxes)
     {
-        poor = newIncomeTaxes.poor;
         low = newIncomeTaxes.low;
         middle = newIncomeTaxes.middle;
         high = newIncomeTaxes.high;
-        obscene = newIncomeTaxes.obscene;
     }
 
 

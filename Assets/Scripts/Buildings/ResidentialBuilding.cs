@@ -68,7 +68,7 @@ public class ResidentialBuilding : Building
         return (uint)occupants.Count;
     }
 
-    public HousingClass ResidentClass()
+    public CitizenClass ResidentClass()
     {
         return residentStats.housingClass;
     }
@@ -80,17 +80,17 @@ public class ResidentialBuilding : Building
 }
 
 
-public enum HousingClass
-{
-    poor, low, middle, high, obscene
-}
+// public enum HousingClass
+// {
+//     poor, low, middle, high, obscene
+// }
 
 [System.Serializable]
 public class ResidentialBuildingStats
 {
     public uint minHousingQuality = 5;
     public uint maxHousingQuality = 75; //Must not exceed 100, the heighest quality of a building in game.
-    public HousingClass housingClass = HousingClass.middle;
+    public CitizenClass housingClass = CitizenClass.middle;
     public uint residentCapacity = 100;
     public uint rent; //in units fund per day
 }
