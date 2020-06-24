@@ -65,7 +65,10 @@ public class ControlManager : MonoBehaviour
             //Cast a ray and check if it hits something we handle.
             RaycastHit hit = CastRay(freeModeSelectables);
             if (hit.collider != null)
-                print ("hit: " + hit.collider.gameObject.name);
+            {
+                //print ("hit: " + hit.collider.gameObject.name);
+                hit.collider.gameObject.GetComponent<Building>().ShowDetailsOnViewer();
+            }
         }
         else if (Input.GetMouseButtonDown(2))
         {

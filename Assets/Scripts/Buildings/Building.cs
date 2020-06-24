@@ -21,8 +21,9 @@ public class Building : MonoBehaviour
     [SerializeField] protected uint budget; //IMPORTANT! budget must always be from stats.minBudget to stats.maxBudget
     [SerializeField] protected BasicResources allocatedResources = new BasicResources(); //These resources will be allocated by the simulation based on availability and priority.
     //[SerializeField] protected bool isWellSupplied = false;
-    public System.Guid uniqueID {get; private set;}
-    
+    protected System.Guid uniqueID {get; private set;}
+    protected System.DateTime constructionDate;
+
     BoxCollider buildingCollider;
     GameObject waterSign, powerSign;
 
@@ -36,6 +37,21 @@ public class Building : MonoBehaviour
     public BuildingStats GetStats()
     {
         return stats;
+    }
+
+    public uint Budget()
+    {
+        return budget;
+    }
+
+    public BasicResources AllocatedResources()
+    {
+        return allocatedResources;
+    }
+
+    public System.DateTime ConstructionDate()
+    {
+        return constructionDate;
     }
 
     public void AllocateResources(BasicResources resources)
@@ -139,6 +155,8 @@ public class Building : MonoBehaviour
 
         powerSign.SetActive(false);
         waterSign.SetActive(false);
+
+        constructionDate = GameManager.simMan.date;
     }
 
     public virtual void UpdateEffectOnNature(int timeWindow)
@@ -168,6 +186,12 @@ public class Building : MonoBehaviour
             waterSign.SetActive(false);
         }
     }
+
+    public virtual void ShowDetailsOnViewer()
+    {
+        BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.generic);
+    }
+
 }
 
 [System.Serializable]

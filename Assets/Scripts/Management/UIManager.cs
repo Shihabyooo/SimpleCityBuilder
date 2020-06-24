@@ -40,7 +40,7 @@ public class UIManager : MonoBehaviour
     }
 
 
-    string GetMonthAbbr(int month)
+    public string GetMonthAbbr(int month)
     {
         switch(month)
         {
