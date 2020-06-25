@@ -44,6 +44,11 @@ public class Building : MonoBehaviour
         return budget;
     }
 
+    public void SetBudget(uint newbudget)
+    {
+        budget = newbudget;
+    }
+
     public BasicResources AllocatedResources()
     {
         return allocatedResources;

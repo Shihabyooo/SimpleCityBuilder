@@ -12,7 +12,8 @@ public class BuildingDataViewer : MonoBehaviour
     public static BuildingDataViewer viewerHandler = null;
     bool isShown = false;
     
-
+    List<Transform> templateTransforms = new List<Transform>();
+    Transform activeTemplate = null;
     void Awake()
     {
         if (viewerHandler == null)
@@ -21,24 +22,13 @@ public class BuildingDataViewer : MonoBehaviour
         }
         else
             Destroy(this.gameObject);
-    }
 
-    // void Update()
-    // {
-    //     this.transform.rotation = Camera.main.transform.rotation;
-    //     this.transform.Rotate(0.0f, 180.0f, 0.0f);
-        
-    //     //Close the viewer if it's outside camera view (player pans away from it)
-    //     if (isShown)
-    //     {
-    //         Vector3 viewportPos = Camera.main.WorldToViewportPoint(this.transform.position);
-    //         if (viewportPos.x <= -0.1f || viewportPos.x >= 1.1f
-    //             ||viewportPos.y <= -0.1f || viewportPos.y >= 1.1f)
-    //         {
-    //             Close();
-    //         }
-    //     }
-    // }
+        foreach (Transform transform in this.transform)
+        {
+            templateTransforms.Add(transform);
+            transform.gameObject.SetActive(false);
+        }
+    }
 
     public void Show(Building building, BuildingViewerTemplate template)
     {
@@ -74,13 +64,32 @@ public class BuildingDataViewer : MonoBehaviour
         }
     }
 
-    void LaunchViewer(Building building, string viewerName)
+    bool LaunchViewer(Building building, string viewerName)
     {
-        this.transform.Find(viewerName).GetComponent<BaseDataViewer>().SetData(building);
+        foreach (Transform transform in templateTransforms)
+        {
+            if (transform.gameObject.name == viewerName)
+            {
+                activeTemplate = this.transform.Find(viewerName);
+                activeTemplate.gameObject.SetActive(true);
+                activeTemplate.GetComponent<BaseDataViewer>().SetData(building);
+                isShown = true;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void Close()
     {
         isShown = false;
+        activeTemplate.gameObject.SetActive(false);
+        activeTemplate = null;
     }
+
+    // public void OnBudgetSliderChange()
+    // {
+
+    // }
 }

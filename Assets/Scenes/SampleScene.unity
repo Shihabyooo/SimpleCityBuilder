@@ -508,6 +508,7 @@ GameObject:
   - component: {fileID: 68623103}
   - component: {fileID: 68623102}
   - component: {fileID: 68623101}
+  - component: {fileID: 68623104}
   m_Layer: 5
   m_Name: GenericBuilding
   m_TagString: Untagged
@@ -549,7 +550,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Content: {fileID: 0}
+  m_Content: {fileID: 852943603}
   m_Horizontal: 0
   m_Vertical: 1
   m_MovementType: 2
@@ -603,6 +604,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 68623099}
   m_CullTransparentMesh: 0
+--- !u!114 &68623104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 68623099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f4ad69f2864ae409daf865b4251bbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &145031101
 GameObject:
   m_ObjectHideFlags: 0
@@ -8454,7 +8467,18 @@ MonoBehaviour:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 68623104}
+        m_MethodName: UpdateBudget
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1713227580
 GameObject:
   m_ObjectHideFlags: 0

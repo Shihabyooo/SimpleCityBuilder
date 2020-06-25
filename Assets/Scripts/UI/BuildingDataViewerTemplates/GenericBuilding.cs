@@ -10,7 +10,7 @@ public class GenericBuilding : BaseDataViewer
     Text powerReq, waterReq;
     Text powerAlloc, waterAlloc;
     Text constructionDate, buildingType;
-
+    
     protected override void Awake()
     {
         base.Awake();
@@ -28,6 +28,7 @@ public class GenericBuilding : BaseDataViewer
 
     public override void SetData(Building building)
     {
+        base.SetData(building);
         budgetCurrent.text = building.Budget().ToString();
         budgetMin.text = building.GetStats().minBudget.ToString();
         budgetMax.text = building.GetStats().maxBudget.ToString();
@@ -37,5 +38,15 @@ public class GenericBuilding : BaseDataViewer
         waterAlloc.text = building.AllocatedResources().water.ToString();
         constructionDate.text = GetDateString(building);
         buildingType.text = GetBuildingType(building);
+
+        budgetSlider.value = ((float)building.Budget() - (float)building.GetStats().minBudget) / ((float)building.GetStats().maxBudget - (float)building.GetStats().minBudget);
+    }
+
+    public override void UpdateBudget()
+    {
+        float budgetPercent = budgetSlider.value;
+        uint newBudget = (uint)Mathf.RoundToInt(budgetPercent * (viewedBuilding.GetStats().maxBudget - viewedBuilding.GetStats().minBudget) + viewedBuilding.GetStats().minBudget);
+        viewedBuilding.SetBudget(newBudget);
+        budgetCurrent.text = newBudget.ToString();
     }
 }

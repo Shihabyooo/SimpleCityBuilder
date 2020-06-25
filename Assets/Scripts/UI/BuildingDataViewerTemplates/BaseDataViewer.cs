@@ -7,7 +7,7 @@ public class BaseDataViewer : MonoBehaviour
 {
 
     protected Transform content;
-
+    protected Building viewedBuilding;
     protected virtual void Awake()
     {
         content = this.transform.Find("Viewport").Find("Content");
@@ -15,7 +15,7 @@ public class BaseDataViewer : MonoBehaviour
 
     public virtual void SetData(Building building)
     {
-
+        viewedBuilding = building;
     }
 
     protected string GetBuildingType(Building building)
@@ -39,5 +39,9 @@ public class BaseDataViewer : MonoBehaviour
     {
         System.DateTime date = building.ConstructionDate();
         return (date.Day.ToString() + "-" + GameManager.uiMan.GetMonthAbbr(date.Month) + "-" + date.Year);
+    }
+
+    public virtual void UpdateBudget()
+    {
     }
 }
