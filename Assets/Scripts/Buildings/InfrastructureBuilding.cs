@@ -15,6 +15,7 @@ public class InfrastructureBuilding : Building
         stats.type = BuildingType.infrastructure;
         workPlace = this.gameObject.GetComponent<WorkPlace>();
     }
+    
 
     public InfrastructureBuildingStats GetInfrastructureBuildingStats()
     {

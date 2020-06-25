@@ -21,6 +21,11 @@ public class PowerPlant_1 : InfrastructureBuilding
         UpdateEmissionVisuals(0.0f);
     }
 
+    public override void ShowDetailsOnViewer()
+    {
+        BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.powerPlant);
+    }
+
     protected override void OnConstructionComplete()
     {
         base.OnConstructionComplete();

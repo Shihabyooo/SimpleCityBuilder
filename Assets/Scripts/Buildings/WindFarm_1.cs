@@ -10,6 +10,11 @@ public class WindFarm_1 : InfrastructureBuilding
 
     [SerializeField] WindFarmStats farmStats = new WindFarmStats();
 
+    public override void ShowDetailsOnViewer()
+    {
+        BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.windFarm);
+    }
+
     protected override void OnConstructionComplete()
     {
         base.OnConstructionComplete();

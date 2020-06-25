@@ -11,9 +11,8 @@ public class BuildingDataViewer : MonoBehaviour
 {
     public static BuildingDataViewer viewerHandler = null;
     bool isShown = false;
-    
-    List<Transform> templateTransforms = new List<Transform>();
-    Transform activeTemplate = null;
+    Transform viewer = null;
+
     void Awake()
     {
         if (viewerHandler == null)
@@ -23,11 +22,9 @@ public class BuildingDataViewer : MonoBehaviour
         else
             Destroy(this.gameObject);
 
-        foreach (Transform transform in this.transform)
-        {
-            templateTransforms.Add(transform);
-            transform.gameObject.SetActive(false);
-        }
+        viewer = this.transform.Find("Viewer");
+        viewer.gameObject.GetComponent<BaseDataViewer>().Initialize();
+        viewer.gameObject.SetActive(false);
     }
 
     public void Show(Building building, BuildingViewerTemplate template)
@@ -35,61 +32,59 @@ public class BuildingDataViewer : MonoBehaviour
         switch(template)
         {
             case BuildingViewerTemplate.generic:
-                LaunchViewer(building, "GenericBuilding");
+                LaunchViewer(building, "Generic");
                 break;
             case BuildingViewerTemplate.residential:
+                LaunchViewer(building, "Residential");
                 break;
             case BuildingViewerTemplate.commercial:
+                LaunchViewer(building, "Commercial");
                 break;
             case BuildingViewerTemplate.industrial:
+                LaunchViewer(building, "Industrial");
                 break;
             case BuildingViewerTemplate.powerPlant:
+                LaunchViewer(building, "PowerPlant");
                 break;
             case BuildingViewerTemplate.windFarm:
+                LaunchViewer(building, "WindFarm");
                 break;
             case BuildingViewerTemplate.waterTreatment:
+                LaunchViewer(building, "WaterTreatment");
                 break;
             case BuildingViewerTemplate.school:
+                LaunchViewer(building, "School");
                 break;
             case BuildingViewerTemplate.police:
+                LaunchViewer(building, "Police");
                 break;
             case BuildingViewerTemplate.hospital:
+                LaunchViewer(building, "Hospital");
                 break;
             case BuildingViewerTemplate.garbageDump:
+                LaunchViewer(building, "GarbageDump");
                 break;
             case BuildingViewerTemplate.park:
+                LaunchViewer(building, "Park");
                 break;
             default: //use generic
+                LaunchViewer(building, "Generic");
                 break;
         }
     }
 
-    bool LaunchViewer(Building building, string viewerName)
+    void LaunchViewer(Building building, string extensionName)
     {
-        foreach (Transform transform in templateTransforms)
-        {
-            if (transform.gameObject.name == viewerName)
-            {
-                activeTemplate = this.transform.Find(viewerName);
-                activeTemplate.gameObject.SetActive(true);
-                activeTemplate.GetComponent<BaseDataViewer>().SetData(building);
-                isShown = true;
-                return true;
-            }
-        }
-
-        return false;
+        viewer.gameObject.SetActive(true);
+        viewer.gameObject.GetComponent<BaseDataViewer>().SetData(building);
+        viewer.gameObject.GetComponent<BaseDataViewer>().SetExtendedData(extensionName);
     }
 
     public void Close()
     {
         isShown = false;
-        activeTemplate.gameObject.SetActive(false);
-        activeTemplate = null;
+        viewer.gameObject.GetComponent<BaseDataViewer>().CloseActiveExtensions();
+        viewer.gameObject.SetActive(false);
     }
 
-    // public void OnBudgetSliderChange()
-    // {
-
-    // }
 }

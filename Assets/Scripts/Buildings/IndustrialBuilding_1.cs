@@ -8,7 +8,6 @@ public class IndustrialBuilding_1 : Building
     IndustrialBuildingStats industryStats = new IndustrialBuildingStats();
     WorkPlace workPlace;
 
-
     [SerializeField][Range(0.0f, 10.0f)] float minEmissionToGenerateSmoke = 6.0f; //bellow or equall to this, smoke particle system would be turned off.
     [SerializeField][Range(20.0f, 60.0f)] float maxEmissionToGenerateSmoke = 30.0f; 
     [SerializeField][Range(0.5f, 1.0f)] float maxSmokeOpacity = 0.75f;
@@ -25,6 +24,11 @@ public class IndustrialBuilding_1 : Building
         smoke = this.transform.Find("Smoke").GetComponent<ParticleSystem>();
         UpdateEmissionVisuals(0.0f);
         stats.type = BuildingType.industrial;
+    }
+
+    public override void ShowDetailsOnViewer()
+    {
+        BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.industrial);
     }
 
     public float ComputeProduction() //Must be called only once per day. Returns profit for day. Different from ComputeProduction in InfrastructureBuildings in that it doesn't depend on load.

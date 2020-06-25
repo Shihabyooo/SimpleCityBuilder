@@ -11,6 +11,11 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
 
     [SerializeField] WaterTreatmentPlantStats plantStats = new WaterTreatmentPlantStats();
 
+    public override void ShowDetailsOnViewer()
+    {
+        BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.waterTreatment);
+    }
+
     protected override void OnConstructionComplete()
     {
         base.OnConstructionComplete();

@@ -8,12 +8,17 @@ public class ResidentialBuilding : Building
     protected List<Citizen> occupants;
     public uint housingQuality {get; private set;} //quality should universally be from 0 to 100, though each building may specifiy tighter limits within.
 
-   protected override void Awake()
-   {
+    protected override void Awake()
+    {
        base.Awake();
        occupants = new List<Citizen>();
        stats.type = BuildingType.residential;
-   }
+    }
+
+    public override void ShowDetailsOnViewer()
+    {
+        BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.residential);
+    }
 
     public virtual void UpdateHousingQuality()
     {
@@ -77,6 +82,7 @@ public class ResidentialBuilding : Building
     {
         return residentStats.rent;
     }
+
 }
 
 
