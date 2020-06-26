@@ -30,6 +30,11 @@ public class BuildingDataViewer : MonoBehaviour
         closeButon.SetActive(false);
     }
 
+    void UpdateViewer(int hour)
+    {
+        viewer.gameObject.GetComponent<BaseDataViewer>().UpdateViewer();
+    }
+
     public void Show(Building building, BuildingViewerTemplate template)
     {
         switch(template)
@@ -79,6 +84,8 @@ public class BuildingDataViewer : MonoBehaviour
 
     void LaunchViewer(Building building, string extensionName = null)
     {
+        SimulationManager.onTimeUpdate += UpdateViewer;
+
         viewer.gameObject.SetActive(true);
         closeButon.SetActive(true);
         viewer.gameObject.GetComponent<BaseDataViewer>().SetData(building);
@@ -88,8 +95,10 @@ public class BuildingDataViewer : MonoBehaviour
 
     public void Close()
     {
+        SimulationManager.onTimeUpdate -= UpdateViewer;
+
         isShown = false;
-        viewer.gameObject.GetComponent<BaseDataViewer>().CloseActiveExtensions();
+        viewer.gameObject.GetComponent<BaseDataViewer>().CloseViewer();
         viewer.gameObject.SetActive(false);
         closeButon.SetActive(false);
     }

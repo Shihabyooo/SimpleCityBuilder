@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class BaseDataViewer : MonoBehaviour
 {
 
-    protected Transform baseContent;
-    protected Building viewedBuilding;
+    Transform baseContent;
+    Building viewedBuilding;
 
     Text buildingName;
     Slider budgetSlider;
@@ -19,9 +19,20 @@ public class BaseDataViewer : MonoBehaviour
     Transform activeExtension = null;
     List<Transform> extensionsTransforms = new List<Transform>();
 
-    protected void Awake()
+    void Awake()
     {
         
+    }
+
+    public void UpdateViewer()
+    {
+        if (viewedBuilding == null)
+            return;
+
+        ResetData();
+
+        if (activeExtension != null)
+            activeExtension.GetComponent<ExtendedDataViewer>().SetExtendedData(viewedBuilding);
     }
 
     public void Initialize()
@@ -51,21 +62,25 @@ public class BaseDataViewer : MonoBehaviour
 
     public void SetData(Building building)
     {
-        CloseActiveExtensions();
+        CloseViewer();
         viewedBuilding = building;
+        ResetData();
+    }
 
-        buildingName.text = building.gameObject.name;
-        budgetCurrent.text = building.Budget().ToString();
-        budgetMin.text = building.GetStats().minBudget.ToString();
-        budgetMax.text = building.GetStats().maxBudget.ToString();
-        powerReq.text = building.GetStats().requiredResources.power.ToString();
-        waterReq.text = building.GetStats().requiredResources.water.ToString();
-        powerAlloc.text = building.AllocatedResources().power.ToString();
-        waterAlloc.text = building.AllocatedResources().water.ToString();
-        constructionDate.text = GetDateString(building);
-        buildingType.text = GetBuildingType(building);
+    void ResetData()
+    {
+        buildingName.text = viewedBuilding.gameObject.name;
+        budgetCurrent.text = viewedBuilding.Budget().ToString();
+        budgetMin.text = viewedBuilding.GetStats().minBudget.ToString();
+        budgetMax.text = viewedBuilding.GetStats().maxBudget.ToString();
+        powerReq.text = viewedBuilding.GetStats().requiredResources.power.ToString();
+        waterReq.text = viewedBuilding.GetStats().requiredResources.water.ToString();
+        powerAlloc.text = viewedBuilding.AllocatedResources().power.ToString();
+        waterAlloc.text = viewedBuilding.AllocatedResources().water.ToString();
+        constructionDate.text = GetDateString(viewedBuilding);
+        buildingType.text = GetBuildingType(viewedBuilding);
 
-        budgetSlider.value = ((float)building.Budget() - (float)building.GetStats().minBudget) / ((float)building.GetStats().maxBudget - (float)building.GetStats().minBudget);
+        budgetSlider.value = ((float)viewedBuilding.Budget() - (float)viewedBuilding.GetStats().minBudget) / ((float)viewedBuilding.GetStats().maxBudget - (float)viewedBuilding.GetStats().minBudget);
     }
 
     protected string GetBuildingType(Building building)
@@ -114,9 +129,11 @@ public class BaseDataViewer : MonoBehaviour
         print ("At SetExtensionData, could not find extension with provided extensionName: " + extensionName);//test
     }
 
-    public void CloseActiveExtensions() //only closes extensions, if any are set
+    public void CloseViewer()
     {
+        viewedBuilding = null;
         if(activeExtension != null)
             activeExtension.gameObject.SetActive(false);
+        activeExtension = null;
     }
 }

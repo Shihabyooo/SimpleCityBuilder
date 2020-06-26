@@ -164,7 +164,8 @@ public class ResourcesManager : MonoBehaviour
         int dataDispWidth = 250;
         int lineHeight = 21;
         int lineSpacing = 7;
-        Rect rect = new Rect(screenWidth - dataDispWidth - 150, 50, dataDispWidth, lineHeight);
+        //Rect rect = new Rect(screenWidth - dataDispWidth - 150, 50, dataDispWidth, lineHeight);
+        Rect rect = new Rect(250, 50, dataDispWidth, lineHeight);
 
         string message = "Tresury: " + finances.treasury.ToString();
         GUI.Label(rect, message, style);
