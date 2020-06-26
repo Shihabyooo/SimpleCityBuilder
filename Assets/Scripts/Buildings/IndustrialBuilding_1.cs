@@ -13,8 +13,8 @@ public class IndustrialBuilding_1 : Building
     [SerializeField][Range(0.5f, 1.0f)] float maxSmokeOpacity = 0.75f;
     ParticleSystem smoke;
 
-    public float currentEmissionRate; // {get; private set;} //unit volume per unit time.
-    [SerializeField] int currentProduction = 0; //TODO remove field serialization once testing has finished.
+    public float currentEmissionRate {get; private set;} //unit volume per unit time.
+    public int currentProduction {get; private set;}
 
     protected override void Awake()
     {
@@ -24,6 +24,7 @@ public class IndustrialBuilding_1 : Building
         smoke = this.transform.Find("Smoke").GetComponent<ParticleSystem>();
         UpdateEmissionVisuals(0.0f);
         stats.type = BuildingType.industrial;
+        currentProduction = 0;
     }
 
     public override void ShowDetailsOnViewer()
