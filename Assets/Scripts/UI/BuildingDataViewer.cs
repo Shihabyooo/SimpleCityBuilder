@@ -12,6 +12,7 @@ public class BuildingDataViewer : MonoBehaviour
     public static BuildingDataViewer viewerHandler = null;
     bool isShown = false;
     Transform viewer = null;
+    GameObject closeButon;
 
     void Awake()
     {
@@ -25,6 +26,8 @@ public class BuildingDataViewer : MonoBehaviour
         viewer = this.transform.Find("Viewer");
         viewer.gameObject.GetComponent<BaseDataViewer>().Initialize();
         viewer.gameObject.SetActive(false);
+        closeButon = this.transform.Find("CloseButton").gameObject;
+        closeButon.SetActive(false);
     }
 
     public void Show(Building building, BuildingViewerTemplate template)
@@ -32,7 +35,8 @@ public class BuildingDataViewer : MonoBehaviour
         switch(template)
         {
             case BuildingViewerTemplate.generic:
-                LaunchViewer(building, "Generic");
+                //LaunchViewer(building, "Generic");
+                LaunchViewer(building);
                 break;
             case BuildingViewerTemplate.residential:
                 LaunchViewer(building, "Residential");
@@ -73,11 +77,13 @@ public class BuildingDataViewer : MonoBehaviour
         }
     }
 
-    void LaunchViewer(Building building, string extensionName)
+    void LaunchViewer(Building building, string extensionName = null)
     {
         viewer.gameObject.SetActive(true);
+        closeButon.SetActive(true);
         viewer.gameObject.GetComponent<BaseDataViewer>().SetData(building);
-        viewer.gameObject.GetComponent<BaseDataViewer>().SetExtendedData(extensionName);
+        if (extensionName != null)
+            viewer.gameObject.GetComponent<BaseDataViewer>().SetExtendedData(extensionName);
     }
 
     public void Close()
@@ -85,6 +91,7 @@ public class BuildingDataViewer : MonoBehaviour
         isShown = false;
         viewer.gameObject.GetComponent<BaseDataViewer>().CloseActiveExtensions();
         viewer.gameObject.SetActive(false);
+        closeButon.SetActive(false);
     }
 
 }
