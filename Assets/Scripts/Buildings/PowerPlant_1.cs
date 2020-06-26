@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class PowerPlant_1 : InfrastructureBuilding
 {
-    float currentPowerProduction;
-    float currentEfficiency;
-    float currentMaxPowerProduction; //not to be confused with maxPowerProduction in PowerPlantStats. This one is variable depending on other simulation factors.
-    float currentEmissionRate; //unit volume per unit time.
+    public float currentPowerProduction {get; private set;}
+    public float currentEfficiency {get; private set;}
+    public float currentMaxPowerProduction {get; private set;} //not to be confused with maxPowerProduction in PowerPlantStats. This one is variable depending on other simulation factors.
+    public float currentEmissionRate {get; private set;} //unit volume per unit time.
     [SerializeField][Range(0.0f, 10.0f)] float minEmissionToGenerateSmoke = 6.0f; //bellow or equall to this, smoke particle system would be turned off.
     [SerializeField][Range(20.0f, 60.0f)] float maxEmissionToGenerateSmoke = 30.0f; 
     [SerializeField][Range(0.5f, 1.0f)] float maxSmokeOpacity = 0.75f;
@@ -52,9 +52,10 @@ public class PowerPlant_1 : InfrastructureBuilding
         UpdateEmissionVisuals(currentEmissionRate);
     }
 
-    public override float GetMaxProduction() 
+    public override float GetMaxProduction()
     {
-        return currentPowerProduction;
+        //return currentPowerProduction;
+        return currentMaxPowerProduction;
     }
 
     public override void UpdateEffectOnNature(int timeWindow)    

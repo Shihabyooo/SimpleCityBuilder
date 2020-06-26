@@ -6,7 +6,7 @@ using UnityEngine;
 public class InfrastructureBuilding : Building
 {
     [SerializeField] protected InfrastructureBuildingStats infraStats;
-    [SerializeField] protected float currentLoad; //as a percentage of max production //TODO remove serialization when testing is done.
+    public float currentLoad {get; private set;} //as a percentage of max production
     [SerializeField] protected WorkPlace workPlace;
 
     override protected void Awake()
