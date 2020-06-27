@@ -9,6 +9,7 @@ public class ExtendedDataViewer : MonoBehaviour
     Text employeeCount, employeeCapacity;
     Text employeeEducationLevel;
     Text wages;
+    Text workplaceQuality;
 
     protected virtual void Awake()
     {
@@ -28,6 +29,7 @@ public class ExtendedDataViewer : MonoBehaviour
         employeeCapacity.text = workPlace.MaxManpower().ToString();
         employeeEducationLevel.text = GetEducationLevelString(workPlace.WorkerEducationLevel());
         wages.text = workPlace.Wages().ToString();
+        workplaceQuality.text = workPlace.WorkplaceQuality().ToString();
     }
 
     void BuildWorkplaceFieldsReferences()
@@ -36,6 +38,7 @@ public class ExtendedDataViewer : MonoBehaviour
         employeeCapacity = this.transform.Find("EmployeeCap").GetComponent<Text>();
         employeeEducationLevel = this.transform.Find("EducationalLevel").GetComponent<Text>();
         wages = this.transform.Find("Wages").GetComponent<Text>();
+        workplaceQuality = this.transform.Find("WorkplaceQuality").GetComponent<Text>();
     }
 
 
