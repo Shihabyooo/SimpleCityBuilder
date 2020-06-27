@@ -124,6 +124,11 @@ public class PopulationManager : MonoBehaviour
             newHappiness.environment = (uint)Mathf.RoundToInt( (float)(2 * homeEnvironmentHappiness + workEnvironmentHappiness) / 3.0f);
         }
 
+        if (citizen.workAddress == null) //unemployed
+            newHappiness.job = 0;
+        else
+            newHappiness.job = citizen.workAddress.WorkplaceQuality();
+
         citizen.happiness.UpdateHappiness(newHappiness);
     }
 
@@ -134,7 +139,7 @@ public class PopulationManager : MonoBehaviour
         ulong totalAvailableHousing = availableHousing.Sum();
 
         int _immigration = Mathf.RoundToInt(((float)populationHappiness.overall / 100.0f) * (0.8f * maxImmigrationRate));
-        _immigration = Mathf.Max(Random.Range(Mathf.RoundToInt(_immigration - 0.2f * maxImmigrationRate),  Mathf.RoundToInt(_immigration + 0.2f * maxImmigrationRate)), PopulationGrowthMetrics.minImmigrationRate);
+        _immigration = Mathf.Max(Random.Range(Mathf.RoundToInt(_immigration - 0.2f * maxImmigrationRate),  Mathf.RoundToInt(_immigration + 0.2f * maxImmigrationRate)), growthStats.minImmigrationRate);
         _immigration = (int)Mathf.Min(_immigration, maxImmigrationRate, totalAvailableHousing);
 
 
@@ -339,7 +344,7 @@ public class PopulationGrowthMetrics
     public ulong birthRate = 0; //in citizens per day.
     public ulong deathRate = 0; //in citizens per day.
     
-    public const int minImmigrationRate = 2;
+    public int minImmigrationRate = 2;
 }
 
 
