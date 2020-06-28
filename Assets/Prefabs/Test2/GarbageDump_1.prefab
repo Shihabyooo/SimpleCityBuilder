@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 90767081597916501}
   - component: {fileID: 8942317696645492579}
   - component: {fileID: 3397394148611167130}
-  - component: {fileID: 399731235928144276}
+  - component: {fileID: 573531958280494763}
   - component: {fileID: 8424652350542170830}
   - component: {fileID: 770033580255317184}
   m_Layer: 9
@@ -81,7 +81,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &399731235928144276
+--- !u!114 &573531958280494763
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -90,7 +90,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3970241890848581446}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26dd95fe230432647b4b91b10fe431d5, type: 3}
+  m_Script: {fileID: 11500000, guid: 445ac2acd54172e45b96fa23797a9326, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   stats:
@@ -109,13 +109,10 @@ MonoBehaviour:
   allocatedResources:
     power: 0
     water: 0
-  waterSign: {fileID: 0}
-  powerSign: {fileID: 0}
   infraStats:
     radiusOfInfluence: 7
     minEfficiency: 0.2
     maxEfficiency: 1
-  currentLoad: 0
   workPlace: {fileID: 0}
 --- !u!114 &8424652350542170830
 MonoBehaviour:
@@ -133,6 +130,8 @@ MonoBehaviour:
   maxManpower: 100
   minWorkerEducationLevel: 1
   wages: 10
+  minWorkplaceQuality: 35
+  maxWorkplaceQuality: 85
   employees: []
 --- !u!65 &770033580255317184
 BoxCollider:
