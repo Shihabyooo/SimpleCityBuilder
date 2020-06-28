@@ -40,6 +40,25 @@ public class IndustrialBuilding_1 : Building
 
         return (float)currentProduction * industryStats.incomePerProduct;
     }
+    
+    float ComputeEfficiency() //nearly similar to InfrastructureBuildings efficiency, the difference is that it isn't clamped to custom min and max value, but straight to 1.0f and 0.0f.
+    {
+        float budgetEffect = (float)(budget - stats.minBudget) / (float) (stats.maxBudget - stats.minBudget); //linear interpolation
+        
+        float manpowerEffect = 0.0f;        
+        if (workPlace.MaxManpower() == 0) //building does not need manpower
+            manpowerEffect = 1.0f;          //TODO this could be removed (unless you're thinking of implementing some futuristic, fully automated industry)
+        else if (workPlace.CurrentManpower() >= workPlace.MinManpower())
+            manpowerEffect = (float)workPlace.CurrentManpower() / (float)workPlace.MaxManpower();
+
+        float resourceEffect = allocatedResources.CompareToBaseResource(stats.requiredResources);
+        float efficiency =  manpowerEffect * budgetEffect * resourceEffect;
+        
+        if (manpowerEffect < 0.001f || budgetEffect < 0.001f || resourceEffect < 0.001f)
+            efficiency = 0.0f;
+
+        return efficiency;
+    }
 
     public override void UpdateEffectOnNature(int timeWindow)
     {
@@ -65,24 +84,6 @@ public class IndustrialBuilding_1 : Building
         particleMain.startColor = new Color(particleMain.startColor.color.r, particleMain.startColor.color.g, particleMain.startColor.color.b, emissionVisualPercentage * maxSmokeOpacity);
     }
 
-    float ComputeEfficiency() //nearly similar to InfrastructureBuildings efficiency, the difference is that it isn't clamped to custom min and max value, but straight to 1.0f and 0.0f.
-    {
-        float budgetEffect = (float)(budget - stats.minBudget) / (float) (stats.maxBudget - stats.minBudget); //linear interpolation
-        
-        float manpowerEffect = 0.0f;        
-        if (workPlace.MaxManpower() == 0) //building does not need manpower
-            manpowerEffect = 1.0f;          //TODO this could be removed (unless you're thinking of implementing some futuristic, fully automated industry)
-        else if (workPlace.CurrentManpower() >= workPlace.MinManpower())
-            manpowerEffect = (float)workPlace.CurrentManpower() / (float)workPlace.MaxManpower();
-
-        float resourceEffect = allocatedResources.CompareToBaseResource(stats.requiredResources);
-        float efficiency =  manpowerEffect * budgetEffect * resourceEffect;
-        
-        if (manpowerEffect < 0.001f || budgetEffect < 0.001f || resourceEffect < 0.001f)
-            efficiency = 0.0f;
-
-        return efficiency;
-    }
 }
 
 [System.Serializable]

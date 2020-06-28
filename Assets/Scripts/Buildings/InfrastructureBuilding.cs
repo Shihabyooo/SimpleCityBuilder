@@ -16,7 +16,6 @@ public class InfrastructureBuilding : Building
         workPlace = this.gameObject.GetComponent<WorkPlace>();
     }
     
-
     public InfrastructureBuildingStats GetInfrastructureBuildingStats()
     {
         return infraStats;
@@ -31,7 +30,6 @@ public class InfrastructureBuilding : Building
     {
         return 0.0f;
     }
-
 
     public virtual void SetLoad(float load)
     {

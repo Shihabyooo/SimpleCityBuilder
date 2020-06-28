@@ -6,7 +6,6 @@ public class PopulationManager : MonoBehaviour
 {
     //TODO implement a better DB system the performs well with the count of population we aim for.
     
-     
     [SerializeField] List<Citizen> population = new List<Citizen>(); //TODO remove this serialization when testing is done.
     [SerializeField] PopulationGrowthMetrics growthStats = new PopulationGrowthMetrics();
     [SerializeField] Happiness populationHappiness = new Happiness(0);
@@ -103,7 +102,6 @@ public class PopulationManager : MonoBehaviour
     {
         Happiness newHappiness = new Happiness(50);
 
-        //TODO research whether Mathf.Sign with casting is more expensive than divind the value with its absolute.
         int changeDirection = (int)Mathf.Sign((int)citizen.homeAddress.housingQuality - (int)citizen.happiness.home); 
         newHappiness.home = (uint)Mathf.Clamp((int)citizen.happiness.home + (changeDirection * Citizen.happinessChangeRatePerDay), 0, 100);
 
@@ -242,14 +240,12 @@ public class PopulationManager : MonoBehaviour
                 //generate citizen.
                 //assign home.
                 //assign work.
-                //assign income based on work.
 
         Citizen newCitizen = GenerateCitizen(_class);
         
         ResidentialBuilding home = GameManager.buildingsMan.GetResidentialBuildingWithEmptySlot(_class);
         if (home != null) //this shouldn't fail.
         {
-            //newCitizen.homeAddress = home.uniqueID;
             newCitizen.homeAddress = home;
             home.AddResident(newCitizen);
         }
@@ -258,15 +254,12 @@ public class PopulationManager : MonoBehaviour
             print ("ERROR! Could not assign home to a citizen");
         }
 
-        //TODO assign work
         WorkPlace workPlace = GameManager.buildingsMan.GetEmptyWorkSlot(newCitizen.educationalLevel);
         if (workPlace != null) //contrary to the home case, this is a possibility.
         {
             newCitizen.workAddress = workPlace;
             workPlace.AssignEmployee(newCitizen);
         }
-
-        //TODO compute income.
 
         population.Add(newCitizen);
     }

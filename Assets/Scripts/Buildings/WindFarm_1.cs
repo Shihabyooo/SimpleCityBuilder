@@ -26,14 +26,8 @@ public class WindFarm_1 : InfrastructureBuilding
     public override void ComputeProduction()  //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
     {
         currentEfficiency = ComputeEfficiency();
-        
         currentMaxPowerProduction = currentEfficiency * farmStats.maxPowerProduction;
         currentPowerProduction = currentMaxPowerProduction * currentLoad;
-    }
-
-    public override float GetMaxProduction() 
-    {
-        return currentMaxPowerProduction;
     }
 
     protected override float ComputeEfficiency()
@@ -56,17 +50,19 @@ public class WindFarm_1 : InfrastructureBuilding
         }
 
         float windDirectionEffect = (Mathf.Max(angleDifference, farmStats.maxPeakPerformanceAngleDifference) - (float)farmStats.maxOperationalAngleDifference) / ((float)farmStats.maxPeakPerformanceAngleDifference - (float)farmStats.maxOperationalAngleDifference) ;
-
         float windSpeedEffect = Mathf.Min(cellWindSpeed / farmStats.maxWindSpeed, 1.0f);
-
         float efficiency = windDirectionEffect * windSpeedEffect * base.ComputeEfficiency();
 
         if (efficiency > 0.001f)
             efficiency = Mathf.Max(efficiency, infraStats.minEfficiency);
 
-
         //print (this.gameObject.name + "  || windDirectionEffect: " + windDirectionEffect + ", difference: " + angleDifference); //test
         return efficiency;
+    }
+
+    public override float GetMaxProduction() 
+    {
+        return currentMaxPowerProduction;
     }
 
     public override void UpdateEffectOnNature(int timeWindow)

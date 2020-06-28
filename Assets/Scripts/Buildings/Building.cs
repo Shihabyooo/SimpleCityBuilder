@@ -20,18 +20,21 @@ public class Building : MonoBehaviour
     public uint[] occupiedCell = new uint[2]; //the cell this building is constructed on, set by BuildingsManager (via ProposedBuilding).
     [SerializeField] protected uint budget; //IMPORTANT! budget must always be from stats.minBudget to stats.maxBudget
     [SerializeField] protected BasicResources allocatedResources = new BasicResources(); //These resources will be allocated by the simulation based on availability and priority.
-    //[SerializeField] protected bool isWellSupplied = false;
     protected System.Guid uniqueID {get; private set;}
     protected System.DateTime constructionDate;
 
     BoxCollider buildingCollider;
     GameObject waterSign, powerSign;
 
-
     virtual protected void Awake()
     {
         budget = (uint)Mathf.FloorToInt((float)(stats.minBudget + stats.maxBudget) / 2.0f);
         buildingCollider = this.gameObject.GetComponent<BoxCollider>();
+    }
+
+    public virtual void ShowDetailsOnViewer()
+    {
+        BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.generic);
     }
 
     public BuildingStats GetStats()
@@ -54,37 +57,36 @@ public class Building : MonoBehaviour
         return allocatedResources;
     }
 
-    public System.DateTime ConstructionDate()
-    {
-        return constructionDate;
-    }
-
     public void AllocateResources(BasicResources resources)
     {
         allocatedResources = resources;
     }
 
-    bool CheckResourcesSufficiency()
+    public System.DateTime ConstructionDate()
     {
-        if (allocatedResources.power < stats.requiredResources.power)
-            return false;
-        else if (allocatedResources.water < stats.requiredResources.water)
-            return false;
-
-        return true;
+        return constructionDate;
     }
+
+    // bool CheckResourcesSufficiency()
+    // {
+    //     if (allocatedResources.power < stats.requiredResources.power)
+    //         return false;
+    //     else if (allocatedResources.water < stats.requiredResources.water)
+    //         return false;
+
+    //     return true;
+    // }
 
     public virtual bool CheckConstructionResourceRequirements(Cell cell) //this does NOT include checking whether cell is occupied or not, which is handled in BuildingsManager.
     {   
-        
         if (stats.requireResourcesToConstruct)
         {
-            //There are two steps to this: Check that the cell is covered by required services (data contained in the cell),
-            //and check that the available resources for the service are enought (from ResourcesManager)
-            if (stats.requiredResources.power > GameManager.resourceMan.AvailablePower() && !cell.isPowered) //second check.
+            //There are two checks here: That the cell is covered by required services (data contained in the cell),
+            //and that the available resources for the service are enought (from ResourcesManager)
+            if (!cell.isPowered && stats.requiredResources.power > GameManager.resourceMan.AvailablePower()) 
                 return false;
 
-            if (stats.requiredResources.water > GameManager.resourceMan.AvailableWater() && !cell.isWatered) //second check.
+            if (!cell.isWatered && stats.requiredResources.water > GameManager.resourceMan.AvailableWater())
                 return false;
         }
         
@@ -115,28 +117,7 @@ public class Building : MonoBehaviour
 
         if (ratio >= 0.999f)
             OnConstructionComplete();
-        
-
     }
-
- //   //Deprecated
-//     float helperTimer = 0.0f;
-//     IEnumerator Construction()
-//     {
-//         //print ("Begining construction of: " + this.gameObject.name + ", finishes in: " + stats.constructionTime); //test
-        
-//         while (helperTimer < stats.constructionTime)
-//         {
-//             helperTimer += Time.fixedDeltaTime;
-//             float ratio = Mathf.Clamp(helperTimer/stats.constructionTime, 0.0f, 1.0f);//test
-//             this.transform.transform.localScale = new Vector3(ratio, ratio, ratio);//test
-//             yield return new WaitForFixedUpdate();
-//         }
-
-//         //print ("Finshed construction of: " + this.gameObject.name ); //test
-//         OnConstructionComplete();
-//         yield return null;
-//     }
 
     protected virtual void OnConstructionComplete()
     {
@@ -190,11 +171,6 @@ public class Building : MonoBehaviour
         {
             waterSign.SetActive(false);
         }
-    }
-
-    public virtual void ShowDetailsOnViewer()
-    {
-        BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.generic);
     }
 
 }
