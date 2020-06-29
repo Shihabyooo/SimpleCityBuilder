@@ -1456,13 +1456,13 @@ MonoBehaviour:
     buildings:
     - {fileID: -4102208194882701168, guid: a380fdc15764d0c468b7c9cd8b0e5487, type: 3}
     - {fileID: -7227954880319117795, guid: 6975d3ec4aa4afd45bdf534c56ec04fc, type: 3}
-    - {fileID: 6801135501518552312, guid: c5451d0c6951fce4cb5842a766d42707, type: 3}
-    - {fileID: 399731235928144276, guid: b0dbff2f53302b343b76552871fffd34, type: 3}
-    - {fileID: 1609966634516983189, guid: 819a23094f4e3e34ba5f04a3a6ba1d99, type: 3}
-    - {fileID: 7736140774182491049, guid: eed323116d5d1c64aab7792b0b3ddeae, type: 3}
-    - {fileID: 5760967318722151, guid: 9c3b77a8ecd588f459c1f23118f41f85, type: 3}
+    - {fileID: 1454842846, guid: c5451d0c6951fce4cb5842a766d42707, type: 3}
+    - {fileID: 573531958280494763, guid: b0dbff2f53302b343b76552871fffd34, type: 3}
+    - {fileID: 5078847166629743028, guid: 819a23094f4e3e34ba5f04a3a6ba1d99, type: 3}
+    - {fileID: 2486912761360008956, guid: eed323116d5d1c64aab7792b0b3ddeae, type: 3}
+    - {fileID: 4279698139025772406, guid: 9c3b77a8ecd588f459c1f23118f41f85, type: 3}
     - {fileID: 6865540290893926453, guid: 15d774d9f1bcd694abdfba7619900f72, type: 3}
-    - {fileID: 7618507240896061298, guid: 8c750de6cf27df94fa72262e89f3d132, type: 3}
+    - {fileID: 7821978076698723070, guid: 8c750de6cf27df94fa72262e89f3d132, type: 3}
     - {fileID: 855314826128607868, guid: f46101b6c78d9f4499e83a1190158146, type: 3}
     - {fileID: 7230156794272959213, guid: 30b3f2368c6db1f42af36c6e63116a21, type: 3}
 --- !u!114 &224963320
@@ -6213,7 +6213,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000030517578, y: 0}
+  m_AnchoredPosition: {x: -0.000030517578, y: -0.000015258789}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &852943604

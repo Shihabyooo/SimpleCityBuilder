@@ -10,8 +10,15 @@ public class BuildingsManager : MonoBehaviour
     public List<Building> constructedBuildings {get; private set;} //containers ALL constructed buildings.
     public List<InfrastructureBuilding> waterProductionBuildings {get; private set;} //contains only water producing buildings
     public List<InfrastructureBuilding> powerProductionBuildings {get; private set;} //contains only power producing buildings
-    public List<WorkPlace> workPlaces {get; private set;} //contains list of all workplaces. Adding buildings to this list is done when adding building to constructedBuildings. 
     //TODO add lists for remaining infrastructure types and update the AddInfrastructureBuilding() method accordingly.
+
+
+    //Adding buildings to the lists bellow is done when adding building to constructedBuildings, since they are not subdivided into smaller types like infrastructure buildings.
+    public List<WorkPlace> workPlaces {get; private set;}
+    public List<ResidentialBuilding> residentialBuildings {get; private set;}
+    public List<IndustrialBuilding> industrialBuildings {get; private set;}
+    public List<CommercialBuilding> commercialBuildings {get; private set;}
+
 
     void Awake()
     {
@@ -19,6 +26,9 @@ public class BuildingsManager : MonoBehaviour
         waterProductionBuildings = new List<InfrastructureBuilding>();
         powerProductionBuildings = new List<InfrastructureBuilding>();
         workPlaces = new List<WorkPlace>();
+        residentialBuildings = new List<ResidentialBuilding>();
+        industrialBuildings = new List<IndustrialBuilding>();
+        commercialBuildings = new List<CommercialBuilding>();
     }
 
     public BuildingProposal StartNewBuildingProposal(int buildingID)
@@ -35,7 +45,14 @@ public class BuildingsManager : MonoBehaviour
     public void AddConstructedBuilding(Building building)
     {
         constructedBuildings.Add(building);
-        
+
+        if (building.GetStats().type == BuildingType.residential)
+            residentialBuildings.Add(building.gameObject.GetComponent<ResidentialBuilding>());
+        else if (building.GetStats().type == BuildingType.industrial)
+            industrialBuildings.Add(building.gameObject.GetComponent<IndustrialBuilding>());
+        else if (building.GetStats().type == BuildingType.commercial)
+            commercialBuildings.Add(building.gameObject.GetComponent<CommercialBuilding>());
+
         if (building.gameObject.GetComponent<WorkPlace>() != null)
             workPlaces.Add(building.gameObject.GetComponent<WorkPlace>());
     }
@@ -71,67 +88,115 @@ public class BuildingsManager : MonoBehaviour
 
     public ResidentialBuilding GetResidentialBuildingWithEmptySlot(CitizenClass _class, bool random = true)
     {
-        //This is a stupid attempt at randomizing building pickup.
-        int count = 0;
+        //Make a list of available housing
+        List<ResidentialBuilding> availableHousing = new List<ResidentialBuilding>();
 
-        while (count < 100) //tries 100 times to find a random building, if fails, grabs the first one it find from the foreach loop bellow.
+        foreach (ResidentialBuilding residence in residentialBuildings)
         {
-            int randomInt = Random.Range(0, constructedBuildings.Count);
-
-            if (constructedBuildings[randomInt].GetStats().type == BuildingType.residential
-                && constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>() != null
-                && constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>().ResidentClass() == _class
-                && constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>().EmptyHousingSlots() > 0)
-            {
-                return constructedBuildings[randomInt].gameObject.GetComponent<ResidentialBuilding>();
-            }
-            count++;
-        }
-
-        //Reaching here means that that stupid randomization thing above failed.
-        foreach (Building building in constructedBuildings)
-        {
-            if (building.GetStats().type == BuildingType.residential
-                && building.gameObject.GetComponent<ResidentialBuilding>() != null
-                && building.gameObject.GetComponent<ResidentialBuilding>().ResidentClass() == _class
-                && building.gameObject.GetComponent<ResidentialBuilding>().EmptyHousingSlots() > 0)
+            if (residence.ResidentClass() == _class
+                && residence.EmptyHousingSlots() > 0)
                 {
-                    return building.gameObject.GetComponent<ResidentialBuilding>();
+                    //if we are not returning random housing, we return our first hit
+                    if (!random)
+                        return residence;
+
+                    availableHousing.Add(residence);
                 }
         }
+        
+        //if the count of refs in availableHousing is zero, means no housing is current available
+        if (availableHousing.Count < 1) //This check has a side effect that it includes error state (negative numbers), which might be problematic if not handled explicitly.
+            return null;
 
-        return null;
+        //Pick a random residence and return it
+        int randomInt = Random.Range(0, availableHousing.Count - 1);
+        
+        return availableHousing[randomInt];
+
+        //Bellow as an old, "stupid" version of random method aquisition (though it prolly does take less memory).
+
+        // //This is a stupid attempt at randomizing building pickup.
+        // int count = 0;
+
+        // while (count < 100) //tries 100 times to find a random building, if fails, grabs the first one it find from the foreach loop bellow.
+        // {
+        //     int randomInt = Random.Range(0, residentialBuildings.Count);
+
+        //     if (residentialBuildings[randomInt].ResidentClass() == _class
+        //         && residentialBuildings[randomInt].EmptyHousingSlots() > 0)
+        //     {
+        //         return residentialBuildings[randomInt];
+        //     }
+        //     count++;
+        // }
+
+        // //Reaching here means that that stupid randomization thing above failed.
+        // foreach (ResidentialBuilding residence in residentialBuildings)
+        // {
+        //     if (residence.ResidentClass() == _class
+        //         && residence.EmptyHousingSlots() > 0)
+        //         {
+        //             return residence;
+        //         }
+        // }
+        
+        //return null;
     }
 
-    public WorkPlace GetEmptyWorkSlot(EducationLevel educationLevel, bool random = true)
+    public WorkPlace GetEmptyWorkSlot(EducationLevel educationLevel, bool random = true) //This method is similar to GetResidentialBuildingWithEmptySlot().
     {
         if (workPlaces.Count < 1)
             return null;
 
-        int count = 0;
-
-        while (count < 100) //tries 100 times to find a random building, if fails, grabs the first one it find from the foreach loop bellow.
-        {
-            int randomInt = Random.Range(0, workPlaces.Count);
-
-            if (workPlaces[randomInt].WorkerEducationLevel() == educationLevel
-                && workPlaces[randomInt].AvailableWorkerSlots() > 0)
-            {
-                return workPlaces[randomInt];
-            }
-            count++;
-        }
+        //Make a list of available workplaces
+        List<WorkPlace> availableWorkPlaces = new List<WorkPlace>();
 
         foreach (WorkPlace workPlace in workPlaces)
         {
             if (workPlace.WorkerEducationLevel() == educationLevel
                 && workPlace.AvailableWorkerSlots() > 0)
                 {
-                    return workPlace;
+                     if (!random)
+                        return workPlace;
+
+                    availableWorkPlaces.Add(workPlace);
                 }
         }
+        
+        //if the count of refs in availableHousing is zero, means no housing is current available
+        if (availableWorkPlaces.Count < 1) //This check has a side effect that it includes error state (negative numbers), which might be problematic if not handled explicitly.
+            return null;
 
-        return null;
+        //Pick a random residence and return it
+        int randomInt = Random.Range(0, availableWorkPlaces.Count - 1);
+        
+        return availableWorkPlaces[randomInt];
+
+
+        // int count = 0;
+
+        // while (count < 100) //tries 100 times to find a random building, if fails, grabs the first one it find from the foreach loop bellow.
+        // {
+        //     int randomInt = Random.Range(0, workPlaces.Count);
+
+        //     if (workPlaces[randomInt].WorkerEducationLevel() == educationLevel
+        //         && workPlaces[randomInt].AvailableWorkerSlots() > 0)
+        //     {
+        //         return workPlaces[randomInt];
+        //     }
+        //     count++;
+        // }
+
+        // foreach (WorkPlace workPlace in workPlaces)
+        // {
+        //     if (workPlace.WorkerEducationLevel() == educationLevel
+        //         && workPlace.AvailableWorkerSlots() > 0)
+        //         {
+        //             return workPlace;
+        //         }
+        // }
+
+        // return null;
     }
 
     //=======================================================================================================================
@@ -221,5 +286,4 @@ class BuildingsDatabase
 
         return null;
     }
-
 }
