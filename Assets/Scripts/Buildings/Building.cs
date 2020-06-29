@@ -8,8 +8,8 @@ using UnityEngine;
 
 public enum BuildingType //TODO add remaining types.
 {
-    residential, commercial, industrial, infrastructure
-}
+    residential, commercial, industrial, infrastructure, undefined //undefined is a logic error guard set as default value for buildings. If the default was another value and
+}                                                                   //designer forgot to change it to correct value, it could cause issues elsewhere.
 
 [RequireComponent(typeof(BoxCollider))]
 public class Building : MonoBehaviour
@@ -180,7 +180,7 @@ public class BuildingStats
 {
     public int id;
     public uint cost = 0;
-    public BuildingType type;
+    public BuildingType type = BuildingType.undefined;
     public float constructionTime = 0.0f; //In hours
 
     //requirements for operation 

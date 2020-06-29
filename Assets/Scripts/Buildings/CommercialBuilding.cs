@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(WorkPlace))]
-public class CommercialBuilding_1 : Building
+public class CommercialBuilding : Building
 {
     protected override void Awake()
     {
         base.Awake();
+        stats.type = BuildingType.commercial;
     }
 
     public override void ShowDetailsOnViewer()

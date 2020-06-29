@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(WorkPlace))]
-public class IndustrialBuilding_1 : Building
+public class IndustrialBuilding : Building
 {
     IndustrialBuildingStats industryStats = new IndustrialBuildingStats();
     WorkPlace workPlace;

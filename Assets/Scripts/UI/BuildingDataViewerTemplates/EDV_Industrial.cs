@@ -22,7 +22,7 @@ public class EDV_Industrial : ExtendedDataViewer
     {
         SetWorkplaceDetails(building);
 
-        IndustrialBuilding_1 industry = building.gameObject.GetComponent<IndustrialBuilding_1>();
+        IndustrialBuilding industry = building.gameObject.GetComponent<IndustrialBuilding>();
         emissions.text = industry.currentEmissionRate.ToString();
         production.text = industry.currentProduction.ToString();
     }
