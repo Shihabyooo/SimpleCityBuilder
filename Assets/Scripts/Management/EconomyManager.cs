@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class EconomyManager : MonoBehaviour
 {
-    //[SerializeField] TaxRates housingTaxRates = new TaxRates(1.0f);
-    [SerializeField] TaxRates incomeTaxRates = new TaxRates(1.0f);
-    //[SerializeField] TaxRates industryTaxRates = new TaxRates(1.0f);
-    //[SerializeField] TaxRates commercialTaxRate = new TaxRates(1.0f);
-
+    //[SerializeField] TaxRates housingTaxRates = new TaxRates(0.01f);
+    [SerializeField] TaxRates incomeTaxRates = new TaxRates(0.01f);
+    //[SerializeField] TaxRates industryTaxRates = new TaxRates(0.01f);
+    //[SerializeField] TaxRates commercialTaxRates = new TaxRates(0.01f);
+    [SerializeField] float industryTaxRate = 0.01f;
+    [SerializeField] float commercialTaxRate = 0.01f;
 
     void Awake()
     {
@@ -51,14 +52,14 @@ public class EconomyManager : MonoBehaviour
         return buildingsBudget;
     }
 
-
     //Taxes
     int ComputeTaxes()
     {
         int taxes = 0;
         taxes += ComputeIncomeTaxes();
+        taxes += ComputeIndustryTaxes();
+        taxes += ComputeCommercialTaxes();
         //TODO add remaining forms of taxes here.
-
         return taxes;
     }
 
@@ -86,8 +87,57 @@ public class EconomyManager : MonoBehaviour
     int ComputeIndustryTaxes()
     {
         int taxes = 0;
+        long totalProfits = 0;
+
+        foreach (IndustrialBuilding industrialBuilding in GameManager.buildingsMan.industrialBuildings)
+        {
+            totalProfits += industrialBuilding.ComputeProduction();
+        }
+
+        taxes = Mathf.RoundToInt(industryTaxRate * totalProfits);
+        
+        //update metrics
+        GameManager.resourceMan.IndustryTaxes() = taxes;
 
         return taxes;
+    }
+
+    int ComputeCommercialTaxes()
+    {
+        int taxes = 0;
+        long totalProfits = 0;
+
+        foreach (CommercialBuilding commercialBuilding in GameManager.buildingsMan.commercialBuildings)
+        {
+            //TODO finish this
+        }
+
+        taxes = Mathf.RoundToInt(commercialTaxRate * totalProfits);
+
+        //update metrics
+        GameManager.resourceMan.CommercialTaxes() = taxes;
+
+        return taxes;
+    }
+
+    //One time expenses (e.g. construction costs checks and substraction)
+    public bool CanAfford(int cost)
+    {
+        if (GameManager.resourceMan.AvailableTreasury() - cost < 0)
+            return false;
+        else
+            return true;
+    }
+
+    public bool Pay(int cost) //Returns false if no sufficient funds are available.
+    {
+        if (CanAfford(cost))
+        {
+            GameManager.resourceMan.SubstractFromTreasury(cost);
+            return true;
+        }
+        else
+            return false;
     }
 
 }
@@ -95,13 +145,14 @@ public class EconomyManager : MonoBehaviour
 [System.Serializable]
 public struct TaxRates //Tax rates are per day
 {
-    public const float minTaxRate = 1.0f;
-    public const float maxTaxRate = 30.0f;
+    public const float minTaxRate = 0.01f;
+    public const float maxTaxRate = 0.3f;
 
     //TODO uncomment the {get; private set;} when testing is done.
     [Range(minTaxRate, maxTaxRate)] public float low; //{get; private set;}
     [Range(minTaxRate, maxTaxRate)] public float middle; //{get; private set;}
     [Range(minTaxRate, maxTaxRate)] public float high; //{get; private set;}
+
 
     public TaxRates(float fixedValue)
     {
