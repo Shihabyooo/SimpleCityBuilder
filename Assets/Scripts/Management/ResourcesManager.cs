@@ -156,6 +156,16 @@ public class ResourcesManager : MonoBehaviour
         return ref finances.incomeTaxes;
     }
 
+    public ref int IndustryTaxes()
+    {
+        return ref finances.industryTaxes;
+    }
+
+    public ref int CommercialTaxes()
+    {
+        return ref finances.commercialTaxes;
+    }
+
     public ref int BuildingExpenses()
     {
         return ref finances.buildingExpenses;
@@ -269,7 +279,9 @@ public class CityFinances
     public long treasury;
 
     //Values bellow are not used for any calculations and are solely for future statistics display to player.
-    public IncomeTaxes incomeTaxes; 
+    public IncomeTaxes incomeTaxes;
+    public int industryTaxes;
+    public int commercialTaxes;
     public int buildingExpenses;
     //TODO add other finances/economy related parameters here
 }
