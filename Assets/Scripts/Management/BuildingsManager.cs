@@ -143,8 +143,9 @@ public class BuildingsManager : MonoBehaviour
         //return null;
     }
 
-    public WorkPlace GetEmptyWorkSlot(EducationLevel educationLevel, bool random = true) //This method is similar to GetResidentialBuildingWithEmptySlot().
-    {
+    public WorkPlace GetEmptyWorkSlot(EducationLevel educationLevel, bool random = true, bool exactLevel = false) //This method is similar to GetResidentialBuildingWithEmptySlot().
+    //If exactLevel == false and no empty workslot of said level is found, will (try to) return a workplace with either an education requirements less than required level.
+    {                                                                                                               
         if (workPlaces.Count < 1)
             return null;
 
@@ -153,25 +154,30 @@ public class BuildingsManager : MonoBehaviour
 
         foreach (WorkPlace workPlace in workPlaces)
         {
-            if (workPlace.WorkerEducationLevel() == educationLevel
-                && workPlace.AvailableWorkerSlots() > 0)
+            if (workPlace.AvailableWorkerSlots() > 0
+                //&& ((exactLevel && workPlace.WorkerEducationLevel() == educationLevel) || (!exactLevel && workPlace.WorkerEducationLevel() <= educationLevel)))
+                && workPlace.WorkerEducationLevel() == educationLevel)
                 {
-                     if (!random)
+                    if (!random)
                         return workPlace;
 
                     availableWorkPlaces.Add(workPlace);
                 }
         }
         
-        //if the count of refs in availableHousing is zero, means no housing is current available
+        //if the count of refs in availableWorkPlaces is zero, means no empty work slot is current available
         if (availableWorkPlaces.Count < 1) //This check has a side effect that it includes error state (negative numbers), which might be problematic if not handled explicitly.
-            return null;
+        {
+            if (exactLevel)
+                return null;
+            else
+                return GetEmptyWorkSlotExtended(educationLevel, random);
+        }
 
         //Pick a random residence and return it
         int randomInt = Random.Range(0, availableWorkPlaces.Count - 1);
         
         return availableWorkPlaces[randomInt];
-
 
         // int count = 0;
 
@@ -199,6 +205,33 @@ public class BuildingsManager : MonoBehaviour
         // return null;
     }
 
+    WorkPlace GetEmptyWorkSlotExtended(EducationLevel educationLevel, bool random = true) //See comments on GetEmptyWorkSlot()
+    {
+        if (workPlaces.Count < 1)
+            return null;
+
+        List<WorkPlace> availableWorkPlaces = new List<WorkPlace>();
+
+        foreach (WorkPlace workPlace in workPlaces)
+        {
+            if (workPlace.AvailableWorkerSlots() > 0
+                && workPlace.WorkerEducationLevel() <= educationLevel)
+            {
+                if (!random)
+                    return workPlace;
+
+                availableWorkPlaces.Add(workPlace);
+            }
+        }
+
+        if (availableWorkPlaces.Count < 1)
+            return null;
+
+        int randomInt = Random.Range(0, availableWorkPlaces.Count - 1);
+        
+        return availableWorkPlaces[randomInt];
+    }
+
     //=======================================================================================================================
     //=======================================================================================================================
     //I made this class within BuildingsManager to access some of the latter's private members without extra lines of code...
@@ -207,7 +240,6 @@ public class BuildingsManager : MonoBehaviour
     {
         public GameObject targetBuilding {get; private set;}
         const float buildingRotationIncrements = 90.0f;
-
 
         public BuildingProposal(int _targetBuildingID)//, BuildingsManager _buildingsManager)
         {
