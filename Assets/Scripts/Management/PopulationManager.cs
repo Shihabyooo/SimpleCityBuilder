@@ -212,7 +212,7 @@ public class PopulationManager : MonoBehaviour
         float dieRoll = Random.Range(0.0f, 1.0f);
 
         if (dieRoll < educationLevelPropability[0])
-            newCitizen.educationalLevel = EducationLevel.illetarte;
+            newCitizen.educationalLevel = EducationLevel.illiterate;
         else if (dieRoll < educationLevelPropability[1])
             newCitizen.educationalLevel = EducationLevel.primary;
         else if (dieRoll < educationLevelPropability[2])
@@ -292,10 +292,7 @@ public class PopulationManager : MonoBehaviour
 }
 
 
-public enum EducationLevel
-{
-    illetarte, primary, secondery, tertiary
-}
+
 
 [System.Serializable]
 public struct Happiness

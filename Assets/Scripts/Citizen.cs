@@ -136,8 +136,12 @@ public class Citizen
     }
 }
 
-
 public enum CitizenClass
 {
     low, middle, high
+}
+
+public enum EducationLevel
+{
+    illiterate = 1, primary = 2, secondery = 4, tertiary = 8
 }
