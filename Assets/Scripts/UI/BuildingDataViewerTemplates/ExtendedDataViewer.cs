@@ -46,7 +46,7 @@ public class ExtendedDataViewer : MonoBehaviour
     {
         switch (level)
         {
-            case EducationLevel.illetarte:
+            case EducationLevel.illiterate:
                 return "Illiterate";
             case EducationLevel.primary:
                 return "Primary";

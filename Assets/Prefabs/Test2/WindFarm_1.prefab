@@ -109,13 +109,10 @@ MonoBehaviour:
   allocatedResources:
     power: 0
     water: 0
-  waterSign: {fileID: 0}
-  powerSign: {fileID: 0}
   infraStats:
     radiusOfInfluence: 5
     minEfficiency: 0.2
     maxEfficiency: 0.8
-  currentLoad: 0
   workPlace: {fileID: 0}
   farmStats:
     maxPowerProduction: 5.75
@@ -136,9 +133,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minManpower: 1
-  maxManpower: 15
+  maxManpower: 10
   minWorkerEducationLevel: 3
   wages: 100
+  minWorkplaceQuality: 35
+  maxWorkplaceQuality: 85
   employees: []
 --- !u!65 &3097793744586352193
 BoxCollider:

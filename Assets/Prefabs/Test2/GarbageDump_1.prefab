@@ -126,8 +126,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6641ad34a5191b74b99aafa6ae62fb39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minManpower: 5
-  maxManpower: 100
+  minManpower: 3
+  maxManpower: 25
   minWorkerEducationLevel: 1
   wages: 10
   minWorkplaceQuality: 35

@@ -114,7 +114,6 @@ MonoBehaviour:
     radiusOfInfluence: 5
     minEfficiency: 0.2
     maxEfficiency: 0.8
-  currentLoad: 0
   workPlace: {fileID: 0}
   minEmissionToGenerateSmoke: 6
   maxEmissionToGenerateSmoke: 30
@@ -136,9 +135,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minManpower: 5
-  maxManpower: 100
+  maxManpower: 50
   minWorkerEducationLevel: 2
   wages: 100
+  minWorkplaceQuality: 35
+  maxWorkplaceQuality: 85
   employees: []
 --- !u!65 &6831662241992203462
 BoxCollider:

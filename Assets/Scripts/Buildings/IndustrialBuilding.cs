@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(WorkPlace))]
 public class IndustrialBuilding : Building
 {
-    IndustrialBuildingStats industryStats = new IndustrialBuildingStats();
+    [SerializeField] IndustrialBuildingStats industryStats = new IndustrialBuildingStats();
     WorkPlace workPlace;
 
     [SerializeField][Range(0.0f, 10.0f)] float minEmissionToGenerateSmoke = 6.0f; //bellow or equall to this, smoke particle system would be turned off.
@@ -32,19 +32,20 @@ public class IndustrialBuilding : Building
         BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.industrial);
     }
 
-    public float ComputeProduction() //Must be called only once per day. Returns profit for day. Different from ComputeProduction in InfrastructureBuildings in that it doesn't depend on load.
+    public int ComputeProduction() //Must be called only once per day. Returns profit for day. Different from ComputeProduction in InfrastructureBuildings in that it doesn't depend on load.
     {                               //TODO rename this
         currentProduction = Mathf.FloorToInt(ComputeEfficiency() * industryStats.maxProductionPerDay);
         currentEmissionRate = industryStats.emissionPerProductUnit * (float)currentProduction;
         UpdateEmissionVisuals(currentEmissionRate);
 
-        return (float)currentProduction * industryStats.incomePerProduct;
+        return Mathf.RoundToInt(currentProduction * industryStats.incomePerProduct);
     }
     
     float ComputeEfficiency() //nearly similar to InfrastructureBuildings efficiency, the difference is that it isn't clamped to custom min and max value, but straight to 1.0f and 0.0f.
     {
         float budgetEffect = (float)(budget - stats.minBudget) / (float) (stats.maxBudget - stats.minBudget); //linear interpolation
-        
+        budgetEffect = budgetEffect * 0.5f + 0.5f; //This limits the change in budget effect from 50% (at min budget) to 100% (at max budget)
+
         float manpowerEffect = 0.0f;        
         if (workPlace.MaxManpower() == 0) //building does not need manpower
             manpowerEffect = 1.0f;          //TODO this could be removed (unless you're thinking of implementing some futuristic, fully automated industry)

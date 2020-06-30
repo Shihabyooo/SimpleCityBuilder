@@ -39,7 +39,6 @@ public class InfrastructureBuilding : Building
     protected virtual float ComputeEfficiency()
     {
         float budgetEffect = (float)(budget - stats.minBudget) / (float) (stats.maxBudget - stats.minBudget); //linear interpolation
-        
         budgetEffect = budgetEffect * 0.5f + 0.5f; //This limits the change in budget effect from 50% (at min budget) to 100% (at max budget)
 
         float manpowerEffect = 0.0f;        

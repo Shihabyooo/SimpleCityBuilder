@@ -4851,7 +4851,7 @@ MonoBehaviour:
     id: 2
     cost: 18000
     type: 2
-    constructionTime: 0
+    constructionTime: 48
     requireResourcesToConstruct: 0
     requiredResources:
       power: 3
@@ -4863,13 +4863,13 @@ MonoBehaviour:
   allocatedResources:
     power: 0
     water: 0
-  waterSign: {fileID: 0}
-  powerSign: {fileID: 0}
+  industryStats:
+    incomePerProduct: 50
+    maxProductionPerDay: 50
+    emissionPerProductUnit: 0.5
   minEmissionToGenerateSmoke: 6
   maxEmissionToGenerateSmoke: 30
   maxSmokeOpacity: 0.75
-  currentEmissionRate: 0
-  currentProduction: 0
 --- !u!114 &331507844283640092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4882,10 +4882,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6641ad34a5191b74b99aafa6ae62fb39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minManpower: 100
-  maxManpower: 500
+  minManpower: 20
+  maxManpower: 100
   minWorkerEducationLevel: 2
   wages: 50
+  minWorkplaceQuality: 35
+  maxWorkplaceQuality: 85
   employees: []
 --- !u!65 &3598504750011880940
 BoxCollider:

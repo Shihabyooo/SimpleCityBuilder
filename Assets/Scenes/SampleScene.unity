@@ -1519,6 +1519,9 @@ MonoBehaviour:
       low: 0
       middle: 0
       high: 0
+    industryTaxes: 0
+    commercialTaxes: 0
+    buildingExpenses: 0
 --- !u!114 &224963322
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1624,6 +1627,8 @@ MonoBehaviour:
     low: 5
     middle: 5
     high: 5
+  industryTaxRate: 0.01
+  commercialTaxRate: 0.01
 --- !u!1 &256751662
 GameObject:
   m_ObjectHideFlags: 0
@@ -6213,7 +6218,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000030517578, y: -0.000015258789}
+  m_AnchoredPosition: {x: -0.000030517578, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &852943604
