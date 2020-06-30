@@ -146,9 +146,19 @@ public class ResourcesManager : MonoBehaviour
         finances.treasury += newFunds;
     }
 
-    public void UpdateIncomeTaxes(IncomeTaxes incomeTaxes)
+    public void SubstractFromTreasury(int newExpenses)
     {
-        finances.incomeTaxes.SetIncomeTaxes(incomeTaxes);
+        finances.treasury -= newExpenses;
+    }
+
+    public ref IncomeTaxes IncomeTaxes()
+    {
+        return ref finances.incomeTaxes;
+    }
+
+    public ref int BuildingExpenses()
+    {
+        return ref finances.buildingExpenses;
     }
 
     //testing viz
@@ -257,7 +267,9 @@ public class CityResources
 public class CityFinances
 {
     public long treasury;
-    public IncomeTaxes incomeTaxes; //Not used for any calculations, the actuall incomeTaxes computation is local to a method in EconomyManager, this version is
-                                    //solely for future statistics display to player.
+
+    //Values bellow are not used for any calculations and are solely for future statistics display to player.
+    public IncomeTaxes incomeTaxes; 
+    public int buildingExpenses;
     //TODO add other finances/economy related parameters here
 }

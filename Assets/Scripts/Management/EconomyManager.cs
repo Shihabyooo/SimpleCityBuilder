@@ -9,6 +9,7 @@ public class EconomyManager : MonoBehaviour
     //[SerializeField] TaxRates industryTaxRates = new TaxRates(1.0f);
     //[SerializeField] TaxRates commercialTaxRate = new TaxRates(1.0f);
 
+
     void Awake()
     {
         SimulationManager.onTimeUpdate += UpdateEconomyHour;
@@ -17,6 +18,7 @@ public class EconomyManager : MonoBehaviour
     public void UpdateEconomyDay()
     {
         GameManager.resourceMan.AddToTreasury(ComputeTaxes());
+        GameManager.resourceMan.SubstractFromTreasury(ComputeCityExpenses());
     }
 
     void UpdateEconomyHour(int hours) //assigned to the SimulationManager.onTimeUpdate delegate.
@@ -25,6 +27,32 @@ public class EconomyManager : MonoBehaviour
     }
 
     
+    //City expenses
+    int ComputeCityExpenses()
+    {
+        //Add all budgets and return them
+        int totalExpenses = ComputeBuildingsBudget();
+        //TODO add other running city expenditure.
+
+        return totalExpenses;
+    }
+
+    int ComputeBuildingsBudget()
+    {
+        int buildingsBudget = 0;
+        foreach (Building building in GameManager.buildingsMan.constructedBuildings)
+        {
+            buildingsBudget += (int)building.Budget();
+        }
+
+        //Update metrics
+        GameManager.resourceMan.BuildingExpenses() = buildingsBudget;
+
+        return buildingsBudget;
+    }
+
+
+    //Taxes
     int ComputeTaxes()
     {
         int taxes = 0;
@@ -48,13 +76,21 @@ public class EconomyManager : MonoBehaviour
                 employee.SubstractTax(employeeTax);
             }
         }
+        
+        //Update metrics
+        GameManager.resourceMan.IncomeTaxes() = incomeTaxes;
 
-        GameManager.resourceMan.UpdateIncomeTaxes(incomeTaxes);
         return incomeTaxes.Sum();
     }
 
-}
+    int ComputeIndustryTaxes()
+    {
+        int taxes = 0;
 
+        return taxes;
+    }
+
+}
 
 [System.Serializable]
 public struct TaxRates //Tax rates are per day
@@ -107,7 +143,6 @@ public struct TaxRates //Tax rates are per day
     }
 }
 
-
 [System.Serializable]
 public struct IncomeTaxes
 {
@@ -150,6 +185,4 @@ public struct IncomeTaxes
         middle = newIncomeTaxes.middle;
         high = newIncomeTaxes.high;
     }
-
-
 }
