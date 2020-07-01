@@ -2514,6 +2514,7 @@ GameObject:
   - component: {fileID: 423706126}
   - component: {fileID: 423706125}
   - component: {fileID: 423706124}
+  - component: {fileID: 423706127}
   m_Layer: 5
   m_Name: Commercial
   m_TagString: Untagged
@@ -2583,18 +2584,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 423706125}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1501601639}
-        m_MethodName: SelectBuilding
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &423706125
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2631,6 +2621,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 423706122}
   m_CullTransparentMesh: 0
+--- !u!114 &423706127
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 423706122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd0bb9b80aff3764db37cb8932eb48a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingID: 3
 --- !u!1 &427145245
 GameObject:
   m_ObjectHideFlags: 0
@@ -4500,6 +4503,7 @@ GameObject:
   - component: {fileID: 660423020}
   - component: {fileID: 660423019}
   - component: {fileID: 660423018}
+  - component: {fileID: 660423021}
   m_Layer: 5
   m_Name: Park
   m_TagString: Untagged
@@ -4569,18 +4573,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 660423019}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1501601639}
-        m_MethodName: SelectBuilding
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 9
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &660423019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4617,6 +4610,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 660423016}
   m_CullTransparentMesh: 0
+--- !u!114 &660423021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 660423016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd0bb9b80aff3764db37cb8932eb48a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingID: 9
 --- !u!1 &662366365
 GameObject:
   m_ObjectHideFlags: 0
@@ -4810,6 +4816,7 @@ GameObject:
   - component: {fileID: 694737194}
   - component: {fileID: 694737193}
   - component: {fileID: 694737192}
+  - component: {fileID: 694737195}
   m_Layer: 5
   m_Name: School
   m_TagString: Untagged
@@ -4879,18 +4886,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 694737193}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1501601639}
-        m_MethodName: SelectBuilding
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 11
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &694737193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4927,6 +4923,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 694737190}
   m_CullTransparentMesh: 0
+--- !u!114 &694737195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 694737190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd0bb9b80aff3764db37cb8932eb48a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingID: 11
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -5261,6 +5270,7 @@ GameObject:
   - component: {fileID: 750248052}
   - component: {fileID: 750248051}
   - component: {fileID: 750248050}
+  - component: {fileID: 750248053}
   m_Layer: 5
   m_Name: WaterPlant
   m_TagString: Untagged
@@ -5330,18 +5340,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 750248051}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1501601639}
-        m_MethodName: SelectBuilding
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 6
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &750248051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5378,6 +5377,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 750248048}
   m_CullTransparentMesh: 0
+--- !u!114 &750248053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 750248048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd0bb9b80aff3764db37cb8932eb48a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingID: 6
 --- !u!1 &771722616
 GameObject:
   m_ObjectHideFlags: 0
@@ -6066,6 +6078,7 @@ GameObject:
   - component: {fileID: 848486218}
   - component: {fileID: 848486217}
   - component: {fileID: 848486216}
+  - component: {fileID: 848486219}
   m_Layer: 5
   m_Name: PoliceStation
   m_TagString: Untagged
@@ -6135,18 +6148,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 848486217}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1501601639}
-        m_MethodName: SelectBuilding
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 10
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &848486217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6183,6 +6185,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 848486214}
   m_CullTransparentMesh: 0
+--- !u!114 &848486219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 848486214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd0bb9b80aff3764db37cb8932eb48a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingID: 10
 --- !u!1 &852943602
 GameObject:
   m_ObjectHideFlags: 0
@@ -6398,6 +6413,7 @@ GameObject:
   - component: {fileID: 886469921}
   - component: {fileID: 886469920}
   - component: {fileID: 886469919}
+  - component: {fileID: 886469922}
   m_Layer: 5
   m_Name: PowerPlant
   m_TagString: Untagged
@@ -6467,18 +6483,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 886469920}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1501601639}
-        m_MethodName: SelectBuilding
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 4
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &886469920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6515,6 +6520,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 886469917}
   m_CullTransparentMesh: 0
+--- !u!114 &886469922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 886469917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd0bb9b80aff3764db37cb8932eb48a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingID: 4
 --- !u!1 &898131525
 GameObject:
   m_ObjectHideFlags: 0
@@ -8325,6 +8343,7 @@ GameObject:
   - component: {fileID: 1113594011}
   - component: {fileID: 1113594010}
   - component: {fileID: 1113594009}
+  - component: {fileID: 1113594012}
   m_Layer: 5
   m_Name: WindFarm
   m_TagString: Untagged
@@ -8394,18 +8413,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1113594010}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1501601639}
-        m_MethodName: SelectBuilding
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 5
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1113594010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8442,6 +8450,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1113594007}
   m_CullTransparentMesh: 0
+--- !u!114 &1113594012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1113594007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd0bb9b80aff3764db37cb8932eb48a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingID: 5
 --- !u!1 &1135815796
 GameObject:
   m_ObjectHideFlags: 0
@@ -11158,6 +11179,7 @@ GameObject:
   - component: {fileID: 1544601319}
   - component: {fileID: 1544601318}
   - component: {fileID: 1544601317}
+  - component: {fileID: 1544601320}
   m_Layer: 5
   m_Name: Residential
   m_TagString: Untagged
@@ -11227,18 +11249,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1544601318}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1501601639}
-        m_MethodName: SelectBuilding
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1544601318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11275,6 +11286,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1544601315}
   m_CullTransparentMesh: 0
+--- !u!114 &1544601320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544601315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd0bb9b80aff3764db37cb8932eb48a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingID: 1
 --- !u!1 &1548289176
 GameObject:
   m_ObjectHideFlags: 0
@@ -13679,6 +13703,7 @@ GameObject:
   - component: {fileID: 1870024658}
   - component: {fileID: 1870024657}
   - component: {fileID: 1870024656}
+  - component: {fileID: 1870024659}
   m_Layer: 5
   m_Name: Hospital
   m_TagString: Untagged
@@ -13748,18 +13773,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1870024657}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1501601639}
-        m_MethodName: SelectBuilding
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 8
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1870024657
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13796,6 +13810,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1870024654}
   m_CullTransparentMesh: 0
+--- !u!114 &1870024659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1870024654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd0bb9b80aff3764db37cb8932eb48a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingID: 8
 --- !u!1 &1875461098
 GameObject:
   m_ObjectHideFlags: 0
@@ -14262,6 +14289,7 @@ GameObject:
   - component: {fileID: 1915375592}
   - component: {fileID: 1915375591}
   - component: {fileID: 1915375590}
+  - component: {fileID: 1915375593}
   m_Layer: 5
   m_Name: Industrial
   m_TagString: Untagged
@@ -14331,18 +14359,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1915375591}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1501601639}
-        m_MethodName: SelectBuilding
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1915375591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14379,6 +14396,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1915375588}
   m_CullTransparentMesh: 0
+--- !u!114 &1915375593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915375588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd0bb9b80aff3764db37cb8932eb48a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingID: 2
 --- !u!1 &1926506467
 GameObject:
   m_ObjectHideFlags: 0
@@ -15748,6 +15778,7 @@ GameObject:
   - component: {fileID: 2111079317}
   - component: {fileID: 2111079316}
   - component: {fileID: 2111079315}
+  - component: {fileID: 2111079318}
   m_Layer: 5
   m_Name: GarbageDump
   m_TagString: Untagged
@@ -15817,18 +15848,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2111079316}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1501601639}
-        m_MethodName: SelectBuilding
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 7
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &2111079316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15865,6 +15885,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2111079313}
   m_CullTransparentMesh: 0
+--- !u!114 &2111079318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2111079313}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd0bb9b80aff3764db37cb8932eb48a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingID: 7
 --- !u!1 &2118031708
 GameObject:
   m_ObjectHideFlags: 0
