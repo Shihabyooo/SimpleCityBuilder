@@ -7,6 +7,9 @@ public class ResourcesManager : MonoBehaviour
     [SerializeField] CityResources resources = new CityResources(); //The serialization is only for testing (to view parameters in editor while testing)
     [SerializeField] CityFinances finances = new CityFinances(); //The serialization is only for testing (to view parameters in editor while testing)
 
+    public delegate void OnTreasuryChange(long newTreasury);
+    public static OnTreasuryChange onTreasuryChange; 
+
     //Getters
     public CityResources GetCityResources()
     {
@@ -144,11 +147,17 @@ public class ResourcesManager : MonoBehaviour
     public void AddToTreasury(int newFunds)
     {
         finances.treasury += newFunds;
+
+        if (onTreasuryChange != null)
+            onTreasuryChange.Invoke(finances.treasury);
     }
 
     public void SubstractFromTreasury(int newExpenses)
     {
         finances.treasury -= newExpenses;
+
+        if (onTreasuryChange != null)
+            onTreasuryChange.Invoke(finances.treasury);
     }
 
     public ref IncomeTaxes IncomeTaxes()
