@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviour
     static public EconomyManager econMan = null;
     public GameObject waterSign, powerSign; //Must be serializable to editor, must be accessible by other scripts.
 
+    public int startFunds = 500000;
+
     void Awake()
     {
         if (gameMan == null)
@@ -47,6 +49,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         simMan.StartSimulation();
+        resourceMan.AddToTreasury(startFunds);
     }
 
     public void SwitchToBuildingPlacement(int buildingID)
