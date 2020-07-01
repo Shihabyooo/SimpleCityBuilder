@@ -31,6 +31,13 @@ public class BuildingsManager : MonoBehaviour
         commercialBuildings = new List<CommercialBuilding>();
     }
 
+    public BuildingStats GetBuildingStats(int buildingID) 
+    {
+        BuildingStats tempStats = new BuildingStats(database.GetStatsForBuilding(buildingID));
+        
+        return tempStats;
+    }
+
     public BuildingProposal StartNewBuildingProposal(int buildingID)
     {
         currentProposal = new BuildingProposal(buildingID);
@@ -155,7 +162,6 @@ public class BuildingsManager : MonoBehaviour
         foreach (WorkPlace workPlace in workPlaces)
         {
             if (workPlace.AvailableWorkerSlots() > 0
-                //&& ((exactLevel && workPlace.WorkerEducationLevel() == educationLevel) || (!exactLevel && workPlace.WorkerEducationLevel() <= educationLevel)))
                 && workPlace.WorkerEducationLevel() == educationLevel)
                 {
                     if (!random)
@@ -170,7 +176,7 @@ public class BuildingsManager : MonoBehaviour
         {
             if (exactLevel)
                 return null;
-            else
+            else //search for a workslot with a level less than the specified level through GetEmptyWorkSlotExtended()
                 return GetEmptyWorkSlotExtended(educationLevel, random);
         }
 
@@ -318,4 +324,5 @@ class BuildingsDatabase
 
         return null;
     }
+
 }

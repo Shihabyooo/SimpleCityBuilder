@@ -193,6 +193,21 @@ public class BuildingStats
     //TODO add remaining requirements.
 
     //TODO add remaining -universal- parameters here.
+    public BuildingStats()
+    {
+
+    }
+
+    public BuildingStats(BuildingStats source) //Deep copy
+    {
+        id = source.id;
+        cost = source.cost;
+        type = source.type;
+        constructionTime = source.constructionTime;
+        requireResourcesToConstruct = source.requireResourcesToConstruct;
+        minBudget = source.minBudget;
+        maxBudget = source.maxBudget;
+    }
 }
 
 [System.Serializable]
@@ -200,6 +215,17 @@ public class BasicResources
 {
     public float power = 0.0f; //in unit power per unit time.
     public float water = 0.0f; //in unit volume per unit time.
+
+    public BasicResources()
+    {
+
+    }
+
+    public BasicResources(BasicResources source) //deep copy
+    {
+        power = source.power;
+        water = source.water;
+    }
 
     public float CompareToBaseResource(BasicResources baseResources) //used mostly in calculating efficiency, called when this object is the ALLOCATED resources. Returns average of
     {                                                                 //percentages of satisfaction for each resource.
