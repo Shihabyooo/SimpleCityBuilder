@@ -11,6 +11,12 @@ public class BuildingMenu : MonoBehaviour
     [SerializeField] float switchingTime = 1.5f;
     [SerializeField] int referenceUIResolutionWidth = 1920;
 
+    void Awake()
+    {
+        ResourcesManager.onTreasuryChange += UpdateBuildingAvailability;
+    }
+
+    //UI animation
     public void SwitchMenuState()
     {
         if (isSwitchingState)
@@ -65,13 +71,14 @@ public class BuildingMenu : MonoBehaviour
         yield return isSwitchingState = false;
     }
 
-   
-   public void SelectBuilding(int id)
-   {
-       if (isSwitchingState)
-            return;
+    void UpdateBuildingAvailability(long funds)
+    {
+        foreach(Transform buttonTransform in this.transform)
+        {
+            if (buttonTransform.gameObject.GetComponent<BuildingButton>() != null)
+                buttonTransform.gameObject.GetComponent<BuildingButton>().UpdateState(funds);
+        }
+        
+    }
 
-       //the code to translate the ID into a building goes here. For now, we hardcode block spawning just to test it out.
-       GameManager.gameMan.SwitchToBuildingPlacement(id);
-   }
 }
