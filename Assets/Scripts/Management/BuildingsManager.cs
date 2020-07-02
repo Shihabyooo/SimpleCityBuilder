@@ -23,8 +23,6 @@ public class BuildingsManager : MonoBehaviour
     [SerializeField] BuildingIDHandler schoolIDHandler = new BuildingIDHandler();
     [SerializeField] BuildingIDHandler policeIDHandler = new BuildingIDHandler();
 
-
-
     void Awake()
     {
         constructedBuildings = new List<Building>();
@@ -57,19 +55,25 @@ public class BuildingsManager : MonoBehaviour
     public void AddConstructedBuilding(Building building)
     {
         constructedBuildings.Add(building);
+        BuildingType type = building.GetStats().type;
 
-        if (building.GetStats().type == BuildingType.residential)
+        if (type == BuildingType.residential)
             residentialBuildings.Add(building.gameObject.GetComponent<ResidentialBuilding>());
-        else if (building.GetStats().type == BuildingType.industrial)
+        else if (type == BuildingType.industrial)
             industrialBuildings.Add(building.gameObject.GetComponent<IndustrialBuilding>());
-        else if (building.GetStats().type == BuildingType.commercial)
+        else if (type == BuildingType.commercial)
             commercialBuildings.Add(building.gameObject.GetComponent<CommercialBuilding>());
+        else if (type == BuildingType.infrastructure)
+        {
+            InfrastructureBuilding infrastructureBuilding = building.GetComponent<InfrastructureBuilding>();
+            AddInfrastructureBuilding(infrastructureBuilding, infrastructureBuilding.InfrastructureType());
+        }
 
         if (building.gameObject.GetComponent<WorkPlace>() != null)
             workPlaces.Add(building.gameObject.GetComponent<WorkPlace>());
     }
 
-    public void AddInfrastructureBuilding(InfrastructureBuilding building, InfrastructureService type)
+    void AddInfrastructureBuilding(InfrastructureBuilding building, InfrastructureService type)
     {
         switch(type) 
         {
@@ -94,11 +98,10 @@ public class BuildingsManager : MonoBehaviour
         }
     }
 
-    // public System.Guid GetNewGUID()
-    // {
-    //     System.Guid newID = System.Guid.NewGuid();
-    //     return newID;
-    // }
+    public void RemoveBuilding(Building building)
+    {
+
+    }
 
     public ulong GetNewID(InfrastructureService type) //So far, only parks, police stations and schools require IDs and are limited in number.
     { 
