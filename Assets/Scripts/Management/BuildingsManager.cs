@@ -19,6 +19,11 @@ public class BuildingsManager : MonoBehaviour
     public List<IndustrialBuilding> industrialBuildings {get; private set;}
     public List<CommercialBuilding> commercialBuildings {get; private set;}
 
+    [SerializeField] BuildingIDHandler parkIDHandler = new BuildingIDHandler();
+    [SerializeField] BuildingIDHandler schoolIDHandler = new BuildingIDHandler();
+    [SerializeField] BuildingIDHandler policeIDHandler = new BuildingIDHandler();
+
+
 
     void Awake()
     {
@@ -80,17 +85,34 @@ public class BuildingsManager : MonoBehaviour
                 break;
             case InfrastructureService.gas:
                 break;
-            case InfrastructureService.recreation:
+            case InfrastructureService.safety:
+                break;
+            case InfrastructureService.parks:
                 break;
             default:
                 break;
         }
     }
 
-    public System.Guid GetNewGUID()
-    {
-        System.Guid newID = System.Guid.NewGuid();
-        return newID;
+    // public System.Guid GetNewGUID()
+    // {
+    //     System.Guid newID = System.Guid.NewGuid();
+    //     return newID;
+    // }
+
+    public ulong GetNewID(InfrastructureService type) //So far, only parks, police stations and schools require IDs and are limited in number.
+    { 
+        switch (type)
+        {
+            case InfrastructureService.parks:
+                return parkIDHandler.GetNewID();
+            case InfrastructureService.safety:
+                return policeIDHandler.GetNewID();
+            case InfrastructureService.education:
+                return schoolIDHandler.GetNewID();
+            default:
+                return 0;
+        }
     }
 
     public ResidentialBuilding GetResidentialBuildingWithEmptySlot(CitizenClass _class, bool random = true)
@@ -272,7 +294,6 @@ public class BuildingsManager : MonoBehaviour
             if (!CanConstructHere(cell))
                 return false;
             
-            Grid.grid.SetCellOccupiedState(cell, true);
             targetBuilding.GetComponent<Building>().BeginConstruction(cell);
             targetBuilding = null;
                 
@@ -296,7 +317,6 @@ public class BuildingsManager : MonoBehaviour
         }
     }
 }
-
 
 [System.Serializable]
 class BuildingsDatabase
@@ -323,6 +343,73 @@ class BuildingsDatabase
         }
 
         return null;
+    }
+
+}
+
+[System.Serializable]
+public class BuildingIDHandler
+{
+    //Note: This object does not track the state of the objects that request an ID. Desotrying/Removing that object without it first releasing its ID will result in the
+    //said ID remaining marked as assigned for the remainder of this object's life. 
+    //A solution to this would be to overhall the system and have this object track both IDs and buildings (of its tracked type), including removal of this building.
+
+    ulong idAssignmentTracker = 0;
+    [SerializeField][Range(6, 64)] int maxCount = 32;
+    [SerializeField] int currentCount = 0;
+
+    public BuildingIDHandler()
+    {
+
+    }
+
+    public ulong GetNewID() //0 is an error state.
+    {
+        for (uint i = 0; i < maxCount; i++)
+        {
+            ulong id = ULongPow(2, i);
+
+            if (!IsIDAssigned(id))
+            {
+                MarkAssigned(id);
+                return id;
+            }
+        }
+
+        return 0;
+    }
+
+    public void ReleaseID(ulong id)
+    {
+        idAssignmentTracker = idAssignmentTracker & (~id);
+        currentCount--;
+    }
+
+    bool IsIDAssigned(ulong id)
+    {
+        if ((idAssignmentTracker & id) == id) 
+            return true;
+        
+        return false;
+    }   
+
+    void MarkAssigned(ulong id)
+    {
+        idAssignmentTracker = idAssignmentTracker | id;
+        currentCount++;
+    }
+    
+    ulong ULongPow(uint _base, uint power) 
+    {
+        //This method is to workaround the fact that Unity and Csharp (afaik) don't provide methods to calculate power of integers. And since we need exact integer results up
+        //to the max cap of ulongs (18,446,744,073,709,551,615), but floats and doubles start to deviate at 16,777,217 and 9,007,199,254,740,993, we have to make a custom power
+        //calculation that only uses integers.
+
+        ulong result = 1;
+        for (uint i = 0; i < power; i++)
+            result = result * _base;
+
+        return result;
     }
 
 }
