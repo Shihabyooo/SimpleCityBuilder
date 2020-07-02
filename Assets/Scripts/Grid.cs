@@ -6,12 +6,6 @@ using UnityEngine;
 //TODO decouple extra grid layer from base grid (i.e. other layers can have coarser grids, to save memory/performance.)
 //TODO several methods bellow use Mathf.Clamp where only a single end bound check is required, replace those with Mathf.Min and Mathf.Max as appropriate.
 
-
-public enum InfrastructureService
-{
-    none = 0, water = 1, power = 2, gas = 4, education = 8, health = 16, safety = 32, parks = 64
-}
-
 [RequireComponent(typeof(BoxCollider))]
 public class Grid : MonoBehaviour
 {

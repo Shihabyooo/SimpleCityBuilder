@@ -19,6 +19,7 @@ public class PowerPlant_1 : InfrastructureBuilding
         base.Awake();
         smoke = this.transform.Find("Smoke").GetComponent<ParticleSystem>();
         UpdateEmissionVisuals(0.0f);
+        infrastructureType = InfrastructureService.power;
     }
 
     public override void ShowDetailsOnViewer()
@@ -31,7 +32,6 @@ public class PowerPlant_1 : InfrastructureBuilding
         base.OnConstructionComplete();
         Grid.grid.SetInfrastructureState(InfrastructureService.power, occupiedCell[0], occupiedCell[1], infraStats.radiusOfInfluence);
         ComputeProduction();
-        GameManager.buildingsMan.AddInfrastructureBuilding(this, InfrastructureService.power);
     }
 
     public override void ComputeProduction() //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.

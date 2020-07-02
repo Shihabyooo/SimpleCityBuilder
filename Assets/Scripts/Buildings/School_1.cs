@@ -8,6 +8,7 @@ public class School_1 : InfrastructureBuilding
     override protected void Awake()
     {
         base.Awake();
+        infrastructureType = InfrastructureService.education;
     }
 
     public override void ShowDetailsOnViewer()

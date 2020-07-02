@@ -11,6 +11,12 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
 
     [SerializeField] WaterTreatmentPlantStats plantStats = new WaterTreatmentPlantStats();
 
+    protected override void Awake()
+    {
+        base.Awake();
+        infrastructureType = InfrastructureService.water;
+    }
+
     public override void ShowDetailsOnViewer()
     {
         BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.waterTreatment);
@@ -21,7 +27,6 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
         base.OnConstructionComplete();
         Grid.grid.SetInfrastructureState(InfrastructureService.water, occupiedCell[0], occupiedCell[1], infraStats.radiusOfInfluence);
         ComputeProduction();
-        GameManager.buildingsMan.AddInfrastructureBuilding(this, InfrastructureService.water);
     }
 
     public override void ComputeProduction()  //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.

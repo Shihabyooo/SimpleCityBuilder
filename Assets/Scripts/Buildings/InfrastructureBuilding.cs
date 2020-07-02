@@ -2,12 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum InfrastructureService
+{
+    undefined = 0, water = 1, power = 2, gas = 4, education = 8, health = 16, safety = 32, parks = 64
+}
+
 [RequireComponent(typeof(WorkPlace))]
 public class InfrastructureBuilding : Building
 {
     [SerializeField] protected InfrastructureBuildingStats infraStats;
     public float currentLoad {get; private set;} //as a percentage of max production
     [SerializeField] protected WorkPlace workPlace;
+    [SerializeField] protected InfrastructureService infrastructureType;
 
     override protected void Awake()
     {
@@ -54,6 +60,11 @@ public class InfrastructureBuilding : Building
             efficiency = 0.0f;
 
         return efficiency;
+    }
+
+    public InfrastructureService InfrastructureType()
+    {
+        return infrastructureType;
     }
 }
 

@@ -13,6 +13,7 @@ public class Park_1 : InfrastructureBuilding
     override protected void Awake()
     {
         base.Awake();
+        infrastructureType = InfrastructureService.parks;
     }
 
     public override void ShowDetailsOnViewer()

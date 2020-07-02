@@ -10,6 +10,12 @@ public class WindFarm_1 : InfrastructureBuilding
 
     [SerializeField] WindFarmStats farmStats = new WindFarmStats();
 
+    protected override void Awake()
+    {
+        base.Awake();
+        infrastructureType = InfrastructureService.power;
+    }
+
     public override void ShowDetailsOnViewer()
     {
         BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.windFarm);
@@ -20,7 +26,6 @@ public class WindFarm_1 : InfrastructureBuilding
         base.OnConstructionComplete();
         Grid.grid.SetInfrastructureState(InfrastructureService.power, occupiedCell[0], occupiedCell[1], infraStats.radiusOfInfluence);
         ComputeProduction();
-        GameManager.buildingsMan.AddInfrastructureBuilding(this, InfrastructureService.power);
     }
 
     public override void ComputeProduction()  //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
