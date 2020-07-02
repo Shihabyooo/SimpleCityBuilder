@@ -1440,6 +1440,7 @@ MonoBehaviour:
     type: 3}
   powerSign: {fileID: 7463499582311921010, guid: d3300d92d1df8484dafff1daa5b1e0f6,
     type: 3}
+  startFunds: 50000
 --- !u!114 &224963319
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1465,6 +1466,15 @@ MonoBehaviour:
     - {fileID: 7821978076698723070, guid: 8c750de6cf27df94fa72262e89f3d132, type: 3}
     - {fileID: 855314826128607868, guid: f46101b6c78d9f4499e83a1190158146, type: 3}
     - {fileID: 7230156794272959213, guid: 30b3f2368c6db1f42af36c6e63116a21, type: 3}
+  parkIDHandler:
+    maxCount: 32
+    currentCount: 0
+  schoolIDHandler:
+    maxCount: 32
+    currentCount: 0
+  policeIDHandler:
+    maxCount: 32
+    currentCount: 0
 --- !u!114 &224963320
 MonoBehaviour:
   m_ObjectHideFlags: 0
