@@ -20,7 +20,7 @@ public class Building : MonoBehaviour
     public uint[] occupiedCell = new uint[2]; //the cell this building is constructed on, set by BuildingsManager (via ProposedBuilding).
     [SerializeField] protected uint budget; //IMPORTANT! budget must always be from stats.minBudget to stats.maxBudget
     [SerializeField] protected BasicResources allocatedResources = new BasicResources(); //These resources will be allocated by the simulation based on availability and priority.
-    protected System.Guid uniqueID {get; private set;}
+    //protected System.Guid uniqueID {get; private set;}
     protected System.DateTime constructionDate;
 
     BoxCollider buildingCollider;
@@ -93,16 +93,16 @@ public class Building : MonoBehaviour
         return true;
     }
 
-    public void BeginConstruction(Cell cell)
+    public virtual void BeginConstruction(Cell cell)
     {
         isUnderConstruction = true;
+        Grid.grid.SetCellOccupiedState(cell, true);
         occupiedCell = new uint[2]{cell.cellID[0], cell.cellID[1]};
         this.transform.localScale = Vector3.zero;
-        //StartCoroutine(Construction());
         SimulationManager.onTimeUpdate += ProgressConstruction;
     }
 
-    int constructionTimeElapsed = 0;
+    int constructionTimeElapsed = 0; //in hours
     void ProgressConstruction(int hours)
     {
         if (!isUnderConstruction)
@@ -122,7 +122,7 @@ public class Building : MonoBehaviour
     protected virtual void OnConstructionComplete()
     {
         isUnderConstruction = false;
-        uniqueID = GameManager.buildingsMan.GetNewGUID();
+        //uniqueID = GameManager.buildingsMan.GetNewGUID();
         GameManager.buildingsMan.AddConstructedBuilding(this);
         SimulationManager.onTimeUpdate -= ProgressConstruction;
 

@@ -4866,7 +4866,7 @@ MonoBehaviour:
   industryStats:
     incomePerProduct: 50
     maxProductionPerDay: 50
-    emissionPerProductUnit: 0.5
+    emissionPerProductUnit: 1
   minEmissionToGenerateSmoke: 6
   maxEmissionToGenerateSmoke: 30
   maxSmokeOpacity: 0.75
