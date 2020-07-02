@@ -265,6 +265,7 @@ public class ControlManager : MonoBehaviour
     }
     
 //Other testing methods
+//This code is ridiculously long, redundant and ineffiecient. It's meant for testing display only.
     bool showCellValue = false;
     Cell inspectedCell;
     void OnGUI()
@@ -277,7 +278,7 @@ public class ControlManager : MonoBehaviour
         if (UnityEditor.EditorApplication.isPlaying && showCellValue)
         {
             int lineHeight = 22;
-            Rect rect = new Rect(250, lineHeight, 500, lineHeight);
+            Rect rect = new Rect(500, lineHeight, 500, lineHeight);
             if (inspectedCell != null)
             {
                 Rect nextLine = rect;
@@ -324,6 +325,47 @@ public class ControlManager : MonoBehaviour
                 text = "Rainfall: " + inspectedCell.rainfall.ToString();
                 GUI.Label(nextLine, text, style);
 
+                string tempString = "";
+                for (uint i = 0; i < 64; i++)
+                {
+                    ulong id = 1;
+                    for (uint j = 0; j < i; j++)
+                        id = id * 2;
+
+                    if ((inspectedCell.servicingParks & id) == id)
+                        tempString += id.ToString() + ", ";
+                }
+                nextLine.y += lineHeight + 5;
+                text = "Servicing parks: " + tempString;
+                GUI.Label(nextLine, text, style);
+
+                tempString = "";
+                for (uint i = 0; i < 64; i++)
+                {
+                    ulong id = 1;
+                    for (uint j = 0; j < i; j++)
+                        id = id * 2;
+
+                    if ((inspectedCell.servicingPolice & id) == id)
+                        tempString += id.ToString() + ", ";
+                }
+                nextLine.y += lineHeight + 5;
+                text = "Servicing police: " + tempString;
+                GUI.Label(nextLine, text, style);
+
+                tempString = "";
+                for (uint i = 0; i < 64; i++)
+                {
+                    ulong id = 1;
+                    for (uint j = 0; j < i; j++)
+                        id = id * 2;
+
+                    if ((inspectedCell.servicingSchools & id) == id)
+                        tempString += id.ToString() + ", ";
+                }
+                nextLine.y += lineHeight + 5;
+                text = "Servicing schools: " + tempString;
+                GUI.Label(nextLine, text, style);
 
             }
             else
