@@ -9,7 +9,7 @@ using UnityEngine;
 
 public enum InfrastructureService
 {
-    none = 0, water = 1, power = 2, gas = 4, education = 8, health = 16, safety = 32, recreation = 64
+    none = 0, water = 1, power = 2, gas = 4, education = 8, health = 16, safety = 32, parks = 64
 }
 
 [RequireComponent(typeof(BoxCollider))]
@@ -28,7 +28,12 @@ public class Grid : MonoBehaviour
 
     //Extra grid layers, each layer targets specific element (e.g. water supply, pollution, health coverage, education coverage, etc)
     //Services and infrastructure
+    //Services layers use bitmasking to set coverage (infrastructreLayer) and the ID of the covering building (Remaining layers).
     public GridLayer<InfrastructureService> infrastructureLayer {get; private set;} //Uses bitmask to mark the reach of an infrastructure service, check InfrastructureService enum.
+    public GridLayer<ulong> parksLayer {get; private set;}
+    public GridLayer<ulong> policeLayer {get; private set;}
+    public GridLayer<ulong> schoolsLayer {get; private set;}
+    
     //natural resources
     public GridLayer<float> groundWaterCapacityLayer {get; private set;} //max capacity, unit volume
     public GridLayer<float> groundWaterVolumeLayer {get; private set;} //current quantity, unit volume
@@ -38,7 +43,7 @@ public class Grid : MonoBehaviour
     //Others layer
     public GridLayer<float> pollutionLayer {get; private set;}
     public GridLayer<float> rainFallLayer {get; private set;}
-
+    
 
     void Awake()
     {
@@ -63,24 +68,18 @@ public class Grid : MonoBehaviour
     {
         cellsStatus = new int[noOfCells.x, noOfCells.y];
 
-        infrastructureLayer = new GridLayer<InfrastructureService>((uint)noOfCells.x, (uint)noOfCells.y); // 
-        InitializeNaturalResourcesLayers();
-        InitializeOthersLayers();
-    }
+        infrastructureLayer = new GridLayer<InfrastructureService>((uint)noOfCells.x, (uint)noOfCells.y);
+        parksLayer = new GridLayer<ulong>((uint)noOfCells.x, (uint)noOfCells.y);
+        policeLayer = new GridLayer<ulong>((uint)noOfCells.x, (uint)noOfCells.y);
+        schoolsLayer = new GridLayer<ulong>((uint)noOfCells.x, (uint)noOfCells.y);
 
-    void InitializeNaturalResourcesLayers()
-    {
-        //TODO implement this after figuring out how maps are going to be designed/saved.public GridLayer<float> groundWaterCapacityLayer {get; private set;} //max capacity, unit volume
         groundWaterCapacityLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
         groundWaterVolumeLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
         groundWaterRechargeLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
         windSpeedLayer  = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
         windDirectionLayer  = new GridLayer<uint>((uint)noOfCells.x, (uint)noOfCells.y);
         rainFallLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
-    }
 
-    void InitializeOthersLayers()
-    {
         pollutionLayer = new GridLayer<float>((uint)noOfCells.x, (uint)noOfCells.y);
     }
 
@@ -200,7 +199,11 @@ public class Grid : MonoBehaviour
         cell.isEducated = IsInfrastructureSet(InfrastructureService.education, cellServices);
         cell.isHealthed = IsInfrastructureSet(InfrastructureService.health, cellServices);
         cell.isPowered = IsInfrastructureSet(InfrastructureService.power, cellServices);
-        cell.isWatered = IsInfrastructureSet(InfrastructureService.water, cellServices);    
+        cell.isWatered = IsInfrastructureSet(InfrastructureService.water, cellServices);
+
+        cell.servicingParks = parksLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
+        cell.servicingSchools = schoolsLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
+        cell.servicingPolice = policeLayer.GetCellValue(cell.cellID[0], cell.cellID[1]);
     }
 
     void GetCellNaturalResourcesStates(ref Cell cell)
@@ -260,6 +263,77 @@ public class Grid : MonoBehaviour
             for (uint j = minX; j <= maxX; j++)
             {
                 infrastructureLayer.GetCellRef(j, i) = infrastructureLayer.GetCellValue(j, i) | service;
+            }
+        }
+    }
+
+    public void SetInfrastructureLayerCoverageByID(uint cellID_x, uint cellID_y, uint radius, InfrastructureService type, ulong id) //Implies SetInfrastructureState() ID is ensured to be 2^n, see notes on Park.cs
+    {
+        //Make a reference to the layer we will modify based on service type
+        GridLayer<ulong> targetLayer;
+        
+        switch (type)
+        {
+            case InfrastructureService.parks:
+                targetLayer = parksLayer;
+                break;
+            case InfrastructureService.safety:
+                targetLayer = policeLayer;
+                break;
+            case InfrastructureService.education:
+                targetLayer = schoolsLayer;
+                break;
+            default:
+                print("WARNING! Attempting to set infralayer coverage for non supporting type: " + type);
+                return;
+        }
+
+        //Set the coverage similarily to SetInfrastructureState()
+        uint minY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y - (long)radius, 0, noOfCells.y - 1));
+        uint maxY = (uint)Mathf.RoundToInt(Mathf.Clamp((long)cellID_y + (long)radius, 0, noOfCells.y - 1));
+        
+        for (uint i = minY; i <= maxY; i++)
+        {
+            long sqrtVal = Mathf.RoundToInt(Mathf.Sqrt(Mathf.Pow(radius, 2) - Mathf.Pow((long)i - (long)cellID_y, 2))); //cache this calculation, since its result will be used twice.
+
+            uint minX = (uint)Mathf.FloorToInt(Mathf.Clamp( (long)cellID_x - sqrtVal, 0, noOfCells.x - 1));
+            uint maxX = (uint)Mathf.CeilToInt(Mathf.Clamp( (long)cellID_x + sqrtVal, 0, noOfCells.x - 1));
+
+            for (uint j = minX; j <= maxX; j++)
+            {
+                targetLayer.GetCellRef(j, i) = targetLayer.GetCellValue(j, i) | id;
+                infrastructureLayer.GetCellRef(j, i) = infrastructureLayer.GetCellValue(j, i) | type;
+            }
+        }    
+    }
+
+    public void UnetInfrastructureLayerCoverageByID(ulong id, InfrastructureService type) //TODO test this
+    {
+         //Make a reference to the layer we will modify based on service type
+        GridLayer<ulong> targetLayer;
+        
+        switch (type)
+        {
+            case InfrastructureService.parks:
+                targetLayer = parksLayer;
+                break;
+            case InfrastructureService.safety:
+                targetLayer = policeLayer;
+                break;
+            case InfrastructureService.education:
+                targetLayer = schoolsLayer;
+                break;
+            default:
+                print("WARNING! Attempting to unset infralayer coverage for non supporting type: " + type);
+                return;
+        }
+
+        //Loop over entire grid and unset the id bit (op is fast, should be able to get away with it with minimal performance impact)
+        for (uint i = 0; i < noOfCells.x; i++)
+        {
+            for (uint j = 0; j < noOfCells.y; j++)
+            {
+                targetLayer.GetCellRef(j, i) = targetLayer.GetCellValue(j, i) & (~id);
             }
         }
     }
@@ -338,6 +412,7 @@ public class Grid : MonoBehaviour
         } 
     }
 
+    
 
 //testing metdhods
     float minGWCap = 50000f, maxGWCap = 111690f;
@@ -548,9 +623,11 @@ public class Cell
     //others
     public float pollution = 0.0f;
     public float rainfall = 0.0f;    
-}
 
-//TODO revisit these classes
+    public ulong servicingParks = 0;
+    public ulong servicingPolice = 0;
+    public ulong servicingSchools = 0;
+}
 
 [System.Serializable]
 public class GridLayer<T>
