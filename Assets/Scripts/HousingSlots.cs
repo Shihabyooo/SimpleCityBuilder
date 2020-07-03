@@ -94,4 +94,26 @@ public class HousingSlots
         return (low + middle + high); 
     }
     
+
+    static public HousingSlots operator+ (HousingSlots slots1, HousingSlots slots2)
+    {
+        HousingSlots sum = new HousingSlots();
+
+        sum.low = slots1.low + slots2.low;
+        sum.middle = slots1.middle + slots2.middle;
+        sum.high = slots1.high + slots2.high;
+
+        return sum;
+    }
+
+    static public HousingSlots operator/ (HousingSlots slots, float denominator)
+    {
+        HousingSlots sum = new HousingSlots();
+
+        sum.low =  System.Convert.ToUInt32(System.Convert.ToDouble(slots.low) / denominator);
+        sum.middle = System.Convert.ToUInt32(System.Convert.ToDouble(slots.middle) / denominator) ;
+        sum.high = System.Convert.ToUInt32(System.Convert.ToDouble(slots.high) / denominator) ;
+
+        return sum;
+    }
 }
