@@ -21,10 +21,15 @@ public class ResourcesManager : MonoBehaviour
         SimulationManager.onTimeUpdate += TimeProgress;
     }
 
+    //TODO while CityResources change over the course of the day, the majority of CityFinances (as of July, 3rd implementation) are the same per day, difference is in the treasury
+    //only (which could change due to player paying for constructions, etc). The current implementation in TimeProgress() and UpdateHistory() has some redundant calculations.
+    //For now, leaving it as is, as there *might* be additional variables in the future in CityFinances that are are updated hourly. If that didn't turn out to be the case, this
+    //is a venue for some cleanup and optimization (for prolly statistically insignificant gains, but still).
+
     public void TimeProgress(int hours)
     {
-        dailySumResources += (resources / (float) hours);
-        dailySumFinances += (finances / (float) hours);
+        dailySumResources += resources;
+        dailySumFinances += finances;
         helperCounter++;
     }
 
@@ -406,14 +411,36 @@ public class ResourcesHistory
     //Assume date is int/int/int = 3 * 4 = 12 bytes, total  = 149 bytes, say 150 bytes.
     //for 10 years: days = 10 * 365 + 3 (worst case: three leap years) = 3653 days.
     //Total size for 10 years history = 3653 * 150 / 1024 =~ 535KB.
+    //Using same initial ests, for 10000 days, size =~ 1.4MB
+    //Even if my ests were off to half the actuall, those are acceptable figures....
 
-
-    int maxHistory = 10000; //in days. 10,000 is roughly 27 years.
-
-
-    public void AddToHistory(System.DateTime date, CityResources avgResources, CityFinances avgFinances)
+    public struct TimePoint
     {
+        public System.DateTime date;
+        public CityResources resources;
+        public CityFinances finances;
 
+        public TimePoint(System.DateTime _date, CityResources _resources, CityFinances _finances)
+        {
+            date = _date;
+            resources = _resources;
+            finances = _finances;
+        }
     }
 
+    int maxHistory = 10000; //in days. 10,000 is roughly 27 years.
+    public List<TimePoint> history {get; private set;}
+
+    public ResourcesHistory()
+    {
+        history = new List<TimePoint>();
+    }
+
+    public void AddToHistory(System.DateTime date, CityResources avgDailyResources, CityFinances avgDailyFinances)
+    {
+        if(history.Count >= maxHistory)
+            history.RemoveAt(0);
+        
+        history.Add(new TimePoint(date, avgDailyResources, avgDailyFinances));
+    }
 }
