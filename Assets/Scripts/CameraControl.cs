@@ -13,6 +13,9 @@ public class CameraControl : MonoBehaviour
     [SerializeField] float degreesPerTick = 5.0f;
     [SerializeField] CameraBoundary cameraBoundary = new CameraBoundary();
 
+    public delegate void PostRender();
+    public static PostRender postRender;
+
     void Awake()
     {
         if (focus == null)
@@ -23,7 +26,6 @@ public class CameraControl : MonoBehaviour
                 print ("ERROR! No focus transform is assigned to main Camera, and no child transform named \"Focus\" was found");
         }
     }
-
 
     public void Zoom(float zoomRate)
     {
@@ -100,6 +102,12 @@ public class CameraControl : MonoBehaviour
         return hit;
     }
 
+    void OnPostRender()
+    {
+        if (postRender != null)
+            postRender.Invoke();
+    }
+
     //testing visualization
     void OnDrawGizmos()
     {        
@@ -140,5 +148,8 @@ public class CameraBoundary
                             Mathf.Clamp(position.y, minCornerXYZ.y, maxCornerXYZ.y),
                             Mathf.Clamp(position.z, minCornerXYZ.z, maxCornerXYZ.z));
     }
+
+
+
     
 }
