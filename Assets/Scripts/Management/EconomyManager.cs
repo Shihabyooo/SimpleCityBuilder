@@ -236,4 +236,26 @@ public struct IncomeTaxes
         middle = newIncomeTaxes.middle;
         high = newIncomeTaxes.high;
     }
+
+    static public IncomeTaxes operator+ (IncomeTaxes in1, IncomeTaxes in2)
+    {
+        IncomeTaxes sum = new IncomeTaxes();
+
+        sum.low = in1.low + in2.low;
+        sum.middle = in1.middle + in2.middle;
+        sum.high = in1.high + in2.high;
+
+        return sum;
+    }
+
+    static public IncomeTaxes operator/ (IncomeTaxes inc, float denominator)
+    {
+        IncomeTaxes result = new IncomeTaxes();
+
+        result.low = Mathf.RoundToInt((float)inc.low / denominator);
+        result.middle = Mathf.RoundToInt((float)inc.middle / denominator);
+        result.high = Mathf.RoundToInt((float)inc.high / denominator);
+
+        return result;
+    }
 }
