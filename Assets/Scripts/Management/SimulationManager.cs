@@ -58,6 +58,7 @@ public class SimulationManager : MonoBehaviour
         GameManager.climateMan.UpdateClimateDay(date);
         GameManager.populationMan.UpdatePopulation();
         GameManager.econMan.UpdateEconomyDay();
+        GameManager.resourceMan.UpdateHistory(date);
     }
 
     //Simulation runs coroutines.

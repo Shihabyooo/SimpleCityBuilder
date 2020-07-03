@@ -10,6 +10,40 @@ public class ResourcesManager : MonoBehaviour
     public delegate void OnTreasuryChange(long newTreasury);
     public static OnTreasuryChange onTreasuryChange; 
 
+
+    CityResources dailySumResources = new CityResources();
+    CityFinances dailySumFinances = new CityFinances();
+    int helperCounter = 0;
+    ResourcesHistory resourceHistory = new ResourcesHistory();
+
+    void Awake()
+    {
+        SimulationManager.onTimeUpdate += TimeProgress;
+    }
+
+    public void TimeProgress(int hours)
+    {
+        dailySumResources += (resources / (float) hours);
+        dailySumFinances += (finances / (float) hours);
+        helperCounter++;
+    }
+
+    public void UpdateHistory(System.DateTime date)
+    {
+        //Divide the sum by the amounts added to get the average
+        CityResources averageDailyResources = dailySumResources / (float)helperCounter;
+        CityFinances averageDailyFinances = dailySumFinances / (float)helperCounter;
+
+        //Add to history
+        resourceHistory.AddToHistory(date, averageDailyResources, averageDailyFinances);
+
+        //reset the averages objects and counter
+        dailySumResources = new CityResources();
+        dailySumFinances = new CityFinances();
+        helperCounter = 0;
+    }
+
+
     //Getters
     public CityResources GetCityResources()
     {
@@ -280,6 +314,48 @@ public class CityResources
 
     public HousingSlots totalHousingSlots = new HousingSlots();
     public HousingSlots occuppiedHousingSlots = new HousingSlots();
+
+    public static CityResources operator+ (CityResources res1, CityResources res2)
+    {
+        CityResources sum = new CityResources();
+        
+        sum.powerDemand = res1.powerDemand + res2.powerDemand;
+        sum.powerConsumption = res1.powerConsumption + res2.powerConsumption;
+        sum.totalAvailablePower = res1.totalAvailablePower + res2.totalAvailablePower;
+        sum.waterDemand = res1.waterDemand + res2.waterDemand;
+        sum.waterConsumption = res1.waterConsumption + res2.waterConsumption;
+        sum.totalAvailableWaterSupply = res1.totalAvailableWaterSupply + res2.totalAvailableWaterSupply;
+        sum.studentsCount = res1.studentsCount + res2.studentsCount;
+        sum.totalAvailableEducationSeats = res1.totalAvailableEducationSeats + res2.totalAvailableEducationSeats;
+        sum.filledHospitalBeds = res1.filledHospitalBeds + res2.filledHospitalBeds;
+        sum.totalAvailableHospitalBeds = res1.totalAvailableHospitalBeds + res2.totalAvailableHospitalBeds;
+        
+        sum.totalHousingSlots = res1.totalHousingSlots + res2.totalHousingSlots;
+        sum.occuppiedHousingSlots = res1.occuppiedHousingSlots + res2.occuppiedHousingSlots;
+
+        return sum;
+    }
+
+    public static CityResources operator/ (CityResources res, float denominator)
+    {
+        CityResources result = new CityResources();
+
+        result.powerDemand = res.powerDemand / denominator;
+        result.powerConsumption = res.powerConsumption / denominator;
+        result.totalAvailablePower = res.totalAvailablePower / denominator;
+        result.waterDemand = res.waterDemand / denominator;
+        result.waterConsumption = res.waterConsumption / denominator;
+        result.totalAvailableWaterSupply = res.totalAvailableWaterSupply / denominator;
+        result.studentsCount = (uint)Mathf.RoundToInt((float)res.studentsCount / denominator);
+        result.totalAvailableEducationSeats = (uint)Mathf.RoundToInt((float)res.totalAvailableEducationSeats / denominator);
+        result.filledHospitalBeds = (uint)Mathf.RoundToInt((float)res.filledHospitalBeds / denominator);
+        result.totalAvailableHospitalBeds = (uint)Mathf.RoundToInt((float)res.totalAvailableHospitalBeds / denominator);
+        
+        result.totalHousingSlots = res.totalHousingSlots / denominator;
+        result.occuppiedHousingSlots = res.occuppiedHousingSlots / denominator;
+
+        return result;
+    }
 }
 
 [System.Serializable]
@@ -293,4 +369,51 @@ public class CityFinances
     public int commercialTaxes;
     public int buildingExpenses;
     //TODO add other finances/economy related parameters here
+
+    static public CityFinances operator+ (CityFinances fin1, CityFinances fin2)
+    {
+        CityFinances sum = new CityFinances();
+
+        sum.treasury = fin1.treasury + fin2.treasury;
+        sum.incomeTaxes = fin1.incomeTaxes + fin2.incomeTaxes;
+        sum.industryTaxes = fin1.industryTaxes + fin2.industryTaxes;
+        sum.commercialTaxes = fin1.commercialTaxes + fin2.commercialTaxes;
+        sum.buildingExpenses = fin1.buildingExpenses + fin2.buildingExpenses;
+
+        return sum;
+    }
+
+    static public CityFinances operator/ (CityFinances fin, float denominator)
+    {
+        CityFinances result = new CityFinances();
+
+        result.treasury =   System.Convert.ToInt64(System.Convert.ToSingle(fin.treasury)/ denominator);
+        result.incomeTaxes = fin.incomeTaxes / denominator;
+        
+        result.industryTaxes = Mathf.RoundToInt((float)fin.industryTaxes / denominator);
+        result.commercialTaxes = Mathf.RoundToInt((float)fin.commercialTaxes / denominator);
+        result.buildingExpenses = Mathf.RoundToInt((float)fin.buildingExpenses / denominator);
+
+        return result;
+    }
+}
+
+[System.Serializable]
+public class ResourcesHistory
+{
+    //Ballparking size of history in memory:
+    //104 bytes for Resources + 32 bytes for finances + 1 for allignement = 137 bytes.
+    //Assume date is int/int/int = 3 * 4 = 12 bytes, total  = 149 bytes, say 150 bytes.
+    //for 10 years: days = 10 * 365 + 3 (worst case: three leap years) = 3653 days.
+    //Total size for 10 years history = 3653 * 150 / 1024 =~ 535KB.
+
+
+    int maxHistory = 10000; //in days. 10,000 is roughly 27 years.
+
+
+    public void AddToHistory(System.DateTime date, CityResources avgResources, CityFinances avgFinances)
+    {
+
+    }
+
 }
