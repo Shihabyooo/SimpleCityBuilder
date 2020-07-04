@@ -5,21 +5,30 @@ using UnityEngine.UI;
 
 //This graph generator is specificly written for Timeseries. i.e. the X-axis is time (in days).
 
+//TODO modify the code to render to a texture, then set texture as an image in appropriate place inside the bigger graph window (itself a mix of images, text, sliders, buttons, etc)
+
 public class GraphGenerator : MonoBehaviour
 {
     [SerializeField] Material lineMaterial;
     [SerializeField] Material bgMaterial;
-    //[SerializeField] Image graphBG;
+    [SerializeField] Material decorationMaterial;
     [SerializeField] Vector2 graphSize;
     [SerializeField] Vector2 referenceCanvasResolution;
     [SerializeField] Vector2 padding;
 
+    [SerializeField] float graphLineThickness = 2.0f; //in pixels.
+    [SerializeField] float axesLineThickness = 3.5f; //in pixels.
+    [SerializeField] float gridLineThickness = 1.5f; //in pixels.
+    [SerializeField] int maxGridCountX = 25;
+    [SerializeField] int maxGridCountY = 10;
+
     Vector2 centre;
     GraphData activeGraphData = null;
-    [SerializeField] bool isShown = false;
+    bool isShown = false;
 
     void Awake()
     {
+        
     }
 
     public bool ShowGraph(TimeSeries<float> data)
@@ -66,7 +75,7 @@ public class GraphGenerator : MonoBehaviour
         GL.LoadOrtho();
 
         DrawBackground();
-        DrawLine(activeGraphData);
+        DrawContent(activeGraphData);
 
         GL.PopMatrix();
     }
@@ -88,24 +97,86 @@ public class GraphGenerator : MonoBehaviour
         GL.End();
     }
 
-    void DrawLine(GraphData data)
+    void DrawContent(GraphData data)
+    {
+        Vector2 workingDimensions = graphSize - (padding * 2.0f);
+        Vector2 origin = (centre - workingDimensions / 2.0f);
+        
+        DrawLine(data, workingDimensions, origin);
+        DrawDecoration(data, workingDimensions, origin);
+    }
+
+    void DrawDecoration(GraphData data, Vector2 workingDimensions, Vector2 origin)
+    {
+        decorationMaterial.SetPass(0);
+        
+        //Cache some repeating calculations
+        float relOriginX = origin.x/ referenceCanvasResolution.x;
+        float relOriginY = origin.y / referenceCanvasResolution.y;
+        float relThicknessHalfX = axesLineThickness / (referenceCanvasResolution.x * 2.0f);
+        float relThicknessHalfY = axesLineThickness / (referenceCanvasResolution.y * 2.0f);
+
+        //Draw Axes
+        GL.Begin(GL.QUADS);
+        
+        //Y axis always begins at left edge        
+        GL.Vertex3(relOriginX + relThicknessHalfX,  relOriginY, 0.0f );
+        GL.Vertex3(relOriginX - relThicknessHalfX,  relOriginY, 0.0f );
+        GL.Vertex3(relOriginX - relThicknessHalfX,  (origin.y + workingDimensions.y) / referenceCanvasResolution.y, 0.0f );
+        GL.Vertex3(relOriginX + relThicknessHalfX,  (origin.y + workingDimensions.y) / referenceCanvasResolution.y, 0.0f );
+
+        //The X axis is clamped to the zero value (if the values oscilate between positive and negative), or is the min (for all positive) or max (for all negative) value.
+        float yCoord;
+        if (data.isOscillatingAroundYAxis) //compute the position of y=zero.
+            yCoord = (origin.y + workingDimensions.y * (0.0f - data.minY) / data.rangeY) / referenceCanvasResolution.y;
+        else //compute position depending on whether all positive or negative
+            yCoord = (origin.y + Mathf.Min((Mathf.Sign(data.Value(0))) * workingDimensions.y , 0.0f)) / referenceCanvasResolution.y;
+        
+        GL.Vertex3(relOriginX, yCoord - relThicknessHalfY, 0.0f);
+        GL.Vertex3(relOriginX, yCoord + relThicknessHalfY, 0.0f);
+        GL.Vertex3(relOriginX + workingDimensions.x / referenceCanvasResolution.x, yCoord + relThicknessHalfY, 0.0f);
+        GL.Vertex3(relOriginX + workingDimensions.x / referenceCanvasResolution.x, yCoord - relThicknessHalfY, 0.0f);
+
+
+        //Draw Grid
+        //modify cached reThicknessHalfX and Y to use
+        relThicknessHalfX = gridLineThickness / (referenceCanvasResolution.x * 2.0f);
+        relThicknessHalfY = gridLineThickness / (referenceCanvasResolution.y * 2.0f);
+
+        int xGridCount = Mathf.Min(data.Length(), maxGridCountX);
+        int yGridCount = Mathf.Min(data.Length(), maxGridCountY);
+
+        float daysPerGridSpacing = Mathf.Floor(data.Length() / xGridCount);
+        float xDistPerDay = (workingDimensions.x / referenceCanvasResolution.x) / (float)data.Length();
+        float distPerGridSpacingX = daysPerGridSpacing * xDistPerDay;
+
+        for (int i = 1; i < xGridCount; i++)
+        {
+            GL.Vertex3(relOriginX + (i * distPerGridSpacingX) + relThicknessHalfX, relOriginY, 0.0f);
+            GL.Vertex3(relOriginX + (i * distPerGridSpacingX) - relThicknessHalfX, relOriginY, 0.0f);
+            GL.Vertex3(relOriginX + (i * distPerGridSpacingX) - relThicknessHalfX, (origin.y + workingDimensions.y) / referenceCanvasResolution.y, 0.0f);
+            GL.Vertex3(relOriginX + (i * distPerGridSpacingX) + relThicknessHalfX, (origin.y + workingDimensions.y) / referenceCanvasResolution.y, 0.0f);
+        }
+
+
+        GL.End();
+
+        //Spawn labels as Gameobjects with Text components (make them children of this transform)
+    }
+
+    void DrawLine(GraphData data, Vector2 workingDimensions, Vector2 origin)
     {
         if (data == null || data.data == null)
             return;
-
-        Vector2 workingDimensions = graphSize - (padding * 2.0f);
-        Vector2 origin = (centre - workingDimensions / 2.0f);
 
         lineMaterial.SetPass(0);
 
         for (int i = 1; i < data.Length(); i++)
         {
-            //print ("===========================Drawing: ");
             GL.Begin(GL.LINES);
+
             for (int j = i - 1; j <= i ; j++)
             {
-                //print (data.DaysSinceStart(j) + ", " + data.Value(j));
-
                 //Compute X relative position
                 float xCoord =  (origin.x + workingDimensions.x * ((float)data.DaysSinceStart(j)) / (float)data.rangeX) / referenceCanvasResolution.x;
                 float yCoord = (origin.y + workingDimensions.y * (data.Value(j) - data.minY) / data.rangeY) / referenceCanvasResolution.y;
@@ -113,32 +184,31 @@ public class GraphGenerator : MonoBehaviour
                 //Set the vertex
                 GL.Vertex3(xCoord, yCoord, 0.0f);
             }
-            //print ("===========================End: ");
             GL.End();
         }
     }
 
-    // //test
-    // public Vector2[] testData;
-    // void OnValidate()
-    // {
-    //     if (UnityEditor.EditorApplication.isPlaying && testData != null)
-    //     {
+    //test
+    public Vector2[] testData;
+    void OnValidate()
+    {
+        if (UnityEditor.EditorApplication.isPlaying && testData != null)
+        {
 
-    //         List<System.DateTime> dates = new List<System.DateTime>();
-    //         List<float> values = new List<float>();
+            List<System.DateTime> dates = new List<System.DateTime>();
+            List<float> values = new List<float>();
             
-    //         for (int i = 0; i < testData.GetLength(0); i++)
-    //         {
-    //            dates.Add(new System.DateTime(2000, 1, (int)testData[i].x));
-    //            values.Add(testData[i].y);
-    //         }
+            for (int i = 0; i < testData.GetLength(0); i++)
+            {
+               dates.Add(new System.DateTime(2000, 1, (int)testData[i].x));
+               values.Add(testData[i].y);
+            }
 
-    //         TimeSeries<float> testSeries = new TimeSeries<float>(dates, values);
+            TimeSeries<float> testSeries = new TimeSeries<float>(dates, values);
 
-    //         ShowGraph(testSeries);
-    //     }
-    // }
+            ShowGraph(testSeries);
+        }
+    }
 }
 
 
@@ -149,7 +219,9 @@ public class GraphData
     public float minY, maxY;
     public int rangeX; //in days
     public float rangeY;
-    
+    public bool isOscillatingAroundYAxis = false;
+
+
     public GraphData(TimeSeries<float> _data)
     {
         if (_data.Length() < 2)
@@ -159,6 +231,9 @@ public class GraphData
 
         ComputeMinMaxY();
         ComputeRanges();
+
+        if (minY * maxY < 0)
+            isOscillatingAroundYAxis = true;
     }
 
     void ComputeMinMaxY()
@@ -245,6 +320,9 @@ public class TimeSeries<T>
 
     public int Length()
     {
+        if (series == null)
+            return 0;
+
         return series.GetLength(0);
     }
 

@@ -4714,17 +4714,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineMaterial: {fileID: 2100000, guid: d4fc96ee7395e034eb587aff0f977421, type: 2}
   bgMaterial: {fileID: 2100000, guid: 001f08bdbf548fd4d966f10bf025377b, type: 2}
-  graphBG: {fileID: 0}
+  decorationMaterial: {fileID: 2100000, guid: 06b1ce2fcfbb4cf4c924239a5b61ed1d, type: 2}
   graphSize: {x: 700, y: 200}
   referenceCanvasResolution: {x: 1920, y: 1080}
   padding: {x: 10, y: 10}
-  centre: {x: 0, y: 0}
+  lineThickness: 3.5
+  isShown: 0
   testData:
-  - {x: 1, y: 5}
-  - {x: 2, y: 6}
+  - {x: 1, y: 10}
+  - {x: 2, y: 5}
   - {x: 3, y: 4}
-  - {x: 4, y: 3}
-  - {x: 5, y: 8}
+  - {x: 4, y: 2.5}
+  - {x: 5, y: 0.5}
+  - {x: 6, y: -2}
+  - {x: 7, y: -0.5}
+  - {x: 8, y: 3}
+  - {x: 9, y: 6}
+  - {x: 10, y: 15}
 --- !u!222 &667331353
 CanvasRenderer:
   m_ObjectHideFlags: 0
