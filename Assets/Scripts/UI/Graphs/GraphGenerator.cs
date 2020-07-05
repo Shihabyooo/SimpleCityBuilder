@@ -185,8 +185,8 @@ public class GraphGenerator : MonoBehaviour
         Vector2 workingDimensions = graphSize - (padding * 2.0f);
         Vector2 origin = (centre - workingDimensions / 2.0f);
         
-        DrawLine(data, workingDimensions, origin);
         DrawDecoration(data, workingDimensions, origin);
+        DrawLine(data, workingDimensions, origin);
     }
 
     void DrawDecoration(GraphData data, Vector2 workingDimensions, Vector2 origin)
@@ -222,25 +222,34 @@ public class GraphGenerator : MonoBehaviour
 
 
         //Draw Grid
-        //modify cached reThicknessHalfX and Y to use
+        //modify cached reThicknessHalfX and Y to use gridLineThickness
         relThicknessHalfX = gridLineThickness / (graphSize.x * 2.0f);
         relThicknessHalfY = gridLineThickness / (graphSize.y * 2.0f);
 
         int xGridCount = Mathf.Min(data.Length(), maxGridCountX);
-        int yGridCount = Mathf.Min(data.Length(), maxGridCountY);
+        //int yGridCount = Mathf.Min(data.Length(), maxGridCountY);
 
-        int daysPerGridSpacing = Mathf.FloorToInt(data.Length() / xGridCount);
-        float xDistPerDay = (workingDimensions.x / graphSize.x) / (float)data.Length();
-        float distPerGridSpacingX = (float)daysPerGridSpacing * xDistPerDay;
+        //The code bellow allows for dynamic fitting of the grid, the end segment will be varrying in size, but the preceding ones will be fixed.
+        int daysPerGridSpacing = Mathf.CeilToInt(data.Length() / (float)xGridCount);
+        float xDistPerDay = (workingDimensions.x / (float)data.Length()) / graphSize.x;
+        //float distPerGridSpacingX = (float)daysPerGridSpacing * xDistPerDay;
 
-        for (int i = 1; i < xGridCount; i++)
+        for (int i = daysPerGridSpacing; i < data.Length(); i += daysPerGridSpacing)
         {
-            GL.Vertex3(relOriginX + (i * distPerGridSpacingX) + relThicknessHalfX, relOriginY, 0.0f);
-            GL.Vertex3(relOriginX + (i * distPerGridSpacingX) - relThicknessHalfX, relOriginY, 0.0f);
-            GL.Vertex3(relOriginX + (i * distPerGridSpacingX) - relThicknessHalfX, (origin.y + workingDimensions.y) / graphSize.y, 0.0f);
-            GL.Vertex3(relOriginX + (i * distPerGridSpacingX) + relThicknessHalfX, (origin.y + workingDimensions.y) / graphSize.y, 0.0f);
+            GL.Vertex3(relOriginX + (i * xDistPerDay) + relThicknessHalfX, relOriginY, 0.0f);
+            GL.Vertex3(relOriginX + (i * xDistPerDay) - relThicknessHalfX, relOriginY, 0.0f);
+            GL.Vertex3(relOriginX + (i * xDistPerDay) - relThicknessHalfX, (origin.y + workingDimensions.y) / graphSize.y, 0.0f);
+            GL.Vertex3(relOriginX + (i * xDistPerDay) + relThicknessHalfX, (origin.y + workingDimensions.y) / graphSize.y, 0.0f);
         }
 
+        float yGridSpacing = workingDimensions.y / (float)maxGridCountY / graphSize.y;
+        for (int i = 0; i <= maxGridCountY; i++)
+        {
+            GL.Vertex3(relOriginX, relOriginY + (i * yGridSpacing) - relThicknessHalfY, 0.0f);
+            GL.Vertex3(relOriginX, relOriginY + (i * yGridSpacing) + relThicknessHalfY, 0.0f);
+            GL.Vertex3((origin.x + workingDimensions.x) / graphSize.x, relOriginY + (i * yGridSpacing) + relThicknessHalfY, 0.0f);
+            GL.Vertex3((origin.x + workingDimensions.x) / graphSize.x, relOriginY + (i * yGridSpacing) - relThicknessHalfY, 0.0f);
+        }
 
         GL.End();
 
