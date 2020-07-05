@@ -112,6 +112,12 @@ public class ResourcesManager : MonoBehaviour
         return finances.treasury;
     }
     
+    public TimeSeries<float> GetTimeSeries(ResourcesHistory.DataType dataType)
+    {
+        TimeSeries<float> ts = new TimeSeries<float>(resourceHistory.GetDates(), resourceHistory.GetAllRecordsFor(dataType));
+        return ts;
+    }
+
     //Setters
     public void UpdatePowerDemand(float newDemand)
     {
@@ -428,6 +434,12 @@ public class ResourcesHistory
         }
     }
 
+    public enum DataType
+    {
+        treasury, incomeTax, industryTax, commerceTax, buildingExpense, powerDemand, powerCons, powerAvail, waterDemand, waterCons, waterAvail, studentCount, eduSeat,
+        hospitalFilled, hospitalAvail
+    }
+
     int maxHistory = 10000; //in days. 10,000 is roughly 27 years.
     public List<TimePoint> history {get; private set;}
 
@@ -442,5 +454,35 @@ public class ResourcesHistory
             history.RemoveAt(0);
         
         history.Add(new TimePoint(date, avgDailyResources, avgDailyFinances));
+    }
+
+    
+    public List<System.DateTime> GetDates()
+    {
+        List<System.DateTime> dates = new List<System.DateTime>();
+
+        foreach (TimePoint timePoint in history)
+            dates.Add(timePoint.date);
+
+        return dates;
+    }
+
+    public List<float> GetAllRecordsFor(DataType dataType)
+    {
+        List<float> data = new List<float>();
+        
+        foreach (TimePoint timePoint in history)
+        {
+            switch (dataType)
+            {
+                case DataType.treasury:
+                    data.Add(timePoint.finances.treasury);
+                    break;
+                //TODO ad remaining datatypes.
+                default:
+                    break;
+            }
+        }
+        return data;
     }
 }
