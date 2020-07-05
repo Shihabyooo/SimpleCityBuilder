@@ -10,7 +10,9 @@ public class UIManager : MonoBehaviour
     Text cityNameField;
     Text treasuryField;
     GraphGenerator tsGraph;
-    
+    ResourcesHistory.DataType currentGraphData = ResourcesHistory.DataType.undefined;
+
+
     void Awake()
     {
         Transform canvas = GameObject.Find("Canvas").transform;
@@ -88,8 +90,9 @@ public class UIManager : MonoBehaviour
     public void ShowTreasuryGraph()
     {
         print ("Attempting to show graph for Treasury");
-        TimeSeries<float> treasuryTS = GameManager.resourceMan.GetTimeSeries(ResourcesHistory.DataType.treasury);
-        tsGraph.ShowGraph(treasuryTS, "Treasury", "Days", "Funds - $");
+        //TimeSeries<float> treasuryTS = GameManager.resourceMan.GetTimeSeries(ResourcesHistory.DataType.treasury);
+        //tsGraph.ShowGraph(treasuryTS, "Treasury", "Days", "Funds - $");
+        tsGraph.ShowGraph(ResourcesHistory.DataType.treasury);
     }
 
 }

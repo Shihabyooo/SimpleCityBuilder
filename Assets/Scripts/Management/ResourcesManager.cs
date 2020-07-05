@@ -118,6 +118,11 @@ public class ResourcesManager : MonoBehaviour
         return ts;
     }
 
+    public float GetLastHistoryEntry(ResourcesHistory.DataType dataType)
+    {
+        return resourceHistory.GetLastRecordFor(dataType);
+    }
+
     //Setters
     public void UpdatePowerDemand(float newDemand)
     {
@@ -436,8 +441,8 @@ public class ResourcesHistory
 
     public enum DataType
     {
-        treasury, incomeTax, industryTax, commerceTax, buildingExpense, powerDemand, powerCons, powerAvail, waterDemand, waterCons, waterAvail, studentCount, eduSeat,
-        hospitalFilled, hospitalAvail
+        undefined, treasury, incomeTax, industryTax, commerceTax, buildingExpense, powerDemand, powerCons, powerAvail, waterDemand, waterCons, waterAvail, studentCount, 
+        eduSeat, hospitalFilled, hospitalAvail
     }
 
     int maxHistory = 10000; //in days. 10,000 is roughly 27 years.
@@ -469,6 +474,9 @@ public class ResourcesHistory
 
     public List<float> GetAllRecordsFor(DataType dataType)
     {
+        if (dataType == DataType.undefined)
+            return new List<float>();
+
         List<float> data = new List<float>();
         
         foreach (TimePoint timePoint in history)
@@ -484,5 +492,20 @@ public class ResourcesHistory
             }
         }
         return data;
+    }
+
+    public float GetLastRecordFor(DataType dataType)
+    {
+        if (history.Count < 1)
+            return 0.0f;
+
+        switch (dataType)
+            {
+                case DataType.treasury:
+                    return history[history.Count - 1].finances.treasury;
+                //TODO ad remaining datatypes.
+                default:
+                    return 0.0f;
+            }
     }
 }

@@ -13,7 +13,6 @@ public class GraphGenerator : MonoBehaviour
     [SerializeField] Material bgMaterial;
     [SerializeField] Material decorationMaterial;
     Vector2 graphSize;
-    //[SerializeField] Vector2 referenceCanvasResolution;
     [SerializeField] Vector2 padding;
 
     [SerializeField] float graphLineThickness = 2.0f; //in pixels.
@@ -28,6 +27,7 @@ public class GraphGenerator : MonoBehaviour
     Transform content;
     RawImage viewport;
     Text title, xAxis, yAxis;
+    ResourcesHistory.DataType currentGraphDataType = ResourcesHistory.DataType.undefined;
 
     void Awake()
     {
@@ -38,8 +38,6 @@ public class GraphGenerator : MonoBehaviour
         xAxis = content.Find("GraphXAxis").gameObject.GetComponent<Text>();
         yAxis = content.Find("GraphYAxis").gameObject.GetComponent<Text>();
         
-
-
         //Set graphSize
         graphSize = new Vector2(viewport.gameObject.GetComponent<RectTransform>().rect.width,
                                 viewport.gameObject.GetComponent<RectTransform>().rect.height);
@@ -48,7 +46,21 @@ public class GraphGenerator : MonoBehaviour
         content.gameObject.SetActive(false);
     }
 
-    public bool ShowGraph(TimeSeries<float> data, string _title, string _xAxis, string _yAxis)
+    public bool ShowGraph (ResourcesHistory.DataType historyDataType)
+    {
+        TimeSeries<float> timeSeries = GameManager.resourceMan.GetTimeSeries(historyDataType);
+        switch (historyDataType)
+        {
+            case ResourcesHistory.DataType.treasury:
+                currentGraphDataType = ResourcesHistory.DataType.treasury;
+                return ShowGraph(timeSeries, "Treasury", "Date", "Funds - $");
+            //TODO Add (relevant) remaining datatypes.
+            default:
+                return false;
+        }
+    }
+
+    bool ShowGraph(TimeSeries<float> data, string _title, string _xAxis, string _yAxis)
     {
         if (!PrepareGraphData(data))
             return false;
@@ -58,6 +70,9 @@ public class GraphGenerator : MonoBehaviour
         SetGraphDetails(_title, _xAxis, _yAxis);
         DrawGraphWindow();
         isShown = true;
+        
+        SimulationManager.onNewDay += UpdateCurrentTimeseries;
+
         return true;
     }
 
@@ -68,6 +83,7 @@ public class GraphGenerator : MonoBehaviour
 
         isShown = false;
         content.gameObject.SetActive(false);
+        SimulationManager.onNewDay -= UpdateCurrentTimeseries;
     }
 
     bool PrepareGraphData(TimeSeries<float> data)
@@ -91,7 +107,21 @@ public class GraphGenerator : MonoBehaviour
         yAxis.text = _yAxis;
     }
 
-    [SerializeField] Color clearColour;
+    void UpdateCurrentTimeseries(System.DateTime date) //to be added to simulation onNewDay
+    {
+        if (currentGraphDataType == ResourcesHistory.DataType.undefined)
+        {
+            print ("WARNING! Attempted to update a graph with data type of undefined. This shouldn't happen");
+            return;
+        }
+
+        //Get Last added data of type and add them to graphData
+        activeGraphData.AddToTimeSeries(date, GameManager.resourceMan.GetLastHistoryEntry(currentGraphDataType));
+        
+        //redraw graph
+        DrawGraphWindow();
+    }
+
     void DrawGraphWindow()
     {
         if(activeGraphData == null)
@@ -109,12 +139,9 @@ public class GraphGenerator : MonoBehaviour
         int texHeight = Mathf.CeilToInt(graphSize.y);
         RenderTexture renderTexture = RenderTexture.GetTemporary(texWidth, texHeight);
         RenderTexture.active = renderTexture;
-        GL.Clear(false, true, clearColour);
-
+        GL.Clear(false, true, Color.magenta);
 
         //Other prep
-        // centre = this.gameObject.GetComponent<RectTransform>().anchoredPosition;
-        // centre += referenceCanvasResolution / 2.0f;
         centre = graphSize / 2.0f;
 
         //GL prep and exec
@@ -142,16 +169,12 @@ public class GraphGenerator : MonoBehaviour
         GL.Begin(GL.QUADS);
         
         GL.TexCoord2(0.0f, 0.0f);
-        //GL.Vertex3((centre.x - graphSize.x / 2.0f) / referenceCanvasResolution.x, (centre.y - graphSize.y / 2.0f) / referenceCanvasResolution.y, 0.0f);
         GL.Vertex3(0.0f, 0.0f, 0.0f);
         GL.TexCoord2(0.0f, 1.0f);
-        //GL.Vertex3((centre.x - graphSize.x / 2.0f) / referenceCanvasResolution.x, (centre.y + graphSize.y / 2.0f) / referenceCanvasResolution.y, 0.0f);
         GL.Vertex3(0.0f, 1.0f, 0.0f);
         GL.TexCoord2(1.0f, 1.0f);
-        //GL.Vertex3((centre.x + graphSize.x / 2.0f) / referenceCanvasResolution.x, (centre.y + graphSize.y / 2.0f) / referenceCanvasResolution.y, 0.0f);
         GL.Vertex3(1.0f, 1.0f, 0.0f);
         GL.TexCoord2(1.0f, 0.0f);
-        //GL.Vertex3((centre.x + graphSize.x / 2.0f) / referenceCanvasResolution.x, (centre.y - graphSize.y / 2.0f) / referenceCanvasResolution.y, 0.0f);
         GL.Vertex3(1.0f, 0.0f, 0.0f);
 
         GL.End();
@@ -171,13 +194,9 @@ public class GraphGenerator : MonoBehaviour
         decorationMaterial.SetPass(0);
         
         //Cache some repeating calculations
-        //float relOriginX = origin.x / referenceCanvasResolution.x;
         float relOriginX = origin.x / graphSize.x;
-        //float relOriginY = origin.y / referenceCanvasResolution.y;
         float relOriginY = origin.y / graphSize.y;
-        //float relThicknessHalfX = axesLineThickness / (referenceCanvasResolution.x * 2.0f);
         float relThicknessHalfX = axesLineThickness / (graphSize.x * 2.0f);
-        //float relThicknessHalfY = axesLineThickness / (referenceCanvasResolution.y * 2.0f);
         float relThicknessHalfY = axesLineThickness / (graphSize.y * 2.0f);
 
         //Draw Axes
@@ -186,50 +205,39 @@ public class GraphGenerator : MonoBehaviour
         //Y axis always begins at left edge        
         GL.Vertex3(relOriginX + relThicknessHalfX,  relOriginY, 0.0f );
         GL.Vertex3(relOriginX - relThicknessHalfX,  relOriginY, 0.0f );
-        //GL.Vertex3(relOriginX - relThicknessHalfX,  (origin.y + workingDimensions.y) / referenceCanvasResolution.y, 0.0f );
         GL.Vertex3(relOriginX - relThicknessHalfX,  (origin.y + workingDimensions.y) / graphSize.y, 0.0f );
-        //GL.Vertex3(relOriginX + relThicknessHalfX,  (origin.y + workingDimensions.y) / referenceCanvasResolution.y, 0.0f );
         GL.Vertex3(relOriginX + relThicknessHalfX,  (origin.y + workingDimensions.y) / graphSize.y, 0.0f );
 
         //The X axis is clamped to the zero value (if the values oscilate between positive and negative), or is the min (for all positive) or max (for all negative) value.
         float yCoord;
         if (data.isOscillatingAroundYAxis) //compute the position of y=zero.
-            //yCoord = (origin.y + workingDimensions.y * (0.0f - data.minY) / data.rangeY) / referenceCanvasResolution.y;
             yCoord = (origin.y + workingDimensions.y * (0.0f - data.minY) / data.rangeY) / graphSize.y;
         else //compute position depending on whether all positive or negative
-            //yCoord = (origin.y + Mathf.Min((Mathf.Sign(data.Value(0))) * workingDimensions.y , 0.0f)) / referenceCanvasResolution.y;
             yCoord = (origin.y + Mathf.Min((Mathf.Sign(data.Value(0))) * workingDimensions.y , 0.0f)) / graphSize.y;
         
         GL.Vertex3(relOriginX, yCoord - relThicknessHalfY, 0.0f);
         GL.Vertex3(relOriginX, yCoord + relThicknessHalfY, 0.0f);
-        //GL.Vertex3(relOriginX + workingDimensions.x / referenceCanvasResolution.x, yCoord + relThicknessHalfY, 0.0f);
         GL.Vertex3(relOriginX + workingDimensions.x / graphSize.x, yCoord + relThicknessHalfY, 0.0f);
-        //GL.Vertex3(relOriginX + workingDimensions.x / referenceCanvasResolution.x, yCoord - relThicknessHalfY, 0.0f);
         GL.Vertex3(relOriginX + workingDimensions.x / graphSize.x, yCoord - relThicknessHalfY, 0.0f);
 
 
         //Draw Grid
         //modify cached reThicknessHalfX and Y to use
-        //relThicknessHalfX = gridLineThickness / (referenceCanvasResolution.x * 2.0f);
         relThicknessHalfX = gridLineThickness / (graphSize.x * 2.0f);
-        //relThicknessHalfY = gridLineThickness / (referenceCanvasResolution.y * 2.0f);
         relThicknessHalfY = gridLineThickness / (graphSize.y * 2.0f);
 
         int xGridCount = Mathf.Min(data.Length(), maxGridCountX);
         int yGridCount = Mathf.Min(data.Length(), maxGridCountY);
 
-        float daysPerGridSpacing = Mathf.Floor(data.Length() / xGridCount);
-        //float xDistPerDay = (workingDimensions.x / referenceCanvasResolution.x) / (float)data.Length();
+        int daysPerGridSpacing = Mathf.FloorToInt(data.Length() / xGridCount);
         float xDistPerDay = (workingDimensions.x / graphSize.x) / (float)data.Length();
-        float distPerGridSpacingX = daysPerGridSpacing * xDistPerDay;
+        float distPerGridSpacingX = (float)daysPerGridSpacing * xDistPerDay;
 
         for (int i = 1; i < xGridCount; i++)
         {
             GL.Vertex3(relOriginX + (i * distPerGridSpacingX) + relThicknessHalfX, relOriginY, 0.0f);
             GL.Vertex3(relOriginX + (i * distPerGridSpacingX) - relThicknessHalfX, relOriginY, 0.0f);
-            //GL.Vertex3(relOriginX + (i * distPerGridSpacingX) - relThicknessHalfX, (origin.y + workingDimensions.y) / referenceCanvasResolution.y, 0.0f);
             GL.Vertex3(relOriginX + (i * distPerGridSpacingX) - relThicknessHalfX, (origin.y + workingDimensions.y) / graphSize.y, 0.0f);
-            //GL.Vertex3(relOriginX + (i * distPerGridSpacingX) + relThicknessHalfX, (origin.y + workingDimensions.y) / referenceCanvasResolution.y, 0.0f);
             GL.Vertex3(relOriginX + (i * distPerGridSpacingX) + relThicknessHalfX, (origin.y + workingDimensions.y) / graphSize.y, 0.0f);
         }
 
@@ -253,9 +261,7 @@ public class GraphGenerator : MonoBehaviour
             for (int j = i - 1; j <= i ; j++)
             {
                 //Compute X relative position
-                //float xCoord =  (origin.x + workingDimensions.x * ((float)data.DaysSinceStart(j)) / (float)data.rangeX) / referenceCanvasResolution.x;
                 float xCoord =  (origin.x + workingDimensions.x * ((float)data.DaysSinceStart(j)) / (float)data.rangeX) / graphSize.x;
-                //float yCoord = (origin.y + workingDimensions.y * (data.Value(j) - data.minY) / data.rangeY) / referenceCanvasResolution.y;
                 float yCoord = (origin.y + workingDimensions.y * (data.Value(j) - data.minY) / data.rangeY) / graphSize.y;
                 
                 //Set the vertex
@@ -265,28 +271,6 @@ public class GraphGenerator : MonoBehaviour
         }
     }
 
-    // //test
-    // public Vector2[] testData;
-    // //void OnValidate()
-    // public void TestShow()
-    // {
-    //     if (UnityEditor.EditorApplication.isPlaying && testData != null)
-    //     {
-
-    //         List<System.DateTime> dates = new List<System.DateTime>();
-    //         List<float> values = new List<float>();
-            
-    //         for (int i = 0; i < testData.GetLength(0); i++)
-    //         {
-    //            dates.Add(new System.DateTime(2000, 1, (int)testData[i].x));
-    //            values.Add(testData[i].y);
-    //         }
-
-    //         TimeSeries<float> testSeries = new TimeSeries<float>(dates, values);
-
-    //         ShowGraph(testSeries);
-    //     }
-    // }
 }
 
 
@@ -331,6 +315,17 @@ public class GraphData
         rangeY = maxY - minY;
     }
 
+    public void AddToTimeSeries(System.DateTime date, float value)
+    {
+        data.AddToTimeSeries(date, value);
+
+        ComputeMinMaxY();
+        ComputeRanges();
+
+        if (minY * maxY < 0)
+            isOscillatingAroundYAxis = true;
+    }
+
     public int Length()
     {
         return data.Length();
@@ -361,7 +356,8 @@ public class TimeSeries<T>
         }
     }
 
-    public TimePoint<T>[] series;
+    //public TimePoint<T>[] series;
+    List<TimePoint<T>> series;
 
     const int minTimeSeriesEntries = 2;
 
@@ -373,7 +369,7 @@ public class TimeSeries<T>
             return;
         }
 
-        series = _series;
+        series = new List<TimePoint<T>>(_series);
     }
 
     public TimeSeries(List<System.DateTime> dates, List<T> values) //Will use the shortest of the two Lists. If shortest length less the minTimeSeriesEntries, TimeSeries' data will remain NULL.
@@ -386,12 +382,15 @@ public class TimeSeries<T>
             return;
         }
 
-        series = new TimePoint<T>[minLength];
+        //series = new TimePoint<T>[minLength];
+        series = new List<TimePoint<T>>();
 
         for (int i = 0; i < minLength; i++)
         {
-            series[i].date = dates[i];
-            series[i].value = values[i];
+            // series[i].date = dates[i];
+            // series[i].value = values[i];
+            TimePoint<T> newPoint = new TimeSeries<T>.TimePoint<T>(dates[i], values[i]);
+            series.Add(newPoint);
         }
 
     }
@@ -401,12 +400,14 @@ public class TimeSeries<T>
         if (series == null)
             return 0;
 
-        return series.GetLength(0);
+        //return series.GetLength(0);
+        return series.Count;
     }
 
     public T Value(int order)
     {
-        if (order >= series.GetLength(0))
+        //if (order >= series.GetLength(0))
+        if (order >= series.Count)
             return default(T);
         
         return series[order].value;
@@ -414,7 +415,8 @@ public class TimeSeries<T>
 
     public System.DateTime Date(int order)
     {
-        if (series == null || order >= series.GetLength(0))
+        //if (series == null || order >= series.GetLength(0))
+        if (series == null || order >= series.Count)
             return new System.DateTime();
         
         return series[order].date;
@@ -427,6 +429,13 @@ public class TimeSeries<T>
 
     public System.DateTime End()
     {
-        return Date(series.GetLength(0) - 1);
+        //return Date(series.GetLength(0) - 1);
+        return Date(series.Count - 1);
     }
+
+    public void AddToTimeSeries(System.DateTime date, T value)
+    {
+        series.Add(new TimePoint<T>(date, value));
+    }
+
 }

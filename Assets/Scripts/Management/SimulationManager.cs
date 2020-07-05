@@ -21,9 +21,9 @@ public class SimulationManager : MonoBehaviour
                                                                             //System should work for any value though.
 
     public delegate void OnTimeUpdate(int hours);
-    //public delegate void OnNewDay(System.DateTime date);
+    public delegate void OnNewDay(System.DateTime date);
     public static OnTimeUpdate onTimeUpdate;
-    // public static OnNewDay onNewDay;
+    public static OnNewDay onNewDay;
 
     Coroutine buildingsSim = null, natResourceSim = null, budgetSim = null, timeKeeper = null;
     
@@ -55,6 +55,7 @@ public class SimulationManager : MonoBehaviour
     //It's tempting to turn NewDay() into a delegate that other objects' methods subscribe to, but since those methods will always run, hardcoding them here is better (clearer).
     void NewDay()
     {
+        //TODO Modify the scripts of the functions bellow have them added to the onNewDay delegate instead.
         GameManager.climateMan.UpdateClimateDay(date);
         GameManager.populationMan.UpdatePopulation();
         GameManager.econMan.UpdateEconomyDay();
@@ -181,6 +182,10 @@ public class SimulationManager : MonoBehaviour
                 if (currentDay != date.Day)
                 {
                     NewDay();
+
+                    if (onNewDay !=null)
+                        onNewDay.Invoke(date);
+
                     currentDay = date.Day;
                 }
                 if (onTimeUpdate != null)
