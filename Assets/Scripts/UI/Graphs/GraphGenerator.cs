@@ -12,7 +12,7 @@ public class GraphGenerator : MonoBehaviour
     [SerializeField] Material lineMaterial;
     [SerializeField] Material bgMaterial;
     [SerializeField] Material decorationMaterial;
-    [SerializeField] Vector2 graphSize;
+    Vector2 graphSize;
     //[SerializeField] Vector2 referenceCanvasResolution;
     [SerializeField] Vector2 padding;
 
@@ -25,20 +25,37 @@ public class GraphGenerator : MonoBehaviour
     Vector2 centre;
     GraphData activeGraphData = null;
     bool isShown = false;
+    Transform content;
     RawImage viewport;
+    Text title, xAxis, yAxis;
 
     void Awake()
     {
-        viewport = this.gameObject.GetComponent<RawImage>();
-        //TODO set the rect trasnfrom width and height to the GraphSize here
+        //Build references
+        content = this.transform.Find("Content");
+        viewport = content.Find("GraphViewport").gameObject.GetComponent<RawImage>();
+        title = content.Find("GraphTitle").gameObject.GetComponent<Text>();
+        xAxis = content.Find("GraphXAxis").gameObject.GetComponent<Text>();
+        yAxis = content.Find("GraphYAxis").gameObject.GetComponent<Text>();
+        
+
+
+        //Set graphSize
+        graphSize = new Vector2(viewport.gameObject.GetComponent<RectTransform>().rect.width,
+                                viewport.gameObject.GetComponent<RectTransform>().rect.height);
+
+        //Hide content
+        content.gameObject.SetActive(false);
     }
 
-    public bool ShowGraph(TimeSeries<float> data)
+    public bool ShowGraph(TimeSeries<float> data, string _title, string _xAxis, string _yAxis)
     {
         if (!PrepareGraphData(data))
             return false;
 
-        //CameraControl.postRender += DrawGraphWindow;
+        content.gameObject.SetActive(true);
+
+        SetGraphDetails(_title, _xAxis, _yAxis);
         DrawGraphWindow();
         isShown = true;
         return true;
@@ -49,8 +66,8 @@ public class GraphGenerator : MonoBehaviour
         if (!isShown)
             return;
 
-        //CameraControl.postRender -= DrawGraphWindow;
         isShown = false;
+        content.gameObject.SetActive(false);
     }
 
     bool PrepareGraphData(TimeSeries<float> data)
@@ -65,6 +82,13 @@ public class GraphGenerator : MonoBehaviour
         
         activeGraphData = graphData;
         return true;
+    }
+
+    void SetGraphDetails(string _title, string _xAxis, string _yAxis)
+    {
+        title.text = _title;
+        xAxis.text = _xAxis;
+        yAxis.text = _yAxis;
     }
 
     [SerializeField] Color clearColour;
@@ -241,28 +265,28 @@ public class GraphGenerator : MonoBehaviour
         }
     }
 
-    //test
-    public Vector2[] testData;
-    //void OnValidate()
-    public void TestShow()
-    {
-        if (UnityEditor.EditorApplication.isPlaying && testData != null)
-        {
+    // //test
+    // public Vector2[] testData;
+    // //void OnValidate()
+    // public void TestShow()
+    // {
+    //     if (UnityEditor.EditorApplication.isPlaying && testData != null)
+    //     {
 
-            List<System.DateTime> dates = new List<System.DateTime>();
-            List<float> values = new List<float>();
+    //         List<System.DateTime> dates = new List<System.DateTime>();
+    //         List<float> values = new List<float>();
             
-            for (int i = 0; i < testData.GetLength(0); i++)
-            {
-               dates.Add(new System.DateTime(2000, 1, (int)testData[i].x));
-               values.Add(testData[i].y);
-            }
+    //         for (int i = 0; i < testData.GetLength(0); i++)
+    //         {
+    //            dates.Add(new System.DateTime(2000, 1, (int)testData[i].x));
+    //            values.Add(testData[i].y);
+    //         }
 
-            TimeSeries<float> testSeries = new TimeSeries<float>(dates, values);
+    //         TimeSeries<float> testSeries = new TimeSeries<float>(dates, values);
 
-            ShowGraph(testSeries);
-        }
-    }
+    //         ShowGraph(testSeries);
+    //     }
+    // }
 }
 
 
