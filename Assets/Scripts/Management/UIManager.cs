@@ -9,7 +9,8 @@ public class UIManager : MonoBehaviour
     Text hourField;
     Text cityNameField;
     Text treasuryField;
-
+    GraphGenerator tsGraph;
+    
     void Awake()
     {
         Transform canvas = GameObject.Find("Canvas").transform;
@@ -18,6 +19,10 @@ public class UIManager : MonoBehaviour
         hourField = header.Find("Hour").GetComponent<Text>();
         cityNameField = header.Find("CityName").GetComponent<Text>();
         treasuryField = header.Find("Treasury").GetComponent<Text>();
+
+        tsGraph= canvas.Find("GraphsContainer").Find("TimeSeriesGraph").GetComponent<GraphGenerator>();
+
+        AddButtonListeners();
     }
     
     public void UpdateTime(System.DateTime date)
@@ -71,6 +76,20 @@ public class UIManager : MonoBehaviour
             default:
                 return "NUL";
         }
+    }
+
+
+    void AddButtonListeners() //Some UI elements (including text) can have actions when clicked on. e.g. clicking on treasury would open a historical graph of treasury.
+    {
+        treasuryField.gameObject.GetComponent<Button>().onClick.AddListener(ShowTreasuryGraph);
+    }
+
+    //Graph showing
+    public void ShowTreasuryGraph()
+    {
+        print ("Attempting to show graph for Treasury");
+        TimeSeries<float> treasuryTS = GameManager.resourceMan.GetTimeSeries(ResourcesHistory.DataType.treasury);
+        tsGraph.ShowGraph(treasuryTS, "Treasury", "Days", "Funds - $");
     }
 
 }
