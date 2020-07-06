@@ -28,6 +28,9 @@ public class GraphGenerator : MonoBehaviour
     RawImage viewport;
     Text title, xAxis, yAxis;
     ResourcesHistory.DataType currentGraphDataType = ResourcesHistory.DataType.undefined;
+    GameObject labelTemplate;
+    Transform labelsContainer;
+    List<GameObject> labelsX, labelsY;
 
     void Awake()
     {
@@ -37,13 +40,30 @@ public class GraphGenerator : MonoBehaviour
         title = content.Find("GraphTitle").gameObject.GetComponent<Text>();
         xAxis = content.Find("GraphXAxis").gameObject.GetComponent<Text>();
         yAxis = content.Find("GraphYAxis").gameObject.GetComponent<Text>();
-        
+        labelTemplate = content.Find("LabelTemplate").gameObject;
+        labelsContainer = content.Find("Labels");
+
         //Set graphSize
         graphSize = new Vector2(viewport.gameObject.GetComponent<RectTransform>().rect.width,
                                 viewport.gameObject.GetComponent<RectTransform>().rect.height);
 
         //Hide content
         content.gameObject.SetActive(false);
+        
+
+        //Spawn Labels and hide them
+        labelsX = new List<GameObject>();
+        labelsY = new List<GameObject>();
+        labelTemplate.SetActive(false); //Would cause the labels to be spawned disabled.
+
+        for (int i = 0; i < maxGridCountX; i++)
+            labelsX.Add(GameObject.Instantiate(labelTemplate, this.transform.position, xAxis.transform.rotation, labelsContainer));
+        
+        
+        for (int i = 0; i <= maxGridCountY; i++) //IMPORTANT! Note that in Y axis, the labels are maxGridCountY + 1, to give label to upper bound of graph
+            labelsY.Add(GameObject.Instantiate(labelTemplate, this.transform.position, xAxis.transform.rotation, labelsContainer));
+        
+
     }
 
     public bool ShowGraph (ResourcesHistory.DataType historyDataType)
@@ -189,7 +209,7 @@ public class GraphGenerator : MonoBehaviour
         DrawLine(data, workingDimensions, origin);
     }
 
-    void DrawDecoration(GraphData data, Vector2 workingDimensions, Vector2 origin)
+    void DrawDecoration(GraphData data, Vector2 workingDimensions, Vector2 origin) //TODO refactor this
     {
         decorationMaterial.SetPass(0);
         
@@ -220,19 +240,16 @@ public class GraphGenerator : MonoBehaviour
         GL.Vertex3(relOriginX + workingDimensions.x / graphSize.x, yCoord + relThicknessHalfY, 0.0f);
         GL.Vertex3(relOriginX + workingDimensions.x / graphSize.x, yCoord - relThicknessHalfY, 0.0f);
 
-
         //Draw Grid
         //modify cached reThicknessHalfX and Y to use gridLineThickness
         relThicknessHalfX = gridLineThickness / (graphSize.x * 2.0f);
         relThicknessHalfY = gridLineThickness / (graphSize.y * 2.0f);
 
         int xGridCount = Mathf.Min(data.Length(), maxGridCountX);
-        //int yGridCount = Mathf.Min(data.Length(), maxGridCountY);
 
         //The code bellow allows for dynamic fitting of the grid, the end segment will be varrying in size, but the preceding ones will be fixed.
         int daysPerGridSpacing = Mathf.CeilToInt(data.Length() / (float)xGridCount);
         float xDistPerDay = (workingDimensions.x / (float)data.Length()) / graphSize.x;
-        //float distPerGridSpacingX = (float)daysPerGridSpacing * xDistPerDay;
 
         for (int i = daysPerGridSpacing; i < data.Length(); i += daysPerGridSpacing)
         {
@@ -254,6 +271,38 @@ public class GraphGenerator : MonoBehaviour
         GL.End();
 
         //Spawn labels as Gameobjects with Text components (make them children of this transform)
+        for (int i = 0; i < xGridCount; i++)
+        {
+            //Set visibility on
+            labelsX[i].SetActive(true);
+
+            //Position at grid line
+            labelsX[i].GetComponent<RectTransform>().anchoredPosition = this.gameObject.GetComponent<RectTransform>().anchoredPosition - workingDimensions / 2.0f
+                                                                        + new Vector2(i * daysPerGridSpacing * workingDimensions.x / data.Length(), -1.0f * padding.y);
+            
+            //Set text value/date
+            labelsX[i].GetComponent<Text>().text = UIManager.DateToString(activeGraphData.DateByOffset(i * daysPerGridSpacing), true);
+        }
+
+        for (int i = 0; i <= maxGridCountY; i++)
+        {
+            //set visibility on
+            labelsY[i].SetActive(true);
+
+            //position at grid line
+            labelsY[i].GetComponent<RectTransform>().anchoredPosition = this.gameObject.GetComponent<RectTransform>().anchoredPosition - workingDimensions / 2.0f
+                                                                        + new Vector2(-1.0f * padding.x, i * workingDimensions.y / (float)maxGridCountY + 10.0f);
+
+            //set text vale/date
+            labelsY[i].GetComponent<Text>().text = (i * activeGraphData.rangeY / (maxGridCountY) + activeGraphData.minY).ToString();
+        }
+
+
+        //disable unused labels 
+        for (int i = xGridCount; i < labelsX.Count; i++)
+        {
+            labelsX[i].SetActive(false);
+        }
     }
 
     void DrawLine(GraphData data, Vector2 workingDimensions, Vector2 origin)
@@ -279,9 +328,7 @@ public class GraphGenerator : MonoBehaviour
             GL.End();
         }
     }
-
 }
-
 
 [System.Serializable]
 public class GraphData
@@ -343,6 +390,11 @@ public class GraphData
     public int DaysSinceStart(int order)
     {
         return data.Date(order).Subtract(data.Start()).Days;
+    }
+
+    public System.DateTime DateByOffset(int offset)
+    {
+        return data.Date(offset);
     }
 
     public float Value(int order)
