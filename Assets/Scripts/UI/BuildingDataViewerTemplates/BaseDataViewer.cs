@@ -103,7 +103,7 @@ public class BaseDataViewer : MonoBehaviour
     protected string GetDateString(Building building)
     {
         System.DateTime date = building.ConstructionDate();
-        return (date.Day.ToString() + "-" + GameManager.uiMan.GetMonthAbbr(date.Month) + "-" + date.Year);
+        return (date.Day.ToString() + "-" + UIManager.GetMonthAbbr(date.Month) + "-" + date.Year);
     }
 
     public void UpdateBudget()

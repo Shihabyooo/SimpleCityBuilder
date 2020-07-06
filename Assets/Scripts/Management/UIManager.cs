@@ -29,11 +29,23 @@ public class UIManager : MonoBehaviour
     
     public void UpdateTime(System.DateTime date)
     {
-        string dateString = date.Day.ToString() + "-" + GetMonthAbbr(date.Month) + "-" + date.Year;
+        //string dateString = date.Day.ToString() + "-" + GetMonthAbbr(date.Month) + "-" + date.Year;
         string hourString = (date.Hour < 10? "0" : "") +  date.Hour.ToString() + ":" + (date.Minute < 10? "0" : "" ) + date.Minute.ToString();
 
-        dateField.text = dateString;
+        dateField.text = DateToString(date);
         hourField.text = hourString;
+    }
+
+    static public string DateToString(System.DateTime date, bool shortFormat = false)
+    {
+        string dateString;
+
+        if (shortFormat)
+            dateString = date.Day.ToString() + "/" + GetMonthAbbr(date.Month) + "/" + (date.Year %100).ToString("D2");
+        else
+            dateString = date.Day.ToString() + "-" + GetMonthAbbr(date.Month) + "-" + date.Year.ToString();
+
+        return dateString;
     }
 
     public void UpdateCityName(string name)
@@ -46,8 +58,7 @@ public class UIManager : MonoBehaviour
         treasuryField.text = "$" + funds.ToString("N0");
     }
 
-
-    public string GetMonthAbbr(int month)
+    static public string GetMonthAbbr(int month)
     {
         switch(month)
         {
