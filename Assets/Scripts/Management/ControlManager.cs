@@ -60,17 +60,20 @@ public class ControlManager : MonoBehaviour
 
     void FreeModeControl()
     {
-        if (Input.GetMouseButtonDown(0)) 
+        if (!IsCursorOverUI() //Effectively prevents attempting to selectobjects/cast ray if over a UI element
+            && Input.GetMouseButtonDown(0)) 
         {
             //Cast a ray and check if it hits something we handle.
             RaycastHit hit = CastRay(freeModeSelectables);
             if (hit.collider != null)
             {
                 //print ("hit: " + hit.collider.gameObject.name);
-                hit.collider.gameObject.GetComponent<Building>().ShowDetailsOnViewer();
+                Building clickedbuilding;
+                if (hit.collider.gameObject.TryGetComponent<Building>(out clickedbuilding))
+                    clickedbuilding.ShowDetailsOnViewer();
             }
         }
-        else if (Input.GetMouseButtonDown(2))
+        else if (!IsCursorOverUI() && Input.GetMouseButtonDown(2))
         {
             //save the last mouse position (which will be used to calculate rotation angles)
             lastMiddleClickLocation = Input.mousePosition;
@@ -118,7 +121,7 @@ public class ControlManager : MonoBehaviour
         Cell cell = Grid.grid.SampleForCell(hit.point);
         
         
-        if (cell != null)
+        if (!IsCursorOverUI() && cell != null)
         {
             buildingToPlace.MovePlan(cell.cellCentre);
 
@@ -238,6 +241,10 @@ public class ControlManager : MonoBehaviour
         return hit;
     }
 
+    bool IsCursorOverUI()
+    {
+        return UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+    }
 //Other Utilities
     public void SwitchToBuildingPlacement(BuildingsManager.BuildingProposal building)
     {

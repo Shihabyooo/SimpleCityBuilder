@@ -1404,7 +1404,7 @@ MonoBehaviour:
     m_Bits: 1024
   freeModeSelectables:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 544
   mousePanDeadZone: 0.05
   mousePanMaxRange: 0.1
   rightClickHoldTime: 0
@@ -2880,7 +2880,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1968220139}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9317872
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
