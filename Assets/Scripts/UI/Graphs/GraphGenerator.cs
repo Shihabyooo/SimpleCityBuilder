@@ -7,8 +7,15 @@ using UnityEngine.UI;
 
 //TODO modify the code to render to a texture, then set texture as an image in appropriate place inside the bigger graph window (itself a mix of images, text, sliders, buttons, etc)
 
+
+
 public class GraphGenerator : MonoBehaviour
 {
+    enum TrackedDataSource
+    {
+        none, cityResource, buildingHistory
+    }
+
     [SerializeField] Material lineMaterial;
     [SerializeField] Material bgMaterial;
     [SerializeField] Material decorationMaterial;
@@ -27,10 +34,15 @@ public class GraphGenerator : MonoBehaviour
     Transform content;
     RawImage viewport;
     Text title, xAxis, yAxis;
-    ResourcesHistory.DataType currentGraphDataType = ResourcesHistory.DataType.undefined;
     GameObject labelTemplate;
     Transform labelsContainer;
     List<GameObject> labelsX, labelsY;
+
+    TrackedDataSource currentTrackedDataSource = TrackedDataSource.none;
+    ResourcesHistory.DataType currentGraphDataType = ResourcesHistory.DataType.undefined;
+    Building currentTrackedBuilding = null;
+    string currentTrackedBuildingData = null;
+
 
     void Awake()
     {
@@ -68,6 +80,8 @@ public class GraphGenerator : MonoBehaviour
 
     public bool ShowGraph (ResourcesHistory.DataType historyDataType)
     {
+        ResetTracking();
+        currentTrackedDataSource = TrackedDataSource.cityResource;
         TimeSeries<float> timeSeries = GameManager.resourceMan.GetTimeSeries(historyDataType);
         switch (historyDataType)
         {
@@ -78,6 +92,18 @@ public class GraphGenerator : MonoBehaviour
             default:
                 return false;
         }
+    }
+
+    public bool ShowGraph(Building building, string dataTitle)
+    {
+        ResetTracking();
+        currentTrackedDataSource = TrackedDataSource.buildingHistory;
+        currentTrackedBuilding = building;
+        currentTrackedBuildingData = dataTitle;
+
+        TimeSeries<float> timeSeries = building.GetAllHistoricalDataFor(dataTitle);
+        string[] graphLabels = building.GetGraphLabelsFor(dataTitle);
+        return ShowGraph(timeSeries, graphLabels[0], graphLabels[1], graphLabels[2]);
     }
 
     bool ShowGraph(TimeSeries<float> data, string _title, string _xAxis, string _yAxis)
@@ -104,6 +130,15 @@ public class GraphGenerator : MonoBehaviour
         isShown = false;
         content.gameObject.SetActive(false);
         SimulationManager.onNewDay -= UpdateCurrentTimeseries;
+        ResetTracking();
+    }
+
+    void ResetTracking()
+    {
+        currentTrackedDataSource = TrackedDataSource.none;
+        currentGraphDataType = ResourcesHistory.DataType.undefined;
+        currentTrackedBuilding = null;
+        currentTrackedBuildingData = null;
     }
 
     bool PrepareGraphData(TimeSeries<float> data)
@@ -129,14 +164,32 @@ public class GraphGenerator : MonoBehaviour
 
     void UpdateCurrentTimeseries(System.DateTime date) //to be added to simulation onNewDay
     {
-        if (currentGraphDataType == ResourcesHistory.DataType.undefined)
-        {
-            print ("WARNING! Attempted to update a graph with data type of undefined. This shouldn't happen");
-            return;
-        }
 
-        //Get Last added data of type and add them to graphData
-        activeGraphData.AddToTimeSeries(date, GameManager.resourceMan.GetLastHistoryEntry(currentGraphDataType));
+        switch(currentTrackedDataSource)
+        {
+            case TrackedDataSource.cityResource:
+                if (currentGraphDataType == ResourcesHistory.DataType.undefined)
+                {
+                    print ("WARNING! Attempted to update a graph with data type of undefined. This shouldn't happen");
+                    CloseGraph();
+                    return;
+                }
+                //Get Last added data of type and add them to graphData
+                activeGraphData.AddToTimeSeries(date, GameManager.resourceMan.GetLastHistoryEntry(currentGraphDataType));        
+                break;
+            case TrackedDataSource.buildingHistory:
+                if (currentTrackedBuildingData == null || currentTrackedBuilding == null)
+                {
+                    print ("WARNING! Attempted to update a graph with an unset building or dataTitle. This shouldn't happen");
+                    CloseGraph();
+                    return;
+                }
+                activeGraphData.AddToTimeSeries(date, currentTrackedBuilding.GetLastHistoricalDataFor(currentTrackedBuildingData));
+                break;
+            default:
+                CloseGraph();
+                return;
+        }
         
         //redraw graph
         DrawGraphWindow();
@@ -424,7 +477,7 @@ public class TimeSeries<T>
 
     public TimeSeries(TimePoint<T>[] _series) //If the length of _series is less the minTimeSeriesEntries, TimeSeries' data will remain NULL.
     {
-        if (_series.GetLength(0) < minTimeSeriesEntries)
+        if (series == null || _series.GetLength(0) < minTimeSeriesEntries)
         {
             series = null;
             return;
