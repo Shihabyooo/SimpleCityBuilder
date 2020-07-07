@@ -54,6 +54,7 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
         {
             currentMaxTreatmentRate = 0.0f;
             currentTreatmentRate = 0.0f;
+            UpdateDailyAverage();
             return;
         }
 

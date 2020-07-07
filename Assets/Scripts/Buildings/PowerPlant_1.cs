@@ -55,6 +55,7 @@ public class PowerPlant_1 : InfrastructureBuilding
         {
             currentMaxPowerProduction = 0.0f;
             currentPowerProduction = 0.0f;
+            UpdateDailyAverage();
             return;
         }
         
