@@ -22,6 +22,7 @@ public class Building : MonoBehaviour
     [SerializeField] protected BasicResources allocatedResources = new BasicResources(); //These resources will be allocated by the simulation based on availability and priority.
     //protected System.Guid uniqueID {get; private set;}
     protected System.DateTime constructionDate;
+    protected BuildingHistory buildingHistory;
 
     BoxCollider buildingCollider;
     GameObject waterSign, powerSign;
@@ -66,16 +67,6 @@ public class Building : MonoBehaviour
     {
         return constructionDate;
     }
-
-    // bool CheckResourcesSufficiency()
-    // {
-    //     if (allocatedResources.power < stats.requiredResources.power)
-    //         return false;
-    //     else if (allocatedResources.water < stats.requiredResources.water)
-    //         return false;
-
-    //     return true;
-    // }
 
     public virtual bool CheckConstructionResourceRequirements(Cell cell) //this does NOT include checking whether cell is occupied or not, which is handled in BuildingsManager.
     {   
@@ -143,6 +134,7 @@ public class Building : MonoBehaviour
         waterSign.SetActive(false);
 
         constructionDate = GameManager.simMan.date;
+        InitializeHistory();
     }
 
     public virtual void UpdateEffectOnNature(int timeWindow)
@@ -171,6 +163,21 @@ public class Building : MonoBehaviour
         {
             waterSign.SetActive(false);
         }
+    }
+
+    protected virtual void InitializeHistory()
+    {
+        
+    }
+
+    protected virtual void UpdateHistory()
+    {
+        
+    }
+
+    protected virtual float GetHistoricalData(System.DateTime date, string dataTitle)
+    {
+        return buildingHistory.GetElementValue(date, dataTitle);
     }
 
 }
@@ -251,5 +258,88 @@ public class BasicResources
             percentage = 1.0f;
 
         return percentage;
+    }
+}
+
+public class BuildingHistory
+{
+    struct TimePoint
+    {
+        //Since this struct will be private to BuildingHistory, I'm relaxing memory safety for it.
+        public float[] data;
+        
+        public TimePoint(int noOfData)
+        {
+            if (noOfData < 1)
+                data = null;
+            
+            data = new float[noOfData];
+        }
+    }
+
+    string[] header;
+    List<TimePoint> history;
+    System.DateTime startDate;
+    int dataCount;
+
+    public BuildingHistory(string[] elementsTitles, System.DateTime _startDate)
+    {
+        dataCount = elementsTitles.GetLength(0);
+        history = new List<TimePoint>();
+        header = elementsTitles;
+        startDate = _startDate;
+    }
+
+    public void AddToHistory(float[] newData) //The problem with this code, is that it's the caller's responcibility to insure it's sending the right amount of data, in the same order.
+    {
+        if (dataCount < 1) //No need to process anything if we aren't storing any data. Save the memory.
+            return;
+
+        //Add a new, zeroed out Time Point.
+        history.Add(new TimePoint(dataCount));
+
+        //Copy data from newData to the Timpoint, prioritizing order.
+        //If content of newData > what we expect (given dataCount), we will only take the first dataCount of elements.
+        //If content of newData < dataCount, will only set the first dataCount of the TimePoint to newData, remaining will be left as zero.
+        for (int i = 0; i < Mathf.Min(newData.GetLength(0), dataCount); i++)
+            history[history.Count - 1].data[i] = newData[i];
+        
+    }
+
+    public float[] GetTimePoint(System.DateTime date)
+    {
+        int daysSinceStart = date.Subtract(startDate).Days;
+        
+        if (daysSinceStart >= history.Count)
+            return new float[dataCount];
+
+
+
+        float[] result = (float[])history[daysSinceStart].data.Clone();
+        return result;
+    }
+
+    public float GetElementValue(System.DateTime date, string elementName)
+    {
+        int elementOrder = GetElementOrder(elementName);
+        
+        if (elementOrder < 0)
+            return 0.0f;
+
+        return GetTimePoint(date)[elementOrder];
+    }
+
+    int GetElementOrder(string elementName) //return -1 if elementName was not found in header.
+    {
+        int counter = 0;
+        foreach (string name in header)
+        {
+            if (elementName == name)
+                return counter;
+            
+            counter++;
+        }
+
+        return -1;
     }
 }
