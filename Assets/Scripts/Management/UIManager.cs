@@ -10,8 +10,6 @@ public class UIManager : MonoBehaviour
     Text cityNameField;
     Text treasuryField;
     GraphGenerator tsGraph;
-    ResourcesHistory.DataType currentGraphData = ResourcesHistory.DataType.undefined;
-
 
     void Awake()
     {
@@ -98,6 +96,13 @@ public class UIManager : MonoBehaviour
     }
 
     //Graph showing
+    //General building graph calls
+    public void ShowGraph(Building building, string dataTitle)
+    {
+        tsGraph.ShowGraph(building, dataTitle);
+    }
+
+    //Specialized graph calls
     public void ShowTreasuryGraph()
     {
         print ("Attempting to show graph for Treasury");

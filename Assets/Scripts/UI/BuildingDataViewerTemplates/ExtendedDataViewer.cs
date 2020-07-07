@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class ExtendedDataViewer : MonoBehaviour
 {
-
     Text employeeCount, employeeCapacity;
     Text employeeEducationLevel;
     Text wages;
@@ -72,5 +71,10 @@ public class ExtendedDataViewer : MonoBehaviour
             default:
                 return "N/A";
         }
+    }
+
+    protected void StartGraph(TimeSeries<float> timeSeries)
+    {
+
     }
 }
