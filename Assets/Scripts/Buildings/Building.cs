@@ -167,6 +167,8 @@ public class Building : MonoBehaviour
         }
     }
 
+
+    //Building History handling methods
     protected virtual void InitializeHistory()
     {
         buildingHistory = new BuildingHistory(null, constructionDate);
@@ -192,9 +194,25 @@ public class Building : MonoBehaviour
         
     }
 
-    protected virtual float GetHistoricalData(System.DateTime date, string dataTitle)
+    public float GetHistoricalDataAt(System.DateTime date, string dataTitle)
     {
         return buildingHistory.GetElementValue(date, dataTitle);
+    }
+    
+    public TimeSeries<float> GetAllHistoricalDataFor(string dataTitle)
+    {
+        return buildingHistory.GetTimeSeries(dataTitle);
+    }
+
+    public float GetLastHistoricalDataFor(string dataTitle)
+    {
+        return buildingHistory.GetLastRecordFor(dataTitle);
+    }
+
+    public string[] GetGraphLabelsFor(string dataTitle)
+    {
+        string[] labels = {dataTitle, "unlabled X-Axis", "unlabled Y-Axis"};
+        return labels;
     }
 
 }
@@ -396,4 +414,34 @@ public class BuildingHistory
 
         return -1;
     }
+
+    public TimeSeries<float> GetTimeSeries(string elementName)
+    {
+        int elementOrder = GetElementOrder(elementName);
+
+        if (history == null  || elementOrder < 0)
+            return new TimeSeries<float>(null);
+
+        List<System.DateTime> dates = new List<System.DateTime>();
+        List<float> values = new List<float>();
+
+        for (int i = 0; i < history.Count; i++)
+        {
+            dates.Add(startDate.AddDays(i));
+            values.Add(history[i].data[elementOrder]);
+        }
+
+        return new TimeSeries<float>(dates, values);
+    }
+
+    public float GetLastRecordFor(string elementName)
+    {
+        int elementOrder = GetElementOrder(elementName);
+
+        if (history == null  || elementOrder < 0)
+            return 0.0f;
+
+        return history[history.Count - 1].data[elementOrder];
+    }
+
 }
