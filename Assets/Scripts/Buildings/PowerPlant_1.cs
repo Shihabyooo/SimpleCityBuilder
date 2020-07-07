@@ -27,6 +27,19 @@ public class PowerPlant_1 : InfrastructureBuilding
         BuildingDataViewer.viewerHandler.Show(this, BuildingViewerTemplate.powerPlant);
     }
 
+    protected override void InitializeHistory()
+    {
+        string[] dataToBeSaved = {loadTitle, powerProductionTitle, efficiencyTitle, emissionTitle};
+        buildingHistory = new BuildingHistory(dataToBeSaved, constructionDate);
+    }
+
+    protected override void UpdateDailyAverage()
+    {
+        //IMPORTANT: Must make sure number of elements in lastTimePointData = buildingHistory.dataCount, itself = dataToBeSaved count set in InitializeHistory. Same for order.
+        float[] lastTimePointData = {currentLoad, currentPowerProduction, currentEfficiency, currentEmissionRate};
+        dailyAverages.Add(new BuildingHistory.TimePoint(lastTimePointData));
+    }
+
     protected override void OnConstructionComplete()
     {
         base.OnConstructionComplete();
@@ -50,6 +63,8 @@ public class PowerPlant_1 : InfrastructureBuilding
         currentPowerProduction = Mathf.Max(currentMaxPowerProduction * currentLoad, plantStats.minPowerProduction);
         currentEmissionRate = (2.0f - currentEfficiency) * plantStats.baseEmissionPerPowerUnit *  currentPowerProduction; //basically, at 100% efficiecy, emission = base esmission * production.
         UpdateEmissionVisuals(currentEmissionRate);
+
+        UpdateDailyAverage();
     }
 
     public override float GetMaxProduction()

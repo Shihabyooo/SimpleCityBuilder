@@ -28,11 +28,26 @@ public class WindFarm_1 : InfrastructureBuilding
         ComputeProduction();
     }
 
+     protected override void InitializeHistory()
+    {
+        string[] dataToBeSaved = {loadTitle, powerProductionTitle, efficiencyTitle};
+        buildingHistory = new BuildingHistory(dataToBeSaved, constructionDate);
+    }
+
+    protected override void UpdateDailyAverage()
+    {
+        //IMPORTANT: Must make sure number of elements in lastTimePointData = buildingHistory.dataCount, itself = dataToBeSaved count set in InitializeHistory. Same for order.
+        float[] lastTimePointData = {currentLoad, currentPowerProduction, currentEfficiency};
+        dailyAverages.Add(new BuildingHistory.TimePoint(lastTimePointData));
+    }
+
     public override void ComputeProduction()  //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
     {
         currentEfficiency = ComputeEfficiency();
         currentMaxPowerProduction = currentEfficiency * farmStats.maxPowerProduction;
         currentPowerProduction = currentMaxPowerProduction * currentLoad;
+        
+        UpdateDailyAverage();
     }
 
     protected override float ComputeEfficiency()

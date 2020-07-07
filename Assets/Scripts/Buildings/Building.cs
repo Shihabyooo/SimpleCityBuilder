@@ -23,6 +23,7 @@ public class Building : MonoBehaviour
     //protected System.Guid uniqueID {get; private set;}
     protected System.DateTime constructionDate;
     protected BuildingHistory buildingHistory;
+    protected List<BuildingHistory.TimePoint> dailyAverages = new List<BuildingHistory.TimePoint>(); //For use with history.
 
     BoxCollider buildingCollider;
     GameObject waterSign, powerSign;
@@ -135,6 +136,7 @@ public class Building : MonoBehaviour
 
         constructionDate = GameManager.simMan.date;
         InitializeHistory();
+        SimulationManager.onNewDay += UpdateHistory;
     }
 
     public virtual void UpdateEffectOnNature(int timeWindow)
@@ -167,10 +169,25 @@ public class Building : MonoBehaviour
 
     protected virtual void InitializeHistory()
     {
-        
+        buildingHistory = new BuildingHistory(null, constructionDate);
     }
 
-    protected virtual void UpdateHistory()
+    protected void UpdateHistory(System.DateTime date)
+    {
+        if (buildingHistory.dataCount < 1)
+            return;
+        
+        BuildingHistory.TimePoint newData = new BuildingHistory.TimePoint(buildingHistory.dataCount);
+
+        foreach (BuildingHistory.TimePoint timePoint in dailyAverages)
+            newData += timePoint;
+
+        newData /= dailyAverages.Count;
+        
+        buildingHistory.AddToHistory(newData);
+    }
+
+    protected virtual void UpdateDailyAverage()
     {
         
     }
@@ -200,6 +217,7 @@ public class BuildingStats
     //TODO add remaining requirements.
 
     //TODO add remaining -universal- parameters here.
+    
     public BuildingStats()
     {
 
@@ -263,27 +281,59 @@ public class BasicResources
 
 public class BuildingHistory
 {
-    struct TimePoint
+    public struct TimePoint
     {
-        //Since this struct will be private to BuildingHistory, I'm relaxing memory safety for it.
         public float[] data;
         
         public TimePoint(int noOfData)
         {
             if (noOfData < 1)
+            {
                 data = null;
+                return;
+            }
             
             data = new float[noOfData];
         }
+        
+        public TimePoint(float[] newData)
+        {
+            data = newData;
+        }
+
+        static public TimePoint operator+ (TimePoint tp1, TimePoint tp2)
+        {
+            int minLength = Mathf.Min(tp1.data.GetLength(0), tp2.data.GetLength(0));
+            TimePoint sum = new TimePoint(minLength);
+
+            for (int i = 0; i < minLength; i++)
+                sum.data[i] = tp1.data[i] + tp2.data[i];
+
+            return sum;
+        }
+
+        static public TimePoint operator/ (TimePoint tp, float denominator)
+        {
+            TimePoint result = new TimePoint(tp.data.GetLength(0));
+            result.data = (float[])tp.data.Clone();
+
+            for (int i = 0; i < tp.data.GetLength(0); i++)
+                result.data[i] /= denominator;
+
+            return result;
+        }
     }
 
-    string[] header;
-    List<TimePoint> history;
+    string[] header = null;
+    List<TimePoint> history = null;
     System.DateTime startDate;
-    int dataCount;
+    public int dataCount {get; private set;}
 
     public BuildingHistory(string[] elementsTitles, System.DateTime _startDate)
     {
+        if (elementsTitles == null)    
+            return;
+
         dataCount = elementsTitles.GetLength(0);
         history = new List<TimePoint>();
         header = elementsTitles;
@@ -303,14 +353,18 @@ public class BuildingHistory
         //If content of newData < dataCount, will only set the first dataCount of the TimePoint to newData, remaining will be left as zero.
         for (int i = 0; i < Mathf.Min(newData.GetLength(0), dataCount); i++)
             history[history.Count - 1].data[i] = newData[i];
-        
+    }
+
+    public void AddToHistory(TimePoint timePoint)
+    {
+        AddToHistory(timePoint.data);
     }
 
     public float[] GetTimePoint(System.DateTime date)
     {
         int daysSinceStart = date.Subtract(startDate).Days;
         
-        if (daysSinceStart >= history.Count)
+        if (daysSinceStart >= history.Count || daysSinceStart < 0)
             return new float[dataCount];
 
 
