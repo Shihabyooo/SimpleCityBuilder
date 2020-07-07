@@ -10,6 +10,15 @@ public enum InfrastructureService
 [RequireComponent(typeof(WorkPlace))]
 public class InfrastructureBuilding : Building
 {
+    public const string loadTitle = "Load"; //For use in retrieving historical data;
+    public const string treatmentRateTitle = "TreatmentRate"; //For use in retrieving historical data;
+    public const string efficiencyTitle = "Efficiency"; //For use in retrieving historical data;
+    public const string availableGWTitle = "AvailableGroundWater"; //For use in retrieving historical data;
+    public const string powerProductionTitle = "PowerProduction"; //For use in retrieving historical data;
+    public const string emissionTitle = "Emission"; //For use in retrieving historical data;
+
+
+
     [SerializeField] protected InfrastructureBuildingStats infraStats;
     public float currentLoad {get; private set;} //as a percentage of max production
     [SerializeField] protected WorkPlace workPlace;

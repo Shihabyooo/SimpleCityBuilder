@@ -8,6 +8,7 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
     float currentEfficiency;
     float currentMaxTreatmentRate; //not to be confused with maxTreatmentRate in WaterTreatmentPlantStats. This one is variable depending on other simulation factors.
     float availableGroundWater;
+    
 
     [SerializeField] WaterTreatmentPlantStats plantStats = new WaterTreatmentPlantStats();
 
@@ -29,6 +30,19 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
         ComputeProduction();
     }
 
+    protected override void InitializeHistory()
+    {
+        string[] dataToBeSaved = {loadTitle, treatmentRateTitle, efficiencyTitle, availableGWTitle};
+        buildingHistory = new BuildingHistory(dataToBeSaved, constructionDate);
+    }
+
+    protected override void UpdateDailyAverage()
+    {
+        //IMPORTANT: Must make sure number of elements in lastTimePointData = buildingHistory.dataCount, itself = dataToBeSaved count set in InitializeHistory. Same for order.
+        float[] lastTimePointData = {currentLoad, currentTreatmentRate, currentEfficiency, availableGroundWater};
+        dailyAverages.Add(new BuildingHistory.TimePoint(lastTimePointData));
+    }
+
     public override void ComputeProduction()  //To be implemented properly after calculations and balancing are finished. For now, use the simple calculations bellow.
     {
         //Sample groundWaterVolumeLayer in the main Grid
@@ -45,6 +59,8 @@ public class WaterTreatmentPlant_1 : InfrastructureBuilding
 
         currentMaxTreatmentRate = currentEfficiency * plantStats.maxTreatmentRate;
         currentTreatmentRate = currentLoad * currentMaxTreatmentRate;
+
+        UpdateDailyAverage();
     }
     
     public override float GetMaxProduction() 
