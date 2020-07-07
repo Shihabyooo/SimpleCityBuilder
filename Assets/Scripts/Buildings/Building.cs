@@ -187,6 +187,27 @@ public class Building : MonoBehaviour
         newData /= dailyAverages.Count;
         
         buildingHistory.AddToHistory(newData);
+
+        // //test
+        // print ("Data tracked for day:");
+        // foreach (BuildingHistory.TimePoint timePoint in dailyAverages)
+        // {
+        //     string dailyAvgContent = "";
+        //     foreach (float data in newData.data)
+        //     {
+        //         dailyAvgContent += data.ToString() + ", ";
+        //     }
+        //     print (dailyAvgContent);
+        // }
+
+        // string updatedData = "";
+        // foreach (float data in newData.data)
+        // {
+        //     updatedData += data.ToString() + ", ";
+        // }
+
+        // print ("Updated daily average to : " + updatedData);
+        // //end test
     }
 
     protected virtual void UpdateDailyAverage()
@@ -196,16 +217,25 @@ public class Building : MonoBehaviour
 
     public float GetHistoricalDataAt(System.DateTime date, string dataTitle)
     {
+        if (buildingHistory == null)
+            return 0.0f;
+
         return buildingHistory.GetElementValue(date, dataTitle);
     }
     
     public TimeSeries<float> GetAllHistoricalDataFor(string dataTitle)
     {
+        if (buildingHistory == null)
+            return new TimeSeries<float>(null);
+
         return buildingHistory.GetTimeSeries(dataTitle);
     }
 
     public float GetLastHistoricalDataFor(string dataTitle)
     {
+        if (buildingHistory == null)
+            return 0.0f;
+
         return buildingHistory.GetLastRecordFor(dataTitle);
     }
 
