@@ -210,6 +210,11 @@ public class ResourcesManager : MonoBehaviour
             onTreasuryChange.Invoke(finances.treasury);
     }
 
+    public ref long Population()
+    {
+        return ref finances.population;
+    }
+
     public ref IncomeTaxes IncomeTaxes()
     {
         return ref finances.incomeTaxes;
@@ -377,6 +382,7 @@ public class CityResources
 [System.Serializable]
 public class CityFinances
 {
+    public long population;
     public long treasury;
 
     //Values bellow are not used for any calculations and are solely for future statistics display to player.
@@ -390,12 +396,13 @@ public class CityFinances
     {
         CityFinances sum = new CityFinances();
 
+        sum.population = fin1.population + fin2.population;
         sum.treasury = fin1.treasury + fin2.treasury;
         sum.incomeTaxes = fin1.incomeTaxes + fin2.incomeTaxes;
         sum.industryTaxes = fin1.industryTaxes + fin2.industryTaxes;
         sum.commercialTaxes = fin1.commercialTaxes + fin2.commercialTaxes;
         sum.buildingExpenses = fin1.buildingExpenses + fin2.buildingExpenses;
-
+    
         return sum;
     }
 
@@ -403,7 +410,8 @@ public class CityFinances
     {
         CityFinances result = new CityFinances();
 
-        result.treasury =   System.Convert.ToInt64(System.Convert.ToSingle(fin.treasury)/ denominator);
+        result.treasury = System.Convert.ToInt64(System.Convert.ToSingle(fin.treasury)/ denominator);
+        result.population = System.Convert.ToInt64(System.Convert.ToSingle(fin.population)/ denominator);
         result.incomeTaxes = fin.incomeTaxes / denominator;
         
         result.industryTaxes = Mathf.RoundToInt((float)fin.industryTaxes / denominator);
@@ -425,6 +433,9 @@ public class ResourcesHistory
     //Using same initial ests, for 10000 days, size =~ 1.4MB
     //Even if my ests were off to half the actuall, those are acceptable figures....
 
+
+    //TODO add PopulationManager's PopulationMetrics struct for recording.
+
     public struct TimePoint
     {
         public System.DateTime date;
@@ -441,7 +452,7 @@ public class ResourcesHistory
 
     public enum DataType
     {
-        undefined, treasury, incomeTax, industryTax, commerceTax, buildingExpense, powerDemand, powerCons, powerAvail, waterDemand, waterCons, waterAvail, studentCount, 
+        undefined, population, treasury, incomeTax, industryTax, commerceTax, buildingExpense, powerDemand, powerCons, powerAvail, waterDemand, waterCons, waterAvail, studentCount, 
         eduSeat, hospitalFilled, hospitalAvail
     }
 
@@ -472,6 +483,24 @@ public class ResourcesHistory
         return dates;
     }
 
+
+    public float GetNthRecordFor(DataType dataType, int order)
+    {
+        if (order >= history.Count)
+            return 0.0f;
+
+        switch (dataType)
+        {
+            case DataType.population:
+                return history[order].finances.population;
+            case DataType.treasury:
+                return history[order].finances.treasury;
+            //TODO ad remaining datatypes.
+            default:
+                return 0.0f;
+        }
+    }
+
     public List<float> GetAllRecordsFor(DataType dataType)
     {
         if (dataType == DataType.undefined)
@@ -479,18 +508,11 @@ public class ResourcesHistory
 
         List<float> data = new List<float>();
         
-        foreach (TimePoint timePoint in history)
+        for (int i = 0; i < history.Count; i++)
         {
-            switch (dataType)
-            {
-                case DataType.treasury:
-                    data.Add(timePoint.finances.treasury);
-                    break;
-                //TODO ad remaining datatypes.
-                default:
-                    break;
-            }
+            data.Add(GetNthRecordFor(dataType, i));
         }
+
         return data;
     }
 
@@ -499,13 +521,6 @@ public class ResourcesHistory
         if (history.Count < 1)
             return 0.0f;
 
-        switch (dataType)
-            {
-                case DataType.treasury:
-                    return history[history.Count - 1].finances.treasury;
-                //TODO ad remaining datatypes.
-                default:
-                    return 0.0f;
-            }
+        return GetNthRecordFor(dataType, history.Count - 1);
     }
 }
