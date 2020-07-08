@@ -78,16 +78,21 @@ public class GraphGenerator : MonoBehaviour
 
     }
 
-    public bool ShowGraph (ResourcesHistory.DataType historyDataType)
+    public bool ShowGraph (ResourcesHistory.DataType resourceHistoryDataType)
     {
         ResetTracking();
         currentTrackedDataSource = TrackedDataSource.cityResource;
-        TimeSeries<float> timeSeries = GameManager.resourceMan.GetTimeSeries(historyDataType);
-        switch (historyDataType)
+        TimeSeries<float> timeSeries = GameManager.resourceMan.GetTimeSeries(resourceHistoryDataType);
+        switch (resourceHistoryDataType)
         {
+            case ResourcesHistory.DataType.population:
+                currentGraphDataType = ResourcesHistory.DataType.population;
+                return ShowGraph(timeSeries, "Population", "Date", "Population - citizens");
+
             case ResourcesHistory.DataType.treasury:
                 currentGraphDataType = ResourcesHistory.DataType.treasury;
                 return ShowGraph(timeSeries, "Treasury", "Date", "Funds - $");
+                
             //TODO Add (relevant) remaining datatypes.
             default:
                 return false;

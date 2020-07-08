@@ -140,8 +140,8 @@ public class PopulationManager : MonoBehaviour
         _immigration = Mathf.Max(Random.Range(Mathf.RoundToInt(_immigration - 0.2f * maxImmigrationRate),  Mathf.RoundToInt(_immigration + 0.2f * maxImmigrationRate)), growthStats.minImmigrationRate);
         _immigration = (int)Mathf.Min(_immigration, maxImmigrationRate, totalAvailableHousing);
 
-
-        if (growthStats.immigrationRate > 0 && totalAvailableHousing > 0)
+        int actualImmigration = 0; //pointless?
+        if (_immigration > 0 && totalAvailableHousing > 0)
         {
             //Spawn new citizens here.
             //This is a test implementation
@@ -152,18 +152,23 @@ public class PopulationManager : MonoBehaviour
             for (int i = 0; i < Mathf.FloorToInt(_immigration * lowRatio); i++)
             {
                 GenerateImmigrationCase(CitizenClass.low);
+                actualImmigration++;
             }
             for (int i = 0; i < Mathf.FloorToInt(_immigration * middleRatio); i++)
             {
                 GenerateImmigrationCase(CitizenClass.middle);
+                actualImmigration++;
             }
             for (int i = 0; i < Mathf.FloorToInt(_immigration * highRatio); i++)
             {
                 GenerateImmigrationCase(CitizenClass.high);
+                actualImmigration++;
             }
         }
         
-        growthStats.immigrationRate = _immigration;
+        growthStats.immigrationRate = actualImmigration;
+        GameManager.resourceMan.Population() = PopulationCount();
+        GameManager.uiMan.UpdatePopulation(PopulationCount());
     }
 
     Citizen GenerateCitizen(CitizenClass _class)
@@ -290,8 +295,6 @@ public class PopulationManager : MonoBehaviour
 
     }
 }
-
-
 
 
 [System.Serializable]
