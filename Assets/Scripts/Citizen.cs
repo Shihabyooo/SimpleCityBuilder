@@ -11,6 +11,10 @@ public enum Gender
 [System.Serializable]
 public class Citizen
 {
+    const long maxSavings = 100000; //worst case difference is 9,223,372,036,854,775,807 - 2,147,483,647 = 9,223,372,034,707,292,160‬ before the savings overflow.
+                                        //however, to add some difficulty (i.e. to prevent player from benefiting from a successfull period of good choice for a long time),
+                                        //we set a max savings after which, any more gains are pointless. So if citizen lost job or income became too low, they won't stick around
+                                        //for long
     //TODO reset the {get; private set;} once testing is done.
     
     public System.Guid id; //{get; private set;}
@@ -79,7 +83,7 @@ public class Citizen
 
         //TODO handle cases of integer overflow/cycling.
         expenses -= income; //if income > expenses, result will be negative, which will increase savings.
-        savings -= expenses; //TODO handle integer overflow here.
+        savings = System.Convert.ToInt64(Mathf.Min(savings - expenses, maxSavings)); 
         
         if (savings < 0)
         {
