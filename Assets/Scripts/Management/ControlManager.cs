@@ -170,7 +170,8 @@ public class ControlManager : MonoBehaviour
         {
             RaycastHit hit = CastRay(gridLayer);
             inspectedCell = Grid.grid.SampleForCell(hit.point);
-            inspectedCellID = inspectedCell.cellID;
+            if (inspectedCell != null)
+                inspectedCellID = inspectedCell.cellID;
         }
         else if (Input.GetMouseButtonDown(1))
         {
