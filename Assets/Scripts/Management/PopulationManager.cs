@@ -136,7 +136,12 @@ public class PopulationManager : MonoBehaviour
         HousingSlots availableHousing = GameManager.resourceMan.AvailableHousing();
         ulong totalAvailableHousing = availableHousing.Sum();
 
-        int _immigration = Mathf.RoundToInt(((float)populationHappiness.overall / 100.0f) * (0.8f * maxImmigrationRate));
+        int minHappinessForImmigration = 35;
+        int maxHappinessForImmigration = 75;
+
+        //int _immigration = Mathf.RoundToInt(((float)populationHappiness.overall / 100.0f) * (0.8f * maxImmigrationRate));
+        float happinesContirbution = Mathf.Clamp((float)(populationHappiness.overall - minHappinessForImmigration  ) / (float)(maxHappinessForImmigration - minHappinessForImmigration), 0.0f, 1.0f);
+        int _immigration = Mathf.RoundToInt(happinesContirbution *  (float)maxImmigrationRate);
         _immigration = Mathf.Max(Random.Range(Mathf.RoundToInt(_immigration - 0.2f * maxImmigrationRate),  Mathf.RoundToInt(_immigration + 0.2f * maxImmigrationRate)), growthStats.minImmigrationRate);
         _immigration = (int)Mathf.Min(_immigration, maxImmigrationRate, totalAvailableHousing);
 
@@ -193,7 +198,7 @@ public class PopulationManager : MonoBehaviour
         {
             case CitizenClass.low:
                 educationLevelPropability = new float[4] {0.1f, 0.25f, 0.9f, 1.0f}; //Any element following one with 1.0f probability will never happen (check the if-statements bellow)
-                                                                                    //This translates to: citizen has 60% chance of being illterate, 40% of having primary education.
+                                                                                    //This translates to: citizen has 10% chance of being illterate, 15% of having primary education, 75% secondary, 10 tertiar.
                 averageAge = 32;
                 ageRange = 14;
                 _savings = Random.Range(800, 1200);
