@@ -102,7 +102,7 @@ MonoBehaviour:
     requiredResources:
       power: 0
       water: 0
-    minBudget: 1000
+    minBudget: 1500
     maxBudget: 3000
   occupiedCell: 0000000000000000
   budget: 0
@@ -114,6 +114,7 @@ MonoBehaviour:
     minEfficiency: 0.2
     maxEfficiency: 0.8
   workPlace: {fileID: 0}
+  infrastructureType: 0
   farmStats:
     maxPowerProduction: 5.75
     minWindSpeed: 5
@@ -134,8 +135,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minManpower: 1
   maxManpower: 10
-  minWorkerEducationLevel: 3
-  wages: 100
+  minWorkerEducationLevel: 8
+  wagesSpread: 0.2
   minWorkplaceQuality: 35
   maxWorkplaceQuality: 85
   employees: []

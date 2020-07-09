@@ -1790,9 +1790,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   incomeTaxRates:
-    low: 5
-    middle: 5
-    high: 5
+    low: 0.01
+    middle: 0.01
+    high: 0.01
   industryTaxRate: 0.01
   commercialTaxRate: 0.01
 --- !u!1 &256751662
@@ -17124,7 +17124,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 00
+  m_Text: population
 --- !u!222 &1917883719
 CanvasRenderer:
   m_ObjectHideFlags: 0

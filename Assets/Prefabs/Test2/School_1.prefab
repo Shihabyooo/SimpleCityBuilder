@@ -102,8 +102,8 @@ MonoBehaviour:
     requiredResources:
       power: 2
       water: 2
-    minBudget: 2500
-    maxBudget: 5000
+    minBudget: 1500
+    maxBudget: 3000
   occupiedCell: 02000000c4090000
   budget: 5000
   allocatedResources:
@@ -114,6 +114,7 @@ MonoBehaviour:
     minEfficiency: 0.2
     maxEfficiency: 1
   workPlace: {fileID: 0}
+  infrastructureType: 0
 --- !u!114 &6886915651944384898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128,8 +129,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minManpower: 5
   maxManpower: 50
-  minWorkerEducationLevel: 2
-  wages: 55
+  minWorkerEducationLevel: 4
+  wagesSpread: 0.2
   minWorkplaceQuality: 35
   maxWorkplaceQuality: 85
   employees: []

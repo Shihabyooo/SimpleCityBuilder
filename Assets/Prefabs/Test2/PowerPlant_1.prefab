@@ -103,8 +103,8 @@ MonoBehaviour:
     requiredResources:
       power: 0
       water: 0
-    minBudget: 5000
-    maxBudget: 10000
+    minBudget: 1500
+    maxBudget: 3000
   occupiedCell: 0000000000000000
   budget: 0
   allocatedResources:
@@ -115,6 +115,7 @@ MonoBehaviour:
     minEfficiency: 0.2
     maxEfficiency: 0.8
   workPlace: {fileID: 0}
+  infrastructureType: 0
   minEmissionToGenerateSmoke: 6
   maxEmissionToGenerateSmoke: 30
   maxSmokeOpacity: 0.75
@@ -136,8 +137,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minManpower: 5
   maxManpower: 50
-  minWorkerEducationLevel: 2
-  wages: 100
+  minWorkerEducationLevel: 4
+  wagesSpread: 0.2
   minWorkplaceQuality: 35
   maxWorkplaceQuality: 85
   employees: []

@@ -103,7 +103,7 @@ MonoBehaviour:
       power: 0
       water: 0
     minBudget: 1000
-    maxBudget: 3000
+    maxBudget: 2000
   occupiedCell: 0000000000000000
   budget: 0
   allocatedResources:
@@ -124,7 +124,7 @@ MonoBehaviour:
   minManpower: 20
   maxManpower: 100
   minWorkerEducationLevel: 2
-  wages: 50
+  wagesSpread: 0.2
   minWorkplaceQuality: 35
   maxWorkplaceQuality: 85
   employees: []
