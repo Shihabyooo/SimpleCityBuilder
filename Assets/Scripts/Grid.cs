@@ -401,7 +401,7 @@ public class Grid : MonoBehaviour
             {
                 float distanceFromCentre = Mathf.Round(Mathf.Sqrt(Mathf.Pow((float)j - (float)cellID_x, 2.0f) + Mathf.Pow((float)i - (float)cellID_y, 2.0f)));
                 float pollutionAtCell = pollution * (1.0f - (distanceFromCentre / (float) radius));
-                pollutionLayer.GetCellRef(j, i) += pollutionAtCell;
+                pollutionLayer.GetCellRef(j,i) = Mathf.Clamp(pollutionLayer.GetCellValue(j, i) + pollutionAtCell, Globals.minPollution, Globals.maxPollution);
             }
         } 
     }

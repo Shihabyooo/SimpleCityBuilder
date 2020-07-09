@@ -114,6 +114,13 @@ MonoBehaviour:
     minEfficiency: 0.2
     maxEfficiency: 1
   workPlace: {fileID: 0}
+  infrastructureType: 0
+  parkStats:
+    minEnvironmentHappinessBoost: 0
+    maxEnvironmentHappinessBoost: 20
+    minPollutionReduction: 23
+    maxPollutionReduction: 46
+  id: 0
 --- !u!114 &3419211805055341375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -129,7 +136,7 @@ MonoBehaviour:
   minManpower: 1
   maxManpower: 10
   minWorkerEducationLevel: 1
-  wages: 10
+  wagesSpread: 0.2
   minWorkplaceQuality: 35
   maxWorkplaceQuality: 85
   employees: []

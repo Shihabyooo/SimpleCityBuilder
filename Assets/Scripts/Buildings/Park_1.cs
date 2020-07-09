@@ -10,10 +10,13 @@ public class Park_1 : InfrastructureBuilding
     [SerializeField] ParkStats parkStats;
     [SerializeField] ulong id; //TODO remove serialization after testing
 
+    public uint environmentHappinessBoost {get; private set;}
+
     override protected void Awake()
     {
         base.Awake();
         infrastructureType = InfrastructureService.parks;
+        environmentHappinessBoost = 0;
     }
 
     public override void ShowDetailsOnViewer()
@@ -39,7 +42,11 @@ public class Park_1 : InfrastructureBuilding
     {
         base.UpdateEffectOnNature(timeWindow);
         
-        //TODO Override UpdateEffectOnNature() to reduce pollution here.
+        float efficiency = ComputeEfficiency();
+        float pollutionReduction = efficiency * (parkStats.maxPollutionReduction - parkStats.minPollutionReduction) + parkStats.minPollutionReduction;
+        pollutionReduction = -1.0f * pollutionReduction; //Because we will subtract it from the current pollution
+
+        Grid.grid.SetPollutionCummilative(occupiedCell[0], occupiedCell[1], infraStats.radiusOfInfluence, pollutionReduction);
     }
 
     //TODO efficiency calculated similarily to standard infrascture
