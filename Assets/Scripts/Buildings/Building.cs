@@ -30,7 +30,7 @@ public class Building : MonoBehaviour
 
     virtual protected void Awake()
     {
-        budget = (uint)Mathf.FloorToInt((float)(stats.minBudget + stats.maxBudget) / 2.0f);
+        SetBudget((uint)Mathf.FloorToInt((float)(stats.minBudget + stats.maxBudget) / 2.0f));
         buildingCollider = this.gameObject.GetComponent<BoxCollider>();
     }
 
@@ -52,6 +52,12 @@ public class Building : MonoBehaviour
     public void SetBudget(uint newbudget)
     {
         budget = newbudget;
+
+        //Update workplace wages if required.
+        WorkPlace workPlace;
+
+        if(this.gameObject.TryGetComponent<WorkPlace>(out workPlace))
+            workPlace.UpdateWages(budget, stats.minBudget, stats.maxBudget);
     }
 
     public BasicResources AllocatedResources()
