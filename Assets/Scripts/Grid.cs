@@ -332,6 +332,34 @@ public class Grid : MonoBehaviour
         }
     }
 
+    public List<ulong> GetInfrastructureIDsCoveringCell(uint cellID_x, uint cellID_y, InfrastructureService type)
+    {
+        List<ulong> result = new List<ulong>();
+        ulong bitChain = 0;
+
+        switch(type)
+        {
+            case InfrastructureService.parks:
+                bitChain = parksLayer.GetCellValue(cellID_x, cellID_y);
+                break;
+            case InfrastructureService.safety:
+                bitChain = policeLayer.GetCellValue(cellID_x, cellID_y);
+                break;
+            case InfrastructureService.education:
+                bitChain = schoolsLayer.GetCellValue(cellID_x, cellID_y);
+                break;
+        }
+
+        for (uint i = 0; i < 64; i++)
+        {
+            ulong testedID = BuildingIDHandler<int>.ULongPow(2, i);
+            if ((bitChain & testedID) == testedID)
+                result.Add(testedID);
+        }
+
+        return result;
+    }
+
     public float GetTotalGroundWaterVolume(uint cellID_x, uint cellID_y, uint radius)
     {
         float sum = 0.0f;
@@ -406,7 +434,6 @@ public class Grid : MonoBehaviour
         } 
     }
 
-    
 
 //testing metdhods
     float minGWCap = 50000f, maxGWCap = 111690f;
