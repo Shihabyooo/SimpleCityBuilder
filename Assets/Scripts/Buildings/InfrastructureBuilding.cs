@@ -17,12 +17,12 @@ public class InfrastructureBuilding : Building
     public const string powerProductionTitle = "PowerProduction"; //For use in retrieving historical data;
     public const string emissionTitle = "Emission"; //For use in retrieving historical data;
 
-
-
     [SerializeField] protected InfrastructureBuildingStats infraStats;
     public float currentLoad {get; private set;} //as a percentage of max production
     [SerializeField] protected WorkPlace workPlace;
     [SerializeField] protected InfrastructureService infrastructureType;
+    [SerializeField] protected ulong id; //Only buildings with limits to how many player can construct use this.  //TODO remove serialization after testing
+
 
     override protected void Awake()
     {
@@ -31,6 +31,15 @@ public class InfrastructureBuilding : Building
         workPlace = this.gameObject.GetComponent<WorkPlace>();
     }
     
+    //Because BuildingIDHandler in Buildings manager will also be used to track whether player has reached cap of builing of specific time, we need to reserve and get an ID
+    //as soon as player clicks to build a park, BeginConstruction() is called by BuildingPlan to mark this event, we override this method to add ID reserving functionality.
+    //Note, GameManager.buildingsMan.GetNewID(this) will only evalute to something meaningfull in a subset of infrastructure buildings (e.g. parks, schools, police stations)
+    public override void BeginConstruction(Cell cell)
+    {
+        base.BeginConstruction(cell);
+        id = GameManager.buildingsMan.GetNewID(this); 
+    }
+
     public InfrastructureBuildingStats GetInfrastructureBuildingStats()
     {
         return infraStats;
