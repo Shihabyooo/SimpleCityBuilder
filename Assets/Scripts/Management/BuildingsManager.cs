@@ -19,9 +19,9 @@ public class BuildingsManager : MonoBehaviour
     public List<IndustrialBuilding> industrialBuildings {get; private set;}
     public List<CommercialBuilding> commercialBuildings {get; private set;}
 
-    [SerializeField] BuildingIDHandler parkIDHandler = new BuildingIDHandler();
-    [SerializeField] BuildingIDHandler schoolIDHandler = new BuildingIDHandler();
-    [SerializeField] BuildingIDHandler policeIDHandler = new BuildingIDHandler();
+    [SerializeField] BuildingIDHandler<Park_1> parkIDHandler = new BuildingIDHandler<Park_1>();
+    [SerializeField] BuildingIDHandler<School_1> schoolIDHandler = new BuildingIDHandler<School_1>();
+    [SerializeField] BuildingIDHandler<PoliceStation_1> policeIDHandler = new BuildingIDHandler<PoliceStation_1>();
 
     void Awake()
     {
@@ -103,19 +103,27 @@ public class BuildingsManager : MonoBehaviour
 
     }
 
-    public ulong GetNewID(InfrastructureService type) //So far, only parks, police stations and schools require IDs and are limited in number.
+    public ulong GetNewID(InfrastructureBuilding building) //So far, only parks, police stations and schools require IDs and are limited in number.
     { 
+        InfrastructureService type = building.InfrastructureType();
+        ulong newID = 0;
+
         switch (type)
         {
             case InfrastructureService.parks:
-                return parkIDHandler.GetNewID();
+                newID = parkIDHandler.AssignNewBuilding(building.gameObject.GetComponent<Park_1>());
+                break;
             case InfrastructureService.safety:
-                return policeIDHandler.GetNewID();
+                newID = policeIDHandler.AssignNewBuilding(building.gameObject.GetComponent<PoliceStation_1>());
+                break;
             case InfrastructureService.education:
-                return schoolIDHandler.GetNewID();
+                newID = schoolIDHandler.AssignNewBuilding(building.gameObject.GetComponent<School_1>());
+                break;
             default:
-                return 0;
+                break;
         }
+
+        return newID;
     }
 
     public ResidentialBuilding GetResidentialBuildingWithEmptySlot(CitizenClass _class, bool random = true)
@@ -144,35 +152,6 @@ public class BuildingsManager : MonoBehaviour
         int randomInt = Random.Range(0, availableHousing.Count - 1);
         
         return availableHousing[randomInt];
-
-        //Bellow as an old, "stupid" version of random method aquisition (though it prolly does take less memory).
-
-        // //This is a stupid attempt at randomizing building pickup.
-        // int count = 0;
-
-        // while (count < 100) //tries 100 times to find a random building, if fails, grabs the first one it find from the foreach loop bellow.
-        // {
-        //     int randomInt = Random.Range(0, residentialBuildings.Count);
-
-        //     if (residentialBuildings[randomInt].ResidentClass() == _class
-        //         && residentialBuildings[randomInt].EmptyHousingSlots() > 0)
-        //     {
-        //         return residentialBuildings[randomInt];
-        //     }
-        //     count++;
-        // }
-
-        // //Reaching here means that that stupid randomization thing above failed.
-        // foreach (ResidentialBuilding residence in residentialBuildings)
-        // {
-        //     if (residence.ResidentClass() == _class
-        //         && residence.EmptyHousingSlots() > 0)
-        //         {
-        //             return residence;
-        //         }
-        // }
-        
-        //return null;
     }
 
     public WorkPlace GetEmptyWorkSlot(EducationLevel educationLevel, bool random = true, bool exactLevel = false) //This method is similar to GetResidentialBuildingWithEmptySlot().
@@ -209,31 +188,6 @@ public class BuildingsManager : MonoBehaviour
         int randomInt = Random.Range(0, availableWorkPlaces.Count - 1);
         
         return availableWorkPlaces[randomInt];
-
-        // int count = 0;
-
-        // while (count < 100) //tries 100 times to find a random building, if fails, grabs the first one it find from the foreach loop bellow.
-        // {
-        //     int randomInt = Random.Range(0, workPlaces.Count);
-
-        //     if (workPlaces[randomInt].WorkerEducationLevel() == educationLevel
-        //         && workPlaces[randomInt].AvailableWorkerSlots() > 0)
-        //     {
-        //         return workPlaces[randomInt];
-        //     }
-        //     count++;
-        // }
-
-        // foreach (WorkPlace workPlace in workPlaces)
-        // {
-        //     if (workPlace.WorkerEducationLevel() == educationLevel
-        //         && workPlace.AvailableWorkerSlots() > 0)
-        //         {
-        //             return workPlace;
-        //         }
-        // }
-
-        // return null;
     }
 
     WorkPlace GetEmptyWorkSlotExtended(EducationLevel educationLevel, bool random = true) //See comments on GetEmptyWorkSlot()
@@ -261,6 +215,29 @@ public class BuildingsManager : MonoBehaviour
         int randomInt = Random.Range(0, availableWorkPlaces.Count - 1);
         
         return availableWorkPlaces[randomInt];
+    }
+
+    public InfrastructureBuilding GetInfrastructureBuilding(InfrastructureService type, ulong id) //Used for buildings with unique IDs only.
+    {
+        switch(type) 
+        {
+            // case InfrastructureService.water:
+            //     break;
+            // case InfrastructureService.power:
+            //     break;
+            // case InfrastructureService.health:
+            //     break;
+            case InfrastructureService.education:
+                return schoolIDHandler.Building(id);
+            // case InfrastructureService.gas:
+            //     break;
+            case InfrastructureService.safety:
+                return policeIDHandler.Building(id);
+            case InfrastructureService.parks:
+                return parkIDHandler.Building(id);
+            default:
+                return null;
+        }
     }
 
     //=======================================================================================================================
@@ -351,7 +328,7 @@ class BuildingsDatabase
 }
 
 [System.Serializable]
-public class BuildingIDHandler
+public class BuildingIDHandler<T>
 {
     //Note: This object does not track the state of the objects that request an ID. Desotrying/Removing that object without it first releasing its ID will result in the
     //said ID remaining marked as assigned for the remainder of this object's life. 
@@ -361,12 +338,28 @@ public class BuildingIDHandler
     [SerializeField][Range(6, 64)] int maxCount = 32;
     [SerializeField] int currentCount = 0;
 
+    T[] trackedBuildings;
+
     public BuildingIDHandler()
     {
-
+        trackedBuildings = new T[maxCount];
     }
 
-    public ulong GetNewID() //0 is an error state.
+    public ulong AssignNewBuilding(T building)
+    {
+        ulong newID = GetNewID();
+        
+        if (newID > 0)
+        {
+            int order = Mathf.RoundToInt(Mathf.Log((float)newID, 2.0f));
+            //print("Assigning new obj of order: " + order); //test
+            trackedBuildings[order] = building;
+        }
+
+        return newID;
+    }
+
+    ulong GetNewID() //0 is an error state.
     {
         for (uint i = 0; i < maxCount; i++)
         {
@@ -380,6 +373,16 @@ public class BuildingIDHandler
         }
 
         return 0;
+    }
+
+    public T Building(ulong id)
+    {
+        int order = Mathf.RoundToInt(Mathf.Log((float)id, 2.0f));
+
+        if (order < maxCount)
+            return trackedBuildings[order];
+        else
+            return default(T);
     }
 
     public void ReleaseID(ulong id)
@@ -402,7 +405,7 @@ public class BuildingIDHandler
         currentCount++;
     }
     
-    ulong ULongPow(uint _base, uint power) 
+    static public ulong ULongPow(uint _base, uint power) 
     {
         //This method is to workaround the fact that Unity and Csharp (afaik) don't provide methods to calculate power of integers. And since we need exact integer results up
         //to the max cap of ulongs (18,446,744,073,709,551,615), but floats and doubles start to deviate at 16,777,217 and 9,007,199,254,740,993, we have to make a custom power
