@@ -8,4 +8,5 @@ public class Globals
 {
     public const float minPollution = 0.0f;
     public const float maxPollution = 1000000.0f;
+    public const uint baseEnvironmentHappiness = 60; //At zero pollution
 }

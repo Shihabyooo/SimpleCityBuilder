@@ -107,20 +107,27 @@ public class PopulationManager : MonoBehaviour
 
         //compute environment happiness. We do that according to pollution in both house and work.
         //Work pollution contributes to happiness half that of home.
-        int homeEnvironmentHappiness = 0, workEnvironmentHappiness = 0;
+        uint homeEnvironmentHappiness = 0, workEnvironmentHappiness = 0;
 
         if (citizen.homeAddress != null) //Again, shouldn't happen, but better safe than sorry.
         {
             float pollutionAtHome = Grid.grid.pollutionLayer.GetCellValue(citizen.homeAddress.occupiedCell[0], citizen.homeAddress.occupiedCell[0]);
-            homeEnvironmentHappiness = Mathf.RoundToInt(Mathf.Clamp(100.0f - (100.0f * (pollutionAtHome - Citizen.minPollutionToAffectHealthHappiness) / (Citizen.maxPollutionToAffectHealthHappiness - Citizen.minPollutionToAffectHealthHappiness)), 0.0f, 100.0f));
-            newHappiness.environment = (uint)homeEnvironmentHappiness;
+            homeEnvironmentHappiness = (uint)Mathf.RoundToInt((float)Globals.baseEnvironmentHappiness - ((float)Globals.baseEnvironmentHappiness * (pollutionAtHome - Citizen.minPollutionToAffectHealthHappiness) / (Citizen.maxPollutionToAffectHealthHappiness - Citizen.minPollutionToAffectHealthHappiness)));
+            homeEnvironmentHappiness = (uint)Mathf.Clamp((int)homeEnvironmentHappiness, 0, (int)Globals.baseEnvironmentHappiness);
+            homeEnvironmentHappiness += Park_1.EnvironmentBoostMax(citizen.homeAddress.occupiedCell[0], citizen.homeAddress.occupiedCell[1]);
+            workEnvironmentHappiness = homeEnvironmentHappiness; //incase citizen.workAddress == null.
         }
+
         if (citizen.workAddress != null)
         {
             float pollutionAtWork = Grid.grid.pollutionLayer.GetCellValue(citizen.workAddress.GetComponent<Building>().occupiedCell[0], citizen.workAddress.GetComponent<Building>().occupiedCell[0]);
-            workEnvironmentHappiness = Mathf.RoundToInt(Mathf.Clamp(100.0f - (100.0f * (pollutionAtWork - Citizen.minPollutionToAffectHealthHappiness) / (Citizen.maxPollutionToAffectHealthHappiness - Citizen.minPollutionToAffectHealthHappiness)), 0.0f, 100.0f));
-            newHappiness.environment = (uint)Mathf.RoundToInt( (float)(2 * homeEnvironmentHappiness + workEnvironmentHappiness) / 3.0f);
+
+            workEnvironmentHappiness = (uint)Mathf.RoundToInt((float)Globals.baseEnvironmentHappiness - ((float)Globals.baseEnvironmentHappiness * (pollutionAtWork - Citizen.minPollutionToAffectHealthHappiness) / (Citizen.maxPollutionToAffectHealthHappiness - Citizen.minPollutionToAffectHealthHappiness)));
+            workEnvironmentHappiness = (uint)Mathf.Clamp((int)workEnvironmentHappiness, 0, (int)Globals.baseEnvironmentHappiness);
+            workEnvironmentHappiness += Park_1.EnvironmentBoostMax(citizen.workAddress.GetComponent<Building>().occupiedCell[0], citizen.workAddress.GetComponent<Building>().occupiedCell[1]);
         }
+
+        newHappiness.environment = (uint)Mathf.RoundToInt( (float)(2 * homeEnvironmentHappiness + workEnvironmentHappiness) / 3.0f);
 
         if (citizen.workAddress == null) //unemployed
             newHappiness.job = 0;
