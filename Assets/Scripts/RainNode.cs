@@ -8,12 +8,13 @@ public class RainNode : MonoBehaviour
     ParticleSystem rainSystem, cloudSystem;
     ParticleSystem.EmissionModule rainEmission, cloudEmission;
     ParticleSystem.ShapeModule rainShape, cloudShape;
+    
     [SerializeField] float maxRateOverTimePerUnitRadius = 200.0f;
     [SerializeField] float minRateOverTimePerUnitRadius = 10.0f;
     [SerializeField] float rainToCloudEmissionRatio = 0.5f;
     [SerializeField] float rainRampUpTime = 5.0f; //time between rain start to reach its max value. Should be less than what it takes the simulation to update rainfall.
+    
     public bool isStarting {get; private set;}
-
     public float rainOpacity {get; private set;}
     public float cloudOpacity {get; private set;}
     public float rainfall {get; private set;}
@@ -45,17 +46,15 @@ public class RainNode : MonoBehaviour
     {
         rainShape.radius = radius;
         cloudShape.radius = rainShape.radius + 1.0f;
-        //SetRainfall(_rainfall);
         StartCoroutine(RainStart(_rainfall));
     }
 
     public void SetRainfall(float _rainfall)
     {
-        //rainEmission.rateOverTime = new ParticleSystem.MinMaxCurve(0.99f * rainfall, 1.01f * rainfall);
         rainfall = _rainfall;
         float rateOverTimePerUnitRadius = Mathf.Clamp(_rainfall, minRateOverTimePerUnitRadius, maxRateOverTimePerUnitRadius);
+
         rainEmission.rateOverTime = rateOverTimePerUnitRadius  * rainShape.radius * 2.0f;
-        
         cloudEmission.rateOverTime = rateOverTimePerUnitRadius * rainToCloudEmissionRatio * cloudShape.radius; 
     }
 
@@ -69,8 +68,8 @@ public class RainNode : MonoBehaviour
     public void SetRainOpacity(float _opacity)
     {        
         Color newColour = rainSystem.main.startColor.color;
-        
         newColour.a = rainOpacity = _opacity;
+
         ParticleSystem.MainModule mainModule = rainSystem.main;
         mainModule.startColor =  newColour;
     }
@@ -78,14 +77,11 @@ public class RainNode : MonoBehaviour
     public void SetCloudOpacity(float _opacity)
     {        
         Color newColour = cloudSystem.main.startColor.color;
-        
         newColour.a = cloudOpacity = _opacity;
+
         ParticleSystem.MainModule mainModule = cloudSystem.main;
         mainModule.startColor =  newColour;
     }
-
-
-
 
     IEnumerator RainStart(float _rainfall)
     {
@@ -96,6 +92,7 @@ public class RainNode : MonoBehaviour
         while (helperTimer < rainRampUpTime)
         {
             yield return new WaitForEndOfFrame();
+            
             SetRainfall(_rainfall * (helperTimer / rainRampUpTime));
             SetRainOpacity (maxOpacity * (helperTimer / rainRampUpTime));
             helperTimer += Time.deltaTime;
@@ -103,21 +100,4 @@ public class RainNode : MonoBehaviour
 
         yield return isStarting = false;
     }
-    
-
-
-
-//testing 
-
-    // public float testRainfall;
-    // public float testRadius;
-    // void OnValidate()
-    // {
-    //     if (!UnityEditor.EditorApplication.isPlaying)
-    //         return;
-    //     opacity = 1.0f;
-    //     print ("evalutating");
-    //     StopAllCoroutines();
-    //     Initialize(testRainfall, testRadius);
-    // }
 }

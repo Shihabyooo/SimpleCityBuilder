@@ -2,10 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public enum Gender
 {
     male, female
+} //FITE ME!!!!
+
+public enum CitizenClass
+{
+    low, middle, high
+} //FITE ME!
+
+public enum EducationLevel
+{
+    illiterate = 1, primary = 2, secondery = 4, tertiary = 8
 }
 
 [System.Serializable]
@@ -15,8 +24,8 @@ public class Citizen
                                         //however, to add some difficulty (i.e. to prevent player from benefiting from a successfull period of good choice for a long time),
                                         //we set a max savings after which, any more gains are pointless. So if citizen lost job or income became too low, they won't stick around
                                         //for long
-    //TODO reset the {get; private set;} once testing is done.
     
+    //TODO reset the {get; private set;} once testing is done.
     public System.Guid id; //{get; private set;}
     public System.DateTime birthDay; //{get; private set;}
     public CitizenClass citizenClass; //{get; private set;} 
@@ -26,10 +35,9 @@ public class Citizen
     public long savings; //{get; private set;} 
     public int health; //{get; private set;} 
 
-    //public System.Guid homeAddress; //{get; private set;} 
     public ResidentialBuilding homeAddress; //{get; private set;} 
     public WorkPlace workAddress; //{get; private set;} 
-    //public bool isInDebt;  //{get; private set;} 
+
     public Gender gender; //{get; private set;} 
     public Citizen spouse; //{get; private set;} 
 
@@ -43,7 +51,6 @@ public class Citizen
     public const float minPollutionToAffectHealthHappiness = 100.0f;
     public const float maxPollutionToAffectHealthHappiness = 2000.0f;
 
-   
     public Citizen()
     {
         //isInDebt = false;
@@ -58,12 +65,9 @@ public class Citizen
         long expenses = 0;
         
         //get paid
-        if (workAddress != null)
-        {
+        if (workAddress != null)        
             income += workAddress.Wages();
-        }
         
-
         //add rent to expenses
         expenses += homeAddress.Rent();
 
@@ -81,7 +85,6 @@ public class Citizen
                 break;
         }
 
-        //TODO handle cases of integer overflow/cycling.
         expenses -= income; //if income > expenses, result will be negative, which will increase savings.
         savings = System.Convert.ToInt64(Mathf.Min(savings - expenses, maxSavings)); 
         
@@ -115,7 +118,6 @@ public class Citizen
         {
             //TODO handle hopsital lookups and visits here.
         }
-
     }
     
     // void AssignDebt()
@@ -136,16 +138,5 @@ public class Citizen
 
         if (workAddress != null)
             workAddress.RemoveEmployee(this);
-
     }
-}
-
-public enum CitizenClass
-{
-    low, middle, high
-}
-
-public enum EducationLevel
-{
-    illiterate = 1, primary = 2, secondery = 4, tertiary = 8
 }

@@ -58,13 +58,17 @@ public class WorkPlace : MonoBehaviour
 
     public uint WorkplaceQuality()
     {
-        //TODO add building resource requirement allocation to this computation.
         //get budget from building, compute the percentage relative to min and max.
         Building building = this.gameObject.GetComponent<Building>();
         float budgetPercent = (building.Budget() - building.GetStats().minBudget) / (building.GetStats().maxBudget - building.GetStats().minBudget);
+        
+        //Get resource allocation sufficiecy
+        float resourcePercent = building.AllocatedResources().CompareToBaseResource(building.GetStats().requiredResources);
+        //Modify resourcePercent to go from 50% to 100%
+        resourcePercent = 0.5f + resourcePercent * 0.5f; //For buildings without resource requirements, this will always result in 0.5f. See CompareToBaseResource() implementation.
 
-        //compute quality based on budget
-        uint quality = (uint)Mathf.RoundToInt(budgetPercent * (maxWorkplaceQuality - minWorkplaceQuality) + minWorkplaceQuality);
+        //compute quality based on budget and resource sufficiency.
+        uint quality = (uint)Mathf.RoundToInt(budgetPercent * resourcePercent * (maxWorkplaceQuality - minWorkplaceQuality) + minWorkplaceQuality);
         
         return quality;
     }
@@ -115,5 +119,4 @@ public class WorkPlace : MonoBehaviour
         float budgetEffect = Mathf.Clamp((float)((int)budget - (int)minBudget) / (float)((int)maxBudget - (int)minBudget), 0.0f, 1.0f);
         wages = (uint)Mathf.RoundToInt(budgetEffect * (float)(maxWage - minWage)) + minWage;
     }
-
 }

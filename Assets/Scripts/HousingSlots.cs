@@ -71,30 +71,21 @@ public class HousingSlots
     public ulong Sum()
     {
         //This is stupid
-        // ulong sum = poor + low;
-        // if (sum < poor || sum < low)
-        //     return ulong.MaxValue;
         
-        // sum += middle;
-        // if (sum < poor + low || sum < middle)
+        // ulong sum = low + middle;
+        // if (sum < low || sum < middle)
         //     return ulong.MaxValue;
 
         // sum += high;
-        // if (sum < poor + low + middle || sum < high)
-        //     return ulong.MaxValue;
-        
-        // sum += obscene;
-        // if (sum < poor + low + middle + high  || sum < obscene)
+        // if (sum <= high)
         //     return ulong.MaxValue;
 
         // return sum;
 
-
         //TODO find a way to limit the total number of housing slots to something that wouldn't cause ulong value to cycle back.
-        return (low + middle + high); 
+        return (low + middle + high);
     }
     
-
     static public HousingSlots operator+ (HousingSlots slots1, HousingSlots slots2)
     {
         HousingSlots sum = new HousingSlots();

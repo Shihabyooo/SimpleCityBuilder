@@ -89,7 +89,7 @@ public class CameraControl : MonoBehaviour
 
         this.transform.eulerAngles = new Vector3(this.transform.eulerAngles.x, this.transform.eulerAngles.y, 0.0f);
         
-        //Clam the position to within the boundaries
+        //Clamp the position to within the boundaries
         this.transform.position = cameraBoundary.Clamp(this.transform.position);
     }
 
@@ -118,10 +118,10 @@ public class CameraControl : MonoBehaviour
 
         Gizmos.DrawWireCube(centre ,size);
         
-        if (UnityEditor.EditorApplication.isPlaying)
-        {
-            Gizmos.DrawCube(focus.position, new Vector3(0.5f, 0.5f, 0.5f));
-        }
+        // if (UnityEditor.EditorApplication.isPlaying)
+        // {
+        //     Gizmos.DrawCube(focus.position, new Vector3(0.5f, 0.5f, 0.5f));
+        // }
     }
 }
 
@@ -130,7 +130,6 @@ public class CameraBoundary
 {
     [SerializeField] public Vector3 minCornerXYZ = new Vector3();
     [SerializeField] public Vector3 maxCornerXYZ = new Vector3();
-
 
     public bool isOOB(Vector3 position)
     {
@@ -148,8 +147,4 @@ public class CameraBoundary
                             Mathf.Clamp(position.y, minCornerXYZ.y, maxCornerXYZ.y),
                             Mathf.Clamp(position.z, minCornerXYZ.z, maxCornerXYZ.z));
     }
-
-
-
-    
 }
